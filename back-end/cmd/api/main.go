@@ -15,7 +15,7 @@ func init() {
 		log.Fatalf("error: env variable JWT_KEY is not set")
 	}
 
-	flag.StringVar(&configPath, "config-path", "configs/config.json", "path to config")
+	flag.StringVar(&configPath, "config-path", "./../../configs/config.json", "path to config")
 }
 
 func main() {
