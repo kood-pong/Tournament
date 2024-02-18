@@ -2,13 +2,14 @@ package sqlstore
 
 import (
 	"database/sql"
+	"tournament/back-end/internal/store"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 type Store struct {
-	Db *sql.DB
-	// chatRepository     *ChatRepository
+	Db             *sql.DB
+	userRepository *UserRepository
 }
 
 func New(db *sql.DB) *Store {
@@ -17,14 +18,14 @@ func New(db *sql.DB) *Store {
 	}
 }
 
-// func (s *Store) Chat() store.ChatRepository {
-// 	if s.chatRepository != nil {
-// 		return s.chatRepository
-// 	}
+func (s *Store) User() store.UserRepository {
+	if s.userRepository != nil {
+		return s.userRepository
+	}
 
-// 	s.chatRepository = &ChatRepository{
-// 		store: s,
-// 	}
+	s.userRepository = &UserRepository{
+		store: s,
+	}
 
-// 	return s.chatRepository
-// }
+	return s.userRepository
+}
