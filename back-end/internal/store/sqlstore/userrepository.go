@@ -44,6 +44,23 @@ func (u *UserRepository) Create(user *models.User) error {
 		return err
 	}
 
+	//Get all admin users
+	admins, err := u.GetAllAdmins()
+	if err != nil {
+		fmt.Println("NOTIFICATION SYSTEM: Error with retrieving admins!", err)
+		return nil
+	}
+
+	//Create notification for each of them
+	for _, admin := range admins{
+		err := u.store.Notification().Create(&models.Notification{
+			UserID: admin.ID,
+			Message: fmt.Sprintf("User %v registered and wants confirmation", user.Username),
+		})
+		if err != nil {
+			fmt.Println("NOTIFICATION SYSTEM: Error with creating notification", err)
+		}
+	}
 	return nil
 }
 
@@ -60,6 +77,30 @@ func (u *UserRepository) Check(login string) (*models.User, error) {
 	}
 	// check if passwords match
 	return &user, nil
+}
+
+func (u *UserRepository) GetAllAdmins() ([]models.User, error) {
+	query := `SELECT id, email, username FROM users u WHERE u.role = 1`
+
+	var users []models.User
+	rows, err := u.store.Db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var user models.User
+		if err := rows.Scan(&user.ID, &user.Email, &user.Username); err != nil {
+			return make([]models.User, 1), fmt.Errorf("failed to scan post row: %v", err)
+		}
+		users = append(users, user)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error reading posts rows: %v", err)
+	}
+
+	return users, nil
 }
 
 func (u *UserRepository) GetAll(status string) ([]models.User, error) {

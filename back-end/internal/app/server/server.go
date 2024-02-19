@@ -51,6 +51,7 @@ func (s *server) configureRouter() {
 	//<------------AUTH MIDDLEWARE REQUIRED-------------->
 	//USERS
 	s.router.GET("/api/v1/jwt/tournaments/register/:id", s.handlerTournamentRegistration())
+	s.router.GET("/api/v1/jwt/notifications/update/:id", s.handlerNotificationUpdate())
 
 	//<------------AUTH + ADMIN MIDDLEWARE REQUIRED-------------->
 	//USERS

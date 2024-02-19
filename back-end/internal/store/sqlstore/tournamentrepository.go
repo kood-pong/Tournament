@@ -14,7 +14,7 @@ type TournamentRepository struct {
 
 func (t *TournamentRepository) Create(tournament *models.Tournament) error {
 	tournament.ID = uuid.New().String()
-
+	
 	query := `INSERT INTO tournaments (id, name, start_date, end_date, type) VALUES (?, ?, ?, ?, ?)`
 
 	_, err := t.store.Db.Exec(query, tournament.ID, tournament.Name, tournament.Start_date, tournament.End_date, tournament.Type)
@@ -70,7 +70,7 @@ func (t *TournamentRepository) Register(reg *models.Register) error {
 	reg.ID = uuid.New().String()
 
 	query := `INSERT INTO registration (id, tournament_id, user_id) VALUES (?, ?, ?)`
-	
+
 	//check if specific tournament exists
 	_, err := t.Get(reg.TournamentID)
 	if err != nil {

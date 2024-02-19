@@ -20,3 +20,10 @@ type TournamentRepository interface {
 	Get(tournament_id string) (*models.Tournament, error)
 	Register(reg *models.Register) error
 }
+
+type NotificationRepository interface {
+	Create(notification *models.Notification) error
+	GetForUser(user_id string) (*[]models.Notification, error)
+	Get(notification_id string) (*models.Notification, error)
+	Update(notification *models.Notification, user_id string) error
+}

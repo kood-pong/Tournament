@@ -78,7 +78,7 @@ CREATE TABLE
 CREATE TABLE 
     IF NOT EXISTS notification (
         id text PRIMARY KEY UNIQUE NOT NULL,
-        user_id text UNIQUE NOT NULL,
+        user_id text NOT NULL,
         message text NOT NULL,
         status text NOT NULL,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,

@@ -9,9 +9,10 @@ import (
 )
 
 type Store struct {
-	Db                   *sql.DB
-	userRepository       *UserRepository
-	tournamentRepository *TournamentRepository
+	Db                     *sql.DB
+	userRepository         *UserRepository
+	tournamentRepository   *TournamentRepository
+	notificationRepository *NotificationRepository
 }
 
 func New(db *sql.DB) *Store {
@@ -44,8 +45,20 @@ func (s *Store) Tournament() store.TournamentRepository {
 	return s.tournamentRepository
 }
 
+func (s *Store) Notification() store.NotificationRepository {
+	if s.notificationRepository != nil {
+		return s.notificationRepository
+	}
+
+	s.notificationRepository = &NotificationRepository{
+		store: s,
+	}
+
+	return s.notificationRepository
+}
+
 func hasStructEmptyValues(s interface{}) bool {
-	val := reflect.ValueOf(s).Elem() 
+	val := reflect.ValueOf(s).Elem()
 	for i := 0; i < val.NumField(); i++ {
 		field := val.Field(i)
 		zeroValue := reflect.Zero(field.Type())

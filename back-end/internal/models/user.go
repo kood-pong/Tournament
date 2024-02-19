@@ -5,18 +5,19 @@ import (
 )
 
 type User struct {
-	ID        string `db:"id" json:"id"`
-	Email     string `db:"email" json:"email"`
-	Username  string `db:"username" json:"username"`
-	Password  string `db:"password" json:"password"`
-	FirstName string `db:"first_name" json:"first_name"`
-	LastName  string `db:"last_name" json:"last_name"`
-	Points    int    `db:"points" json:"points"`
-	Wins      int    `db:"wins" json:"wins"`
-	Losses    int    `db:"losses" json:"losses"`
-	Ranking   int    `db:"ranking" json:"ranking"`
-	Status    string `db:"status" json:"status"`
-	Role      int    `db:"role" json:"role"`
+	ID            string          `db:"id" json:"id"`
+	Email         string          `db:"email" json:"email"`
+	Username      string          `db:"username" json:"username"`
+	Password      string          `db:"password" json:"password"`
+	FirstName     string          `db:"first_name" json:"first_name"`
+	LastName      string          `db:"last_name" json:"last_name"`
+	Points        int             `db:"points" json:"points"`
+	Wins          int             `db:"wins" json:"wins"`
+	Losses        int             `db:"losses" json:"losses"`
+	Ranking       int             `db:"ranking" json:"ranking"`
+	Status        string          `db:"status" json:"status"`
+	Role          int             `db:"role" json:"role"`
+	Notifications *[]Notification `json:"notifications"`
 }
 
 func (u *User) Sanitize() {
