@@ -14,7 +14,7 @@ type TournamentRepository struct {
 
 func (t *TournamentRepository) Create(tournament *models.Tournament) error {
 	tournament.ID = uuid.New().String()
-	
+
 	query := `INSERT INTO tournaments (id, name, start_date, end_date, type) VALUES (?, ?, ?, ?, ?)`
 
 	_, err := t.store.Db.Exec(query, tournament.ID, tournament.Name, tournament.Start_date, tournament.End_date, tournament.Type)
@@ -29,7 +29,6 @@ func (t *TournamentRepository) Create(tournament *models.Tournament) error {
 func (t *TournamentRepository) Update(tournament *models.Tournament) error {
 	query := `UPDATE tournaments SET name = ?, start_date = ?, end_date = ?, type = ? WHERE id = ?`
 
-	tournament.Status = "open"
 	if hasStructEmptyValues(tournament) {
 		return fmt.Errorf("NO EMPTY FIELDS")
 	}
