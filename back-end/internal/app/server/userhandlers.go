@@ -161,6 +161,13 @@ func (s *server) handlerGetUser() http.HandlerFunc {
 			return
 		}
 
+		notifications, err := s.store.Notification().GetForUser(user.ID)
+		if err != nil {
+			fmt.Println("test");
+			s.error(w, r, http.StatusBadRequest, err)
+		}
+		user.Notifications = notifications
+
 		s.respond(w, r, http.StatusOK, Response{
 			Message: "Successfully got user!",
 			Data:    user,
