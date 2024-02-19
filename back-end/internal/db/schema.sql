@@ -19,7 +19,7 @@ CREATE TABLE
         wins integer DEFAULT 0,
         losses integer DEFAULT 0,
         ranking integer DEFAULT 0,
-        status text DEFAULT 'Pending',
+        status text DEFAULT 'pending',
         role integer DEFAULT 0
     );
 

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"tournament/back-end/internal/models"
 
 	"github.com/google/uuid"
@@ -61,11 +62,11 @@ func (u *UserRepository) Check(login string) (*models.User, error) {
 	return &user, nil
 }
 
-func (r *UserRepository) GetAllOtherUsers() ([]models.User, error) {
-	query := `SELECT id, email, username, first_name, last_name, points, wins, losses, ranking, status FROM users`
+func (u *UserRepository) GetAll(status string) ([]models.User, error) {
+	query := `SELECT id, email, username, first_name, last_name, points, wins, losses, ranking, status FROM users u WHERE u.status = ?`
 
 	var users []models.User
-	rows, err := r.store.Db.Query(query)
+	rows, err := u.store.Db.Query(query, strings.ToLower(status))
 	if err != nil {
 		return nil, err
 	}
@@ -84,3 +85,68 @@ func (r *UserRepository) GetAllOtherUsers() ([]models.User, error) {
 
 	return users, nil
 }
+
+func (u *UserRepository) CompleteRegistration(user_id, status string) error {
+	//Update the application to approved / rejected
+	query := `UPDATE users SET status = ? WHERE id = ?`
+
+	_, err := u.store.Db.Exec(query, status, user_id)
+	if err != nil{
+		return err
+	}
+
+	return nil
+}
+
+func (u *UserRepository) UpdatePoints(user_id string, points int) error {
+	//Update the user overall points
+	query := `UPDATE users SET points = points + ? WHERE id = ?`
+
+	_, err := u.store.Db.Exec(query, points, user_id)
+	if err != nil{
+		return err
+	}
+
+	return nil
+}
+
+func (u *UserRepository) UpdateWins(user_id string, wins int) error {
+	//Update the user overall points
+	query := `UPDATE users SET wins = wins + ? WHERE id = ?`
+
+	_, err := u.store.Db.Exec(query, wins, user_id)
+	if err != nil{
+		return err
+	}
+
+	return nil
+}
+
+func (u *UserRepository) UpdateLosses(user_id string, losses int) error {
+	//Update the user overall points
+	query := `UPDATE users SET losses = losses + ? WHERE id = ?`
+
+	_, err := u.store.Db.Exec(query, losses, user_id)
+	if err != nil{
+		return err
+	}
+
+	return nil
+}
+
+func (u *UserRepository) UpdateRanking(user_id string, ranking int) error {
+	//Update the user overall points
+	query := `UPDATE users SET ranking = ranking + ? WHERE id = ?`
+
+	_, err := u.store.Db.Exec(query, ranking, user_id)
+	if err != nil{
+		return err
+	}
+
+	return nil
+}
+
+
+
+
+

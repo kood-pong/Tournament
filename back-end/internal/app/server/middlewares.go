@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"tournament/back-end/pkg/jwttoken"
@@ -58,5 +59,31 @@ func (s *server) jwtMiddleware(next http.Handler) http.Handler {
 		}
 
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxUserID, claims.UserID)))
+	})
+}
+
+func (s *server) adminMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//get id from jwt middleware
+		id := r.Context().Value(ctxUserID).(string)
+
+		if id == "" {
+			s.error(w, r, http.StatusUnauthorized, fmt.Errorf("ONLY ADMIN"))
+			return
+		}
+		user, err := s.store.User().FindByID(id)
+		if err != nil {
+			s.error(w, r, http.StatusUnauthorized, err)
+			return
+		}
+		//check if user is admin
+		if user.Role == 1 {
+			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxUserID, id)))
+		} else {
+			s.respond(w, r, http.StatusUnauthorized, Response{
+				Message: "User is not admin",
+				Data:    nil,
+			})
+		}
 	})
 }

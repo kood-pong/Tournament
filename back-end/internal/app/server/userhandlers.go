@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -33,7 +34,9 @@ func (s *server) handlerCreateUser() http.HandlerFunc {
 
 func (s *server) handlerGetAllUsers() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		data, err := s.store.User().GetAllOtherUsers()
+		status := router.Param(r.Context(), "status")
+
+		data, err := s.store.User().GetAll(status)
 		if err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
@@ -162,5 +165,31 @@ func (s *server) handlerGetUser() http.HandlerFunc {
 			Message: "Successfully got user!",
 			Data:    user,
 		})
+	}
+}
+
+func (s *server) handlerCompleteRegistration() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		type RequestBody struct {
+			UserID    string `json:"user_id"`
+			Status string `json:"status"`
+		}
+		var requestBody RequestBody
+		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		if requestBody.Status == "approved" || requestBody.Status == "rejected" {
+			if err := s.store.User().CompleteRegistration(requestBody.UserID, requestBody.Status); err != nil {
+				s.error(w, r, http.StatusBadRequest, err)
+			}
+			s.respond(w, r, http.StatusOK, Response{
+				Message: fmt.Sprintf(`User successfully %v`, requestBody.Status),
+				Data: nil,
+			})
+		} else {
+			s.error(w, r, http.StatusBadRequest, fmt.Errorf(`INVALID STATUS`))
+		}
 	}
 }
