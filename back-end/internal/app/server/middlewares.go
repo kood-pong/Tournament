@@ -80,10 +80,8 @@ func (s *server) adminMiddleware(next http.Handler) http.Handler {
 		if user.Role == 1 {
 			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxUserID, id)))
 		} else {
-			s.respond(w, r, http.StatusUnauthorized, Response{
-				Message: "User is not admin",
-				Data:    nil,
-			})
+			s.error(w, r, http.StatusUnauthorized, fmt.Errorf("ONLY ADMIN"))
+			return
 		}
 	})
 }

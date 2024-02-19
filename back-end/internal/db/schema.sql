@@ -4,7 +4,8 @@ CREATE TABLE
         name text NOT NULL,
         start_date DATETIME,
         end_date DATETIME,
-        type text
+        type text,
+        status text DEFAULT 'open'
     );
 
 CREATE TABLE
@@ -30,7 +31,7 @@ CREATE TABLE
         player_1 text UNIQUE NOT NULL,
         player_2 text UNIQUE NOT NULL,
         sets_to_win text NOT NULL,
-        completed integer,
+        status text DEFAULT 'ongoing',
         FOREIGN KEY (tournament_id) REFERENCES tournaments (id),
         FOREIGN KEY (player_1) REFERENCES user (id),
         FOREIGN KEY (player_2) REFERENCES user (id)

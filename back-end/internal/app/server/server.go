@@ -37,7 +37,7 @@ func newServer(store store.Store) *server {
 }
 
 func (s *server) configureRouter() {
-	//middlewares soon
+	//Middleware usage
 	s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
 	s.router.UseWithPrefix("/admin", s.adminMiddleware)
 	//USERS
@@ -45,15 +45,19 @@ func (s *server) configureRouter() {
 	s.router.POST("/api/v1/users/login", s.handlerLoginUser())
 	s.router.GET("/api/v1/users/logout", s.handlerLogOut())
 	s.router.GET("/api/v1/auth/checkCookie", s.handlerCheckCookie())
-
+	s.router.GET("/api/v1/users/all/:status", s.handlerGetAllUsers())
+	s.router.GET("/api/v1/users/:id", s.handlerGetUser())
+	
 	//<------------AUTH MIDDLEWARE REQUIRED-------------->
 	//USERS
-	s.router.GET("/api/v1/jwt/users/all/:status", s.handlerGetAllUsers())
-	s.router.GET("/api/v1/jwt/users/:id", s.handlerGetUser())
+	s.router.GET("/api/v1/jwt/tournaments/register/:id", s.handlerTournamentRegistration())
 
 	//<------------AUTH + ADMIN MIDDLEWARE REQUIRED-------------->
 	//USERS
 	s.router.PUT("/api/v1/jwt/admin/users/complete", s.handlerCompleteRegistration())
+	//TOURNAMENTS
+	s.router.POST("/api/v1/jwt/admin/tournaments/create", s.handlerCreateTournament())
+	s.router.PUT("/api/v1/jwt/admin/tournaments/update", s.handlerUpdateTournament())
 
 }
 

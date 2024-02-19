@@ -183,6 +183,7 @@ func (s *server) handlerCompleteRegistration() http.HandlerFunc {
 		if requestBody.Status == "approved" || requestBody.Status == "rejected" {
 			if err := s.store.User().CompleteRegistration(requestBody.UserID, requestBody.Status); err != nil {
 				s.error(w, r, http.StatusBadRequest, err)
+				return
 			}
 			s.respond(w, r, http.StatusOK, Response{
 				Message: fmt.Sprintf(`User successfully %v`, requestBody.Status),
@@ -190,6 +191,7 @@ func (s *server) handlerCompleteRegistration() http.HandlerFunc {
 			})
 		} else {
 			s.error(w, r, http.StatusBadRequest, fmt.Errorf(`INVALID STATUS`))
+			return
 		}
 	}
 }
