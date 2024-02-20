@@ -38,6 +38,7 @@ func newServer(store store.Store) *server {
 
 func (s *server) configureRouter() {
 	//Middleware usage
+	s.router.Use(s.CORSMiddleware)
 	s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
 	s.router.UseWithPrefix("/admin", s.adminMiddleware)
 	//USERS
