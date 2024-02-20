@@ -5,4 +5,6 @@ type Store interface {
 	Tournament() TournamentRepository
 	Notification() NotificationRepository
 	Match() MatchRepository
+	Set() SetRepository
+	Result() ResultRepository
 }

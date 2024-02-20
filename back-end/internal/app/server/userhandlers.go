@@ -163,7 +163,7 @@ func (s *server) handlerGetUser() http.HandlerFunc {
 
 		notifications, err := s.store.Notification().GetForUser(user.ID)
 		if err != nil {
-			fmt.Println("test");
+			fmt.Println("test")
 			s.error(w, r, http.StatusBadRequest, err)
 		}
 		user.Notifications = notifications
@@ -178,7 +178,7 @@ func (s *server) handlerGetUser() http.HandlerFunc {
 func (s *server) handlerCompleteRegistration() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		type RequestBody struct {
-			UserID    string `json:"user_id"`
+			UserID string `json:"user_id"`
 			Status string `json:"status"`
 		}
 		var requestBody RequestBody
@@ -194,7 +194,7 @@ func (s *server) handlerCompleteRegistration() http.HandlerFunc {
 			}
 			s.respond(w, r, http.StatusOK, Response{
 				Message: fmt.Sprintf(`User successfully %v`, requestBody.Status),
-				Data: nil,
+				Data:    nil,
 			})
 		} else {
 			s.error(w, r, http.StatusBadRequest, fmt.Errorf(`INVALID STATUS`))

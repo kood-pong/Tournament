@@ -15,6 +15,7 @@ type Store struct {
 	notificationRepository *NotificationRepository
 	matchRepository        *MatchRepository
 	setRepository          *SetRepository
+	resultRepository       *ResultRepository
 }
 
 func New(db *sql.DB) *Store {
@@ -82,6 +83,19 @@ func (s *Store) Set() store.SetRepository {
 
 	return s.setRepository
 }
+
+func (s *Store) Result() store.ResultRepository {
+	if s.resultRepository != nil {
+		return s.resultRepository
+	}
+
+	s.resultRepository = &ResultRepository{
+		store: s,
+	}
+
+	return s.resultRepository
+}
+
 
 func hasStructEmptyValues(s interface{}) bool {
 	val := reflect.ValueOf(s).Elem()

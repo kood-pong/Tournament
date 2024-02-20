@@ -90,7 +90,7 @@ func (s *server) handlerGenerateTournament() http.HandlerFunc {
 			return
 		}
 		s.respond(w, r, http.StatusOK, Response{
-			Message: "Successfully generated new table",
+			Message: "Successfully generated new matches",
 			Data:    matches,
 		})
 	}
