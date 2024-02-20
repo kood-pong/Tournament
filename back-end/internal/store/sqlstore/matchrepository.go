@@ -1,6 +1,7 @@
 package sqlstore
 
 import (
+	"database/sql"
 	"fmt"
 	"tournament/back-end/internal/models"
 
@@ -46,4 +47,47 @@ func (m *MatchRepository) FindOngoing(tournament_id string) ([]models.Match, err
 	}
 
 	return matches, nil
+}
+
+func (m *MatchRepository) UpdateStatus(match models.Match) error {
+	//check if match is not empty
+	if match.Status != "ongoing" && match.Status != "finished" {
+		return fmt.Errorf("only accepted statuses - finished, ongoing")
+	}
+
+	//check if match is won by someone
+	if err := m.store.Set().DetermineWinner(match.ID); err != nil {
+		return err
+	}
+
+	query := `UPDATE matches SET status = ? WHERE id = ?`
+
+	_, err := m.store.Db.Exec(query, match.Status, match.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *MatchRepository) Get(match_id string) (*models.Match, error) {
+	match := &models.Match{}
+	query := `SELECT id, tournament_id, player_1, player_2, sets_to_win, status FROM matches m WHERE m.id = ?`
+
+	err := m.store.Db.QueryRow(query, match_id).Scan(
+		&match.ID,
+		&match.TournamentID,
+		&match.Player1,
+		&match.Player2,
+		&match.SetsToWin,
+		&match.Status,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("no match found with id: %s", match_id)
+		}
+		return nil, fmt.Errorf("error while scanning row: %v", err)
+	}
+
+	return match, nil
 }

@@ -200,7 +200,7 @@ func (t *TournamentRepository) GenerateMatches(participants []models.User, tourn
 	return matches, nil
 }
 
-func (t *TournamentRepository) Generate(tournament_id string) ([]models.User, error){
+func (t *TournamentRepository) Generate(tournament_id string) ([]models.Match, error){
 	tournament, err := t.Get(tournament_id)
 	if err != nil {
 		return nil, err
@@ -214,8 +214,16 @@ func (t *TournamentRepository) Generate(tournament_id string) ([]models.User, er
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(matches)
+	if len(matches) > 0{
+		return matches, nil
+	}
+	//Find all the players who are still on tournament
+	winners, err := t.store.Result().GetWinners()
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("WINNERS", winners)
+	// matches, err = t.GenerateMatches(participants)
 
 	return nil, nil
 }

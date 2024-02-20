@@ -62,6 +62,8 @@ func (s *server) configureRouter() {
 	s.router.PUT("/api/v1/jwt/admin/tournaments/update", s.handlerUpdateTournament())
 	s.router.GET("/api/v1/jwt/admin/tournaments/start/:id", s.handlerStartTournament())
 	s.router.GET("/api/v1/jwt/admin/tournaments/generate/:id", s.handlerGenerateTournament())
+	s.router.PUT("/api/v1/jwt/admin/tournaments/match/update", s.handlerUpdateMatch())
+	s.router.POST("/api/v1/jwt/admin/tournaments/set/create", s.handlerCreateSet())
 
 }
 
