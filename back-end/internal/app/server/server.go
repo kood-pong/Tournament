@@ -47,7 +47,7 @@ func (s *server) configureRouter() {
 	s.router.GET("/api/v1/auth/checkCookie", s.handlerCheckCookie())
 	s.router.GET("/api/v1/users/all/:status", s.handlerGetAllUsers())
 	s.router.GET("/api/v1/users/:id", s.handlerGetUser())
-	
+
 	//<------------AUTH MIDDLEWARE REQUIRED-------------->
 	//USERS
 	s.router.GET("/api/v1/jwt/tournaments/register/:id", s.handlerTournamentRegistration())
@@ -59,6 +59,8 @@ func (s *server) configureRouter() {
 	//TOURNAMENTS
 	s.router.POST("/api/v1/jwt/admin/tournaments/create", s.handlerCreateTournament())
 	s.router.PUT("/api/v1/jwt/admin/tournaments/update", s.handlerUpdateTournament())
+	s.router.GET("/api/v1/jwt/admin/tournaments/start/:id", s.handlerStartTournament())
+	s.router.GET("/api/v1/jwt/admin/tournaments/generate/:id", s.handlerGenerateTournament())
 
 }
 

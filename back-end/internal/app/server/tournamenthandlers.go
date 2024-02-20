@@ -63,3 +63,35 @@ func (s *server) handlerTournamentRegistration() http.HandlerFunc {
 		})
 	}
 }
+
+func (s *server) handlerStartTournament() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tournament_id := router.Param(r.Context(), "id")
+		matches, err := s.store.Tournament().Start(tournament_id)
+
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		s.respond(w, r, http.StatusOK, Response{
+			Message: "Tournament started successfully",
+			Data:    matches,
+		})
+	}
+}
+
+func (s *server) handlerGenerateTournament() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tournament_id := router.Param(r.Context(), "id")
+		matches, err := s.store.Tournament().Generate(tournament_id)
+
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		s.respond(w, r, http.StatusOK, Response{
+			Message: "Successfully generated new table",
+			Data:    matches,
+		})
+	}
+}

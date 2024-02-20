@@ -115,7 +115,7 @@ func (u *UserRepository) GetAll(status string) ([]models.User, error) {
 	for rows.Next() {
 		var user models.User
 		if err := rows.Scan(&user.ID, &user.Email, &user.Username, &user.FirstName, &user.LastName, &user.Points, &user.Wins, &user.Losses, &user.Ranking, &user.Status); err != nil {
-			return make([]models.User, 1), fmt.Errorf("failed to scan post row: %v", err)
+			return make([]models.User, 1), fmt.Errorf("failed to scan user row: %v", err)
 		}
 		users = append(users, user)
 	}
