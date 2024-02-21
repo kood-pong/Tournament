@@ -130,7 +130,64 @@ func (t *TournamentRepository) GetParticipants(tournament_id string) ([]models.U
 	return userList, nil
 }
 
-func (t *TournamentRepository) Start(tournament_id string) ([]models.Match, error) {
+func (t *TournamentRepository) GetLeaderboard(tournament_id string) ([]models.User, error) {
+	query := `SELECT
+    	u.id,
+    	u.username,
+		u.email,
+		u.first_name,
+		u.last_name,
+		u.points,
+		u.wins,
+		u.losses,
+		u.ranking,
+    COUNT(DISTINCT w.id) AS wins,
+    COUNT(DISTINCT l.id) AS losses
+	FROM
+    	users u
+	LEFT JOIN
+    	results w ON u.id = w.winner_id
+	LEFT JOIN
+    	results l ON u.id = l.loser_id
+	JOIN
+		matches m ON (w.match_id = m.id OR l.match_id = m.id)
+	JOIN
+		tournaments t ON m.tournament_id = t.id 
+	WHERE
+		t.id = ?
+	GROUP BY
+    	u.id,
+    	u.username
+	ORDER BY
+    	wins DESC, losses ASC;`
+
+	rows, err := t.store.Db.Query(query, tournament_id)
+	if err != nil {
+		return nil, fmt.Errorf("error executing db query: %v", err)
+	}
+	defer rows.Close()
+
+		var userList []models.User
+
+	for rows.Next() {
+		var user models.User
+		var wins, losses int
+
+		if err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.FirstName, &user.LastName, &user.Points, &user.Wins, &user.Losses, &user.Ranking, &wins, &losses); err != nil {
+			return nil, fmt.Errorf("error scanning rows: %v", err)
+		}
+
+		userList = append(userList, user)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error retrieving rows: %v", err)
+	}
+
+	return userList, nil
+}
+
+func (t *TournamentRepository) Start(tournament_id string, numberOfSets int) ([]models.Match, error) {
 	tournament, err := t.Get(tournament_id)
 	if err != nil {
 		return nil, err
@@ -158,14 +215,14 @@ func (t *TournamentRepository) Start(tournament_id string) ([]models.Match, erro
 	}
 
 	//generate matches
-	matches, err := t.GenerateMatches(participants, tournament_id)
+	matches, err := t.GenerateMatches(participants, tournament_id, numberOfSets)
 	if err != nil {
 		return nil, err
 	}
 	return matches, nil
 }
 
-func (t *TournamentRepository) GenerateMatches(participants []models.User, tournament_id string) ([]models.Match, error) {
+func (t *TournamentRepository) GenerateMatches(participants []models.User, tournament_id string, numberOfSets int) ([]models.Match, error) {
 	//shuffle players
 	shuffledParticipants := shuffle(participants)
 	//Get how many matches we need to generate
@@ -179,7 +236,7 @@ func (t *TournamentRepository) GenerateMatches(participants []models.User, tourn
 				TournamentID: tournament_id,
 				Player1:      shuffledParticipants[i].ID,
 				Player2:      "byebye",
-				SetsToWin:    1,
+				SetsToWin:    numberOfSets,
 				Status:       "ongoing",
 			})
 		} else {
@@ -194,18 +251,18 @@ func (t *TournamentRepository) GenerateMatches(participants []models.User, tourn
 	//Add matches to db
 	for _, m := range matches {
 		if err := t.store.Match().Create(m); err != nil {
-			return nil, err 
+			return nil, err
 		}
 	}
 	return matches, nil
 }
 
-func (t *TournamentRepository) Generate(tournament_id string) ([]models.Match, error){
+func (t *TournamentRepository) Generate(tournament_id string, numberOfSets int) ([]models.Match, error) {
 	tournament, err := t.Get(tournament_id)
 	if err != nil {
 		return nil, err
 	}
-	if tournament.Status != "ongoing"{
+	if tournament.Status != "ongoing" {
 		return nil, fmt.Errorf("tournament is %v", tournament.Status)
 	}
 
@@ -214,7 +271,7 @@ func (t *TournamentRepository) Generate(tournament_id string) ([]models.Match, e
 	if err != nil {
 		return nil, err
 	}
-	if len(matches) > 0{
+	if len(matches) > 0 {
 		return matches, nil
 	}
 	//Find all the players who are still on tournament
@@ -222,12 +279,27 @@ func (t *TournamentRepository) Generate(tournament_id string) ([]models.Match, e
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("WINNERS", winners)
-	// matches, err = t.GenerateMatches(participants)
+	if len(winners) == 1 {
+		//finish tournament
+		tournament.Status = "finished"
+		if err = t.Update(tournament); err != nil {
+			return nil, err
+		}
+		return nil, nil
+	}
+	if len(winners) <= 4 {
+		fmt.Println("IMPLEMENT FINALE!")
+	}
 
-	return nil, nil
+	matches, err = t.GenerateMatches(winners, tournament_id, numberOfSets)
+	if err != nil {
+		return nil, err
+	}
+
+	return matches, nil
 }
 
+// helpers for generating a dynamic tournaments
 func calcMatches(participants int) int {
 	matchNumbers := []int{2, 4, 8, 16, 32, 64, 128, 256}
 	for _, num := range matchNumbers {
@@ -251,7 +323,6 @@ func shuffle(participants []models.User) []models.User {
 //1. status = ongoing
 //2. find number of matches to begin with (read from registration table)
 //3. generate matches accordingly
-
 
 //check tournament state
 //1. Check tournament state --> if its going start the tournament
