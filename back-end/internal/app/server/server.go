@@ -60,8 +60,11 @@ func (s *server) configureRouter() {
 	//TOURNAMENTS
 	s.router.POST("/api/v1/jwt/admin/tournaments/create", s.handlerCreateTournament())
 	s.router.PUT("/api/v1/jwt/admin/tournaments/update", s.handlerUpdateTournament())
-	s.router.GET("/api/v1/jwt/admin/tournaments/start/:id", s.handlerStartTournament())
-	s.router.GET("/api/v1/jwt/admin/tournaments/generate/:id", s.handlerGenerateTournament())
+	s.router.POST("/api/v1/jwt/admin/tournaments/start", s.handlerStartTournament())
+	s.router.POST("/api/v1/jwt/admin/tournaments/generate", s.handlerGenerateTournament())
+	s.router.PUT("/api/v1/jwt/admin/tournaments/match/update", s.handlerUpdateMatch())
+	s.router.POST("/api/v1/jwt/admin/tournaments/set/create", s.handlerCreateSet())
+	s.router.GET("/api/v1/jwt/admin/tournaments/leaderboard/:id", s.handlerGetLeaderboard())
 
 }
 

@@ -19,10 +19,11 @@ type TournamentRepository interface {
 	Update(tournament *models.Tournament) error
 	Get(tournament_id string) (*models.Tournament, error)
 	Register(reg *models.Register) error
-	Start(tournament_id string) ([]models.Match, error)
+	GetLeaderboard(tournament_id string) ([]models.User, error)
+	Start(tournament_id string, numberOfSets int) ([]models.Match, error)
 	GetParticipants(tournament_id string) ([]models.User, error)
-	GenerateMatches(participants []models.User, tournament_id string) ([]models.Match, error)
-	Generate(tournament_id string) ([]models.User, error)
+	GenerateMatches(participants []models.User, tournament_id string, numberOfSets int) ([]models.Match, error)
+	Generate(tournament_id string, numberOfSets int) ([]models.Match, error)
 }
 
 type NotificationRepository interface {
@@ -35,8 +36,16 @@ type NotificationRepository interface {
 type MatchRepository interface {
 	Create(match models.Match) error
 	FindOngoing(tournament_id string) ([]models.Match, error)
+	UpdateStatus(match models.Match) error
+	Get(match_id string) (*models.Match, error)
 }
 
 type SetRepository interface {
 	Create(set *models.Set) (*models.Set, error)
+	DetermineWinner(match_id string) error
+}
+
+type ResultRepository interface {
+	Create(result *models.Result) error
+	GetWinners() ([]models.User, error)
 }
