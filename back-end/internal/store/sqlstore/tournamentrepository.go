@@ -131,6 +131,15 @@ func (t *TournamentRepository) GetParticipants(tournament_id string) ([]models.U
 }
 
 func (t *TournamentRepository) GetLeaderboard(tournament_id string) ([]models.User, error) {
+	//check tournament status leaderboard will only be generated, if tournament is finished
+	tournament, err := t.Get(tournament_id)
+	if err != nil{
+		return nil, err
+	}
+	if tournament.Status != "finished"{
+		return nil, fmt.Errorf("tournament is not finished - state %v", tournament.Status)
+	}
+
 	query := `SELECT
     	u.id,
     	u.username,
