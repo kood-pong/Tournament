@@ -19,10 +19,11 @@ type TournamentRepository interface {
 	Update(tournament *models.Tournament) error
 	Get(tournament_id string) (*models.Tournament, error)
 	Register(reg *models.Register) error
-	Start(tournament_id string) ([]models.Match, error)
+	GetLeaderboard(tournament_id string) ([]models.User, error)
+	Start(tournament_id string, numberOfSets int) ([]models.Match, error)
 	GetParticipants(tournament_id string) ([]models.User, error)
-	GenerateMatches(participants []models.User, tournament_id string) ([]models.Match, error)
-	Generate(tournament_id string) ([]models.Match, error)
+	GenerateMatches(participants []models.User, tournament_id string, numberOfSets int) ([]models.Match, error)
+	Generate(tournament_id string, numberOfSets int) ([]models.Match, error)
 }
 
 type NotificationRepository interface {
