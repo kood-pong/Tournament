@@ -11,7 +11,7 @@ const MainPage = ({PORT}: Props) => {
             try {
                 const response = await fetch(`${PORT}/api/v1/users/all/approved`, {
                     method: 'GET',
-                    // credentials: 'include'
+                    credentials: 'include'
                 })
                 const json = await response.json()
                 console.log(json)
@@ -23,7 +23,7 @@ const MainPage = ({PORT}: Props) => {
 
     return(
         <>
-        <h1>kood/pong</h1>
+        <h1>kood/pong main page</h1>
         </>
     )
 }
