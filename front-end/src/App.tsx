@@ -9,7 +9,7 @@ import TournamentSetUp from './components/TournamentSetUp';
 import Matches from './components/Matches';
 import Sets from './components/Sets';
 
-const PORT: string = 'http://localhost:7080';
+const PORT: string = 'http://localhost:7080'
 
 function App() {
   return (
