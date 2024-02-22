@@ -1,6 +1,4 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
-import logo from './logo.svg';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import './App.css';
 import MainPage from './components/MainLeaderboard';
 import Calendar from './components/Calendar';
