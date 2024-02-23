@@ -8,6 +8,7 @@ import CreateTournament from './components/CreateTournament';
 import TournamentSetUp from './components/TournamentSetUp';
 import Matches from './components/Matches';
 import Sets from './components/Sets';
+import Requests from "./components/Requests";
 
 const PORT: string = 'http://localhost:7080'
 
@@ -36,6 +37,12 @@ function App() {
             element={
               <Tournament />
             } />
+          <Route // only for admin
+            path='/requests'
+            element={
+              <Requests />
+            }
+          />
           <Route // only for admin
             path='/create-tournament'
             element={
