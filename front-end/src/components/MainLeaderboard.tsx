@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import Header from "./BasicElements/Header";
 
 interface Props {
     PORT: string;
@@ -23,7 +24,7 @@ const MainPage = ({PORT}: Props) => {
 
     return(
         <>
-        <h1>kood/pong main page</h1>
+        <Header />
         </>
     )
 }
