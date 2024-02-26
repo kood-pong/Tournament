@@ -7,6 +7,8 @@
   --color-2: #3D4756;
   --color-3: #DCF900;
   --color-4: #F3F5F8;
+
+  --dic-icon-color: white;
   --grad: linear-gradient(to bottom, var(--color-3), transparent);
 
   --body-text-font-size: 1.05em;
@@ -23,6 +25,7 @@
   --bg-color-2: #ffffff;
   --text-color: var(--color-1);
   --sun-color: var(--color-1);
+  --footer-color: var(--color-1);
 }
 
 /* Dark mode styles */
@@ -31,6 +34,7 @@
   --bg-color-2: var(--color-2);
   --text-color: #ffffff;
   --sun-color: var(--color-4);
+  --footer-color: var(--color-2);
 }
 
 body {

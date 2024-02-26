@@ -1,11 +1,13 @@
 import { useEffect } from "react";
 import Header from "./BasicElements/Header";
+import Footer from "./BasicElements/Footer";
+import './basic.css';
 
 interface Props {
     PORT: string;
 }
 
-const MainPage = ({PORT}: Props) => {
+const MainPage = ({ PORT }: Props) => {
     useEffect(() => {
         (async () => {
             console.log(PORT)
@@ -20,12 +22,15 @@ const MainPage = ({PORT}: Props) => {
                 console.log('error', error)
             }
         })()
-    },[])
+    }, [])
 
-    return(
-        <>
-        <Header />
-        </>
+    return (
+        <div id="page-container">
+            <Header />
+            <div id="content-wrap">
+            </div>
+            <Footer />
+        </div>
     )
 }
 
