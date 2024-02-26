@@ -1,0 +1,64 @@
+.pedestals-cont {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 20px;
+}
+
+.pedestal-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.usr-img-holder {
+    width: 50px;
+    height: 50px;
+    background-color: var(--text-color);
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.usr-img-holder img {
+    min-width: 100%;
+    max-height: 100%;
+}
+
+.pedestal {
+    width: 188px;
+    background: var(--grad);
+    border-radius: 20px 20px 0 0;
+}
+
+.num-1 {
+    height: 230px;
+}
+
+.num-2 {
+    height: 184px;
+}
+
+.num-3 {
+    height: 145px;
+}
+
+.num {
+    font-family: var(--title-font);
+    font-size: var(--title-font-size);
+    font-weight: 800;
+}
+
+.big-title {
+    position: relative;
+    top: -50px;;
+    font-family: var(--title-font);
+    font-size: var(--title-font-size);
+    font-weight: 800;
+    margin: 0;
+}

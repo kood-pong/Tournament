@@ -2,12 +2,13 @@ import './basic.css';
 
 type Props = {
     text: string;
-    variant: number; // default - 1 default-1 - 2
+    variant: number;
+    textColor?: string;
 }
 
-const Button1 = ({text, variant}: Props) => {
+const Button1 = ({text, variant, textColor}: Props) => {
     return (
-        <button className="btn-1">
+        <button className={`btn-1 ${variant === 2 ? 'variant-2': ''} ${textColor}`}>
             {text}
         </button>
     );

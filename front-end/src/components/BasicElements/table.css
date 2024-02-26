@@ -1,0 +1,38 @@
+.table-header {
+    width: 100%;
+    height: 60px;
+    background-color: var(--color-2);
+    border-radius: 30px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    color: white;
+}
+
+.col {
+    min-width: 10%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tryper {
+    min-width: 30%;
+    justify-content: flex-start;
+}
+
+.table-entity {
+    border-bottom: solid 1px var(--text-color);
+    width: 100%;
+    height: 40px;
+    margin: 0 20px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}

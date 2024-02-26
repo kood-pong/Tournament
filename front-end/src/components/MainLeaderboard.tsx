@@ -2,6 +2,11 @@ import { useEffect } from "react";
 import Header from "./BasicElements/Header";
 import Footer from "./BasicElements/Footer";
 import './basic.css';
+import './main.css';
+import Announcement from "./BasicElements/Announcement";
+import Pedestal from "./BasicElements/Pedestal";
+import TableHeader from "./BasicElements/TableHeader";
+import TableEntity from "./BasicElements/TableEntity";
 
 interface Props {
     PORT: string;
@@ -25,9 +30,16 @@ const MainPage = ({ PORT }: Props) => {
     }, [])
 
     return (
-        <div id="page-container">
+        <div className="page-container">
             <Header />
-            <div id="content-wrap">
+            <div className="content-wrap">
+                <Announcement text="Register Now for Our Upcoming Tournament!" btnsText={['Register']} />
+                <Pedestal winers={[]} />
+                <div className="table-cont">
+                    <TableHeader />
+                    <div style={{height:'15px'}}></div>
+                    <TableEntity />
+                </div>
             </div>
             <Footer />
         </div>

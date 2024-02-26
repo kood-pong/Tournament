@@ -1,9 +1,10 @@
-#page-container {
+.page-container {
     position: relative;
     min-height: 100vh;
 }
 
-#content-wrap {
-    padding-bottom: 2.5rem;
-    /* Footer height */
+.content-wrap {
+    padding-top: 55px; /*for header*/
+    padding-bottom: 2.5rem; /*for footer*/
+    margin: 0 10%;
 }
