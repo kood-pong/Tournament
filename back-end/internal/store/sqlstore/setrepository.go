@@ -16,7 +16,7 @@ type SetRepository struct {
 func (s *SetRepository) Create(set *models.Set) (*models.Set, error) {
 	//If match id exists
 	_, err := s.store.Match().Get(set.MatchID)
-	if err != nil{
+	if err != nil {
 		return nil, fmt.Errorf("match with id %v does not exist", set.MatchID)
 	}
 	set.ID = uuid.New().String()
@@ -92,6 +92,12 @@ func (s *SetRepository) DetermineWinner(match_id string) error {
 	if err = s.store.User().UpdateLosses(result.LoserID, 1); err != nil {
 		return err
 	}
-
+	//Change rankinkg Winner gets 3 ranking points, loser gets only 1
+	if err = s.store.User().UpdateRanking(result.WinnerID, 3); err != nil {
+		return err
+	}
+	if err = s.store.User().UpdateRanking(result.LoserID, 1); err != nil {
+		return err
+	}
 	return nil
 }

@@ -133,10 +133,10 @@ func (t *TournamentRepository) GetParticipants(tournament_id string) ([]models.U
 func (t *TournamentRepository) GetLeaderboard(tournament_id string) ([]models.User, error) {
 	//check tournament status leaderboard will only be generated, if tournament is finished
 	tournament, err := t.Get(tournament_id)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
-	if tournament.Status != "finished"{
+	if tournament.Status != "finished" {
 		return nil, fmt.Errorf("tournament is not finished - state %v", tournament.Status)
 	}
 
@@ -176,7 +176,7 @@ func (t *TournamentRepository) GetLeaderboard(tournament_id string) ([]models.Us
 	}
 	defer rows.Close()
 
-		var userList []models.User
+	var userList []models.User
 
 	for rows.Next() {
 		var user models.User
@@ -296,7 +296,11 @@ func (t *TournamentRepository) Generate(tournament_id string, numberOfSets int) 
 		}
 		return nil, nil
 	}
-	if len(winners) <= 4 {
+	//check if its finale
+	if len(winners) <= 2 {
+		//it should generate matches for 3rd and 4th place also
+		//query information for 3rd and 4th
+		// finaleMatches, err := t.GenerateMatches()
 		fmt.Println("IMPLEMENT FINALE!")
 	}
 
