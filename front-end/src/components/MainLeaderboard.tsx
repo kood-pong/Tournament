@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Header from "./BasicElements/Header";
 import Footer from "./BasicElements/Footer";
 import './basic.css';
@@ -13,6 +13,8 @@ interface Props {
 }
 
 const MainPage = ({ PORT }: Props) => {
+    const [leaderboard, getLeaderboard] = useState([]);
+
     useEffect(() => {
         (async () => {
             console.log(PORT)
@@ -22,7 +24,11 @@ const MainPage = ({ PORT }: Props) => {
                     credentials: 'include'
                 })
                 const json = await response.json()
-                console.log(json)
+                // TODO create class for users and modify it
+                const lb = json.data.sort(function (a: { ranking: number; }, b: { ranking: number; }) {
+                    return a.ranking - b.ranking;
+                });
+                getLeaderboard(lb);
             } catch (error) {
                 console.log('error', error)
             }
@@ -34,11 +40,19 @@ const MainPage = ({ PORT }: Props) => {
             <Header />
             <div className="content-wrap">
                 <Announcement text="Register Now for Our Upcoming Tournament!" btnsText={['Register']} />
-                <Pedestal winers={[]} />
+                {leaderboard.length >= 3 ? <Pedestal winers={leaderboard.slice(0, 3)} /> : null}
                 <div className="table-cont">
                     <TableHeader />
-                    <div style={{height:'15px'}}></div>
-                    <TableEntity />
+                    <div style={{ height: '15px' }}></div>
+                    {leaderboard.length >= 4 ? (
+                        <>
+                            {leaderboard.slice(3).map(user => (
+                                <div key={user["id"]}>
+                                    {/* TODO change user type */}
+                                    <TableEntity user={user} />
+                                </div>
+                            ))}
+                        </>) : null}
                 </div>
             </div>
             <Footer />
