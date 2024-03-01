@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins&family=Syne:wght@400..800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@800&display=swap');
 
-:root{
+:root {
   --color-1: #232830;
   --color-2: #3D4756;
   --color-3: #DCF900;
@@ -20,7 +20,7 @@
 }
 
 /* Light mode styles */
-:root[data-theme="light"]{
+:root[data-theme="light"] {
   --bg-color: var(--color-4);
   --bg-color-2: #ffffff;
   --text-color: var(--color-1);
@@ -29,7 +29,7 @@
 }
 
 /* Dark mode styles */
-:root[data-theme="dark"]{
+:root[data-theme="dark"] {
   --bg-color: var(--color-1);
   --bg-color-2: var(--color-2);
   --text-color: #ffffff;
@@ -40,12 +40,26 @@
 body {
   margin: 0;
   /* font-family: 'Poppins', sans-serif; */
-  font-family: 'Poppins', sans-serif; 
+  font-family: 'Poppins', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--bg-color);
   color: var(--text-color);
   font-size: var(--body-text-font-size);
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--text-color);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 6px;
 }
 
 code {
