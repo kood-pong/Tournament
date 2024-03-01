@@ -18,19 +18,10 @@
     height: 50px;
     background-color: var(--text-color);
     border-radius: 50%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.usr-img-holder img {
-    min-width: 100%;
-    max-height: 100%;
 }
 
 .pedestal {
+    padding-top: 5px;
     width: 188px;
     background: var(--grad);
     border-radius: 20px 20px 0 0;
@@ -48,17 +39,37 @@
     height: 145px;
 }
 
-.num {
-    font-family: var(--title-font);
-    font-size: var(--title-font-size);
-    font-weight: 800;
+.p-title {
+    position: relative;
+    top: -50px;
+    margin: 0;
 }
 
-.big-title {
-    position: relative;
-    top: -50px;;
-    font-family: var(--title-font);
-    font-size: var(--title-font-size);
-    font-weight: 800;
-    margin: 0;
+@media (max-width: 815px) {
+    .pedestal {
+        width: 100%;
+    }
+
+    .pedestals-cont {
+        gap: 10px;
+    }
+
+    .p-title {
+        position: inherit;
+        /* top: -25px; */
+        margin-bottom: 30px;
+    }
+
+    .num-1 {
+        height: 180px;
+    }
+    
+    .num-2 {
+        height: 125px;
+    }
+    
+    .num-3 {
+        height: 75px;
+    }
+    
 }

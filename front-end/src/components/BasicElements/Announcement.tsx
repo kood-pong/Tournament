@@ -9,7 +9,7 @@ type Props = {
 const Announcement = ({ text, btnsText }: Props) => {
     return (
         <div className="announc-cont">
-            <p>{text}</p>
+            <p className='text'>{text}</p>
             <div className="btns-cont">
                 {btnsText.map((btnText, index) => (
                     <Button1 key={index} text={btnText} variant={2} textColor='black' />
