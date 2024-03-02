@@ -26,11 +26,11 @@ const Header = () => {
                     <Button2 text="Leaderboard" />
                     <Button2 text="Calendar" />
                     <ModeSwitcher />
-                    {/* <div style={{display:"flex", gap: "20px"}}>
+                    <div style={{display:"flex", gap: "20px"}}>
                         <Button1 text="Log In" variant={2} />
                         <Button1 text="Sign Up" variant={1} />
-                    </div> */}
-                    <div className="requests-btn">
+                    </div>
+                    {/* <div className="requests-btn">
                         <div className="request-icon-cont">
                             <RequestsIcon />
                             <div className="buble-num">1</div>
@@ -42,7 +42,7 @@ const Header = () => {
                             <img src='https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg' />
                         </div>
                         Username
-                    </div>
+                    </div> */}
                 </div>
                 <div className={`resp-footer ${isOpen ? 'open-footer' : ''}`}>
                     <Footer />

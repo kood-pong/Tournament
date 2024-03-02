@@ -48,6 +48,7 @@
 @media (max-width: 815px) {
     .pedestal {
         width: 100%;
+        min-width: 75px;
     }
 
     .pedestals-cont {
@@ -56,7 +57,7 @@
 
     .p-title {
         position: inherit;
-        /* top: -25px; */
+        margin-top: -25px;
         margin-bottom: 30px;
     }
 
@@ -70,6 +71,11 @@
     
     .num-3 {
         height: 75px;
+    }
+
+    .usr-img-holder {
+        width: 30px;
+        height: 30px;
     }
     
 }
