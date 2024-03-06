@@ -95,20 +95,19 @@
     min-height: 35px;
 }
 
-.btn-1:hover {
-    background-color: var(--color-3);
-    color: var(--color-1);
-}
-
 .variant-2 {
     border: solid 1px var(--text-color);
     background-color: transparent;
     color: var(--text-color);
 }
 
+.btn-1:hover {
+    background-color: var(--color-3);
+    color: var(--color-1);
+}
+
 .variant-2:hover {
-    background-color: var(--text-color);
-    color: var(--bg-color);
+    border-color: var(--color-3);
 }
 
 .black {
@@ -117,7 +116,7 @@
     color: var(--color-1);
 }
 
-.variant-2:hover {
+.black:hover {
     background-color: var(--color-1);
     color: white;
 }
