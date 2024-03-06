@@ -1,15 +1,15 @@
 import { useState } from "react";
 import './basic.css';
-import Button1 from "./Button1";
-import Button2 from "./Button2";
 import ModeSwitcher from "./ModeSwitcher";
 import HamburgerMenu from "../assets/HamburgerMenu";
 import Cross from "../assets/Cross";
 import Footer from "./Footer";
 import RequestsIcon from "../assets/RequestsIcon";
+import { useNavigate } from "react-router-dom";
 
 
 const Header = () => {
+    const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleMenu = () => {
@@ -23,12 +23,12 @@ const Header = () => {
             </div>
             <div className={`${isOpen ? 'responsive_nav' : ''}`}>
                 <div className={`button-right-container ${isOpen ? 'vis' : ''}`}>
-                    <Button2 text="Leaderboard" />
-                    <Button2 text="Calendar" />
+                    <button onClick={() => {navigate('/')}} className="btn-2">Leaderboard</button>
+                    <button onClick={() => {navigate('/calendar')}} className="btn-2">Calendar</button>
                     <ModeSwitcher />
-                    <div style={{display:"flex", gap: "20px"}}>
-                        <Button1 text="Log In" variant={2} />
-                        <Button1 text="Sign Up" variant={1} />
+                    <div style={{ display: "flex", gap: "20px" }}>
+                        <button onClick={() => {navigate('/login')}} className='btn-1 variant-2'>Log In</button>
+                        <button onClick={() => {navigate('/signup')}} className='btn-1'>Sign Up</button>
                     </div>
                     {/* <div className="requests-btn">
                         <div className="request-icon-cont">

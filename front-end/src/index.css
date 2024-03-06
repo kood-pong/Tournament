@@ -32,6 +32,7 @@
   --footer-color: var(--color-1);
   --hovered-btn-color: var(--color-2);
   --req-icon-color: var(--text-color);
+  --link-color: var(--color-2);
 }
 
 /* Dark mode styles */
@@ -43,6 +44,7 @@
   --footer-color: var(--color-2);
   --hovered-btn-color: var(--color-3);
   --req-icon-color: var(--text-color);
+  --link-color: var(--color-4);
 }
 
 body {

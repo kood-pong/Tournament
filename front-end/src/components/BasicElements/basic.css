@@ -217,6 +217,16 @@
     display: none;
 }
 
+.link {
+    text-decoration: none;
+    color: var(--link-color);
+}
+.link:hover {
+    text-decoration: none;
+    color: var(--text-color);
+    text-decoration: underline var(--color-3);
+}
+
 @media (max-width: 815px) {
 
     .header {

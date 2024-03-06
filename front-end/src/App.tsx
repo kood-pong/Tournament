@@ -10,6 +10,7 @@ import Matches from './components/Matches';
 import Sets from './components/Sets';
 import Requests from "./components/Requests";
 import { useState } from "react";
+import Authentication from "./components/Authentication/Authentication";
 
 const PORT: string = 'http://localhost:7080'
 
@@ -20,6 +21,14 @@ function App() {
       {/* <p>Text</p> */}
       <BrowserRouter>
         <Routes>
+          <Route
+            path="/login"
+            element={<Authentication isLogin={true} />
+            } />
+          <Route
+            path="/signup"
+            element={<Authentication isLogin={false} />
+            } />
           <Route
             path="/"
             element={
