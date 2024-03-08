@@ -1,16 +1,57 @@
 import { useState } from 'react';
 import './auth.css';
+import { useNavigate } from 'react-router-dom';
 
-const SignUp = () => {
-    const [fullname, setName] = useState<string>('');
+interface Props {
+    PORT: string;
+}
+
+const SignUp = ({ PORT }: Props) => {
+    const navigate = useNavigate();
+    const [firstName, setFirstName] = useState<string>('');
+    const [lastName, setLastName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
-    const [discorName, setDiscorName] = useState<string>('');
+    const [username, setDiscorName] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [repeatedPassword, setRepeatedPassword] = useState<string>('');
+    const [error, setError] = useState<{ isError: boolean, text: string }>({ isError: false, text: "" });
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log('Form submitted:', { fullname, email, discorName, password });
+        console.log('Form submitted:', { email, username, password, 'first_name': firstName, 'last_name': lastName });
+        if (password !== repeatedPassword) {
+            setError({isError: true, text: 'Wrong repeated password'})
+            return
+        }
+        try {
+            const res = await fetch(`${PORT}/api/v1/users/create`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "appliction/json" },
+                body: JSON.stringify({ email, password, username }),
+            })
+            if (res.ok) {
+                const data = await res.json()
+                navigate('/');
+                // if (data.success) {
+                // } else {
+                //     setError({
+                //         isError: true,
+                //         text: data.error,
+                //     })
+                // } TODO
+            } else {
+                setError({
+                    isError: true,
+                    text: "There was a problem signing you up to Social Network. Please try again soon.",
+                })
+            }
+        } catch (error) {
+            setError({
+                isError: true,
+                text: "There was a problem signing you up to Social Network. Please try again soon.",
+            })
+        }
     };
 
     return <div className="content-wrap-auth">
@@ -30,13 +71,24 @@ const SignUp = () => {
                 <h1 className='title-1'>Sign Up</h1>
                 <form onSubmit={handleSubmit}>
                     <div className='input-field'>
-                        <label htmlFor="name">Fullname:</label>
+                        <label htmlFor="first-name">First name:</label>
                         <input
                             type="text"
-                            id="name"
-                            value={fullname}
+                            id="first-name"
+                            value={firstName}
                             placeholder="Enter your name"
-                            onChange={(e) => setName(e.target.value)}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className='input-field'>
+                        <label htmlFor="last-name">Last name:</label>
+                        <input
+                            type="text"
+                            id="last-name"
+                            value={lastName}
+                            placeholder="Enter your name"
+                            onChange={(e) => setLastName(e.target.value)}
                             required
                         />
                     </div>
@@ -56,7 +108,7 @@ const SignUp = () => {
                         <input
                             type="text"
                             id="discord-name"
-                            value={discorName}
+                            value={username}
                             placeholder="Enter your Discord username"
                             onChange={(e) => setDiscorName(e.target.value)}
                             required
@@ -84,6 +136,7 @@ const SignUp = () => {
                             required
                         ></input>
                     </div>
+                    {error.text}
                     <button className='btn-1 submit-btn' type="submit">Submit</button>
                 </form>
                 <div>
