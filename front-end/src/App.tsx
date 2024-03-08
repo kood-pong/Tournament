@@ -11,23 +11,25 @@ import Sets from './components/Sets';
 import Requests from "./components/Requests";
 import { useState } from "react";
 import Authentication from "./components/Authentication/Authentication";
+import { AuthProvider } from './components/contexts/AuthContext';
 
 const PORT: string = 'http://localhost:7080'
 
 function App() {
 
   return (
+    <AuthProvider PORT={PORT}>
     <div className="App">
       {/* <p>Text</p> */}
       <BrowserRouter>
         <Routes>
           <Route
             path="/login"
-            element={<Authentication isLogin={true} />
+            element={<Authentication isLogin={true} PORT={PORT} />
             } />
           <Route
             path="/signup"
-            element={<Authentication isLogin={false} />
+            element={<Authentication isLogin={false} PORT={PORT} />
             } />
           <Route
             path="/"
@@ -82,6 +84,7 @@ function App() {
         </Routes>
       </BrowserRouter>
     </div>
+    </AuthProvider>
   );
 }
 

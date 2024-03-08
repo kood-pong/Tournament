@@ -6,11 +6,14 @@ import Cross from "../assets/Cross";
 import Footer from "./Footer";
 import RequestsIcon from "../assets/RequestsIcon";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 
 const Header = () => {
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
+    const { isLoggedIn } = useAuth();
+    var id = 0;
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -23,13 +26,22 @@ const Header = () => {
             </div>
             <div className={`${isOpen ? 'responsive_nav' : ''}`}>
                 <div className={`button-right-container ${isOpen ? 'vis' : ''}`}>
-                    <button onClick={() => {navigate('/')}} className="btn-2">Leaderboard</button>
-                    <button onClick={() => {navigate('/calendar')}} className="btn-2">Calendar</button>
+                    <button onClick={() => { navigate('/') }} className="btn-2">Leaderboard</button>
+                    <button onClick={() => { navigate('/calendar') }} className="btn-2">Calendar</button>
                     <ModeSwitcher />
-                    <div style={{ display: "flex", gap: "20px" }}>
-                        <button onClick={() => {navigate('/login')}} className='btn-1 variant-2'>Log In</button>
-                        <button onClick={() => {navigate('/signup')}} className='btn-1'>Sign Up</button>
-                    </div>
+                    {!isLoggedIn ? (
+                        <div style={{ display: "flex", gap: "20px" }}>
+                            <button onClick={() => { navigate('/login') }} className='btn-1 variant-2'>Log In</button>
+                            <button onClick={() => { navigate('/signup') }} className='btn-1'>Sign Up</button>
+                        </div>
+                    ) : (
+                        <div className="profile-btn" onClick={() => { navigate(`/user/${id}`) }}>
+                            <div className="usr-img img-holder">
+                                <img src='https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg' />
+                            </div>
+                            Username
+                        </div>
+                    )}
                     {/* <div className="requests-btn">
                         <div className="request-icon-cont">
                             <RequestsIcon />

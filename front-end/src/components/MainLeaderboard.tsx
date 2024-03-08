@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import Header from "./BasicElements/Header";
 import Footer from "./BasicElements/Footer";
 import './basic.css';
 import './main.css';
-import Announcement from "./BasicElements/Announcement";
+// import Announcement from "./BasicElements/Announcement";
 import Pedestal from "./BasicElements/Pedestal";
 import TableHeader from "./BasicElements/TableHeader";
 import TableEntity from "./BasicElements/TableEntity";
+import './BasicElements/announcement.css';
+import { useAuth } from "./contexts/AuthContext";
 
 interface Props {
     PORT: string;
@@ -14,6 +16,8 @@ interface Props {
 
 const MainPage = ({ PORT }: Props) => {
     const [leaderboard, getLeaderboard] = useState([]);
+    // const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const { isLoggedIn } = useAuth();
 
     useEffect(() => {
         (async () => {
@@ -35,11 +39,22 @@ const MainPage = ({ PORT }: Props) => {
         })()
     }, [])
 
+    const handleRegisteration = () => {
+        console.log('registrated')
+    }
+
     return (
         <div className="page-container">
             <Header />
             <div className="content-wrap">
-                <Announcement text="Register Now for Our Upcoming Tournament!" btnsText={['Register']} />
+                {/* TODO try to use it as a component */}
+                <div className="announc-cont">
+                    <p className='text'>Register Now for Our Upcoming Tournament!</p>
+                    <div className="btns-cont">
+                        <button onClick={handleRegisteration} className='btn-1 variant-2 black'>Register</button>
+                    </div>
+                </div>
+                {/* <Announcement text="Register Now for Our Upcoming Tournament!" btnsText={['Register']} /> */}
                 {leaderboard.length >= 3 ? <Pedestal winers={leaderboard.slice(0, 3)} /> : null}
                 <div className="table-cont">
                     <TableHeader />
