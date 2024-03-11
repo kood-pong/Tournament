@@ -70,71 +70,78 @@ const SignUp = ({ PORT }: Props) => {
             <div className="form-cont">
                 <h1 className='title-1'>Sign Up</h1>
                 <form onSubmit={handleSubmit}>
-                    <div className='input-field'>
+                    <div className='input-field text'>
                         <label htmlFor="first-name">First name:</label>
                         <input
                             type="text"
                             id="first-name"
                             value={firstName}
                             placeholder="Enter your name"
+                            className={`${error.isError ? 'red-border' : 'black-border'}`}
                             onChange={(e) => setFirstName(e.target.value)}
                             required
                         />
                     </div>
-                    <div className='input-field'>
+                    <div className='input-field text'>
                         <label htmlFor="last-name">Last name:</label>
                         <input
                             type="text"
                             id="last-name"
                             value={lastName}
                             placeholder="Enter your name"
+                            className={`${error.isError ? 'red-border' : 'black-border'}`}
                             onChange={(e) => setLastName(e.target.value)}
                             required
                         />
                     </div>
-                    <div className='input-field'>
+                    <div className='input-field text'>
                         <label htmlFor="email">Email:</label>
                         <input
                             type="email"
                             id="email"
                             value={email}
                             placeholder="Enter your email"
+                            className={`${error.isError ? 'red-border' : 'black-border'}`}
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
                     </div>
-                    <div className='input-field'>
+                    <div className='input-field text'>
                         <label htmlFor="discord-name">Discord username:</label>
                         <input
                             type="text"
                             id="discord-name"
                             value={username}
                             placeholder="Enter your Discord username"
+                            className={`${error.isError ? 'red-border' : 'black-border'}`}
                             onChange={(e) => setDiscorName(e.target.value)}
                             required
                         />
                     </div>
-                    <div className='input-field'>
+                    <div className='input-field text'>
                         <label htmlFor="password">Password:</label>
                         <input
                             id="password"
                             type='password'
                             value={password}
                             placeholder="Enter your password"
+                            className={`${error.isError ? 'red-border' : 'black-border'}`}
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         ></input>
                     </div>
-                    <div className='input-field'>
-                        <label htmlFor="rep-password">Repeat password:</label>
+                    <div className='input-field text'>
+                        <label htmlFor="rep-password" className={`${error.isError ? 'red' : ''}`}>Repeat password:</label>
                         <input
                             id="rep-password"
                             type='password'
                             value={repeatedPassword}
                             placeholder="Repeat your password"
+                            className={`${error.isError ? 'red-border' : 'black-border'}`}
                             onChange={(e) => setRepeatedPassword(e.target.value)}
                             required
                         ></input>
+                        <span className='text red'>{error.text}</span>
                     </div>
                     {error.text}
                     <button className='btn-1 submit-btn' type="submit">Submit</button>

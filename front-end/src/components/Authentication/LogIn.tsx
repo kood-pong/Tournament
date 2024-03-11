@@ -36,7 +36,7 @@ const LogIn = ({ PORT }: Props) => {
             } else {
                 setError({
                     isError: true,
-                    text: "There was a problem signing you up to Social Network. Please try again soon.",
+                    text: "Some error",
                 })
             }
         } catch (error) {
@@ -57,34 +57,37 @@ const LogIn = ({ PORT }: Props) => {
             <div className="form-cont">
                 <h1 className='title-1'>Log In</h1>
                 <form onSubmit={handleSubmit}>
-                    <div className='input-field'>
-                        <label htmlFor="email">Email:</label>
+                    <div className='input-field text'>
+                        <label htmlFor="email" className={`${error.isError ? 'red' : ''}`} >Email:</label>
                         <input
                             type="email"
                             id="email"
                             value={email}
                             placeholder="Enter your email"
+                            className={`${error.isError ? 'red-border' : 'black-border'}`}
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
+                        <span className='text red'>{error.text}</span>
                     </div>
-                    <div className='input-field'>
-                        <label htmlFor="password">Password:</label>
+                    <div className='input-field text'>
+                        <label htmlFor="password" className={`${error.isError ? 'red' : ''}`}>Password:</label>
                         <input
                             id="password"
                             type='password'
                             value={password}
                             placeholder="Enter your password"
+                            className={`${error.isError ? 'red-border' : 'black-border'}`}
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         ></input>
+                        <span className='text red'>{error.text}</span>
                     </div>
-                    {error.text}
                     <button className='btn-1 submit-btn' type="submit">Submit</button>
                 </form>
                 <div>
-                    <span className="text-gray">Don't have an account? </span>
-                    <a className='link' href="/signup">Sign Up</a>
+                    <span className="text-gray text">Don't have an account? </span>
+                    <a className='link text' href="/signup">Sign Up</a>
                 </div>
             </div>
         </div>

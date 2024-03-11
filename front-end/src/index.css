@@ -7,6 +7,7 @@
   --color-2: #3D4756;
   --color-3: #DCF900;
   --color-4: #F3F5F8;
+  --color-red: #EA2B1F;
 
   --dic-icon-color: white;
   --grad: linear-gradient(to bottom, var(--color-3), transparent);
