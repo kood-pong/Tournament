@@ -1,4 +1,3 @@
-import Button1 from './Button1';
 import './announcement.css';
 
 type Props = {
@@ -12,7 +11,7 @@ const Announcement = ({ text, btnsText }: Props) => {
             <p className='text'>{text}</p>
             <div className="btns-cont">
                 {btnsText.map((btnText, index) => (
-                    <Button1 key={index} text={btnText} variant={2} textColor='black' />
+                    <button key={index} className='btn-1 variant-2 black'>{btnText}</button>
                 ))}
             </div>
         </div>

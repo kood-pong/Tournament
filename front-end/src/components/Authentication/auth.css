@@ -1,0 +1,90 @@
+.content-wrap-auth {
+    margin: 0 10%;
+
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    gap: 20px;
+}
+
+.intro {
+    width: 100%;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: start;
+    gap: 50px;
+}
+
+.form {
+    width: 100%;
+    min-height: 100px;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    margin: 50px 0;
+}
+
+.form-cont {
+    width: 100%;
+    background-color: var(--bg-color-2);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.form-cont form {
+    width: 90%;
+}
+
+.form-cont input {
+    /* what can I do with it? */
+    width: 89%;
+    height: 40px;
+    padding: 0 5%;
+    margin: 15px 0;
+    border-radius: 10px;
+    background-color: var(--bg-color);
+}
+
+.red-border {
+    border: solid 1px var(--color-red);
+}
+
+.black-border {
+    border: solid 1px var(--text-color);
+}
+
+.input-field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.submit-btn {
+    margin: 10px 0;
+    width: 100%;
+}
+
+.red {
+    color: var(--color-red);
+}
+
+@media (max-width: 815px) {
+    .form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .intro {
+        align-items: center;
+    }
+}
