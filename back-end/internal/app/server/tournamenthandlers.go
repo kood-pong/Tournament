@@ -1,27 +1,32 @@
 package server
 
 import (
-	"encoding/json"
 	"net/http"
 	"tournament/back-end/internal/models"
+	"tournament/back-end/pkg/validator"
 )
 
 type RequestBody struct {
-	TournamentID string `json:"tournament_id"`
-	NumberOfSets int    `json:"sets_to_win"`
+	TournamentID string `json:"tournament_id" validate:"required"`
+	NumberOfSets int    `json:"sets_to_win" validate:"required"`
 }
 
 func (s *server) tournamentCreate() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var response *models.Tournament
 
-		if err := json.NewDecoder(r.Body).Decode(&response); err != nil {
-			s.error(w, http.StatusBadRequest, err)
+		if err := s.decode(r, &response); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		if err := validator.Validate(response); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 
 		if err := s.store.Tournament().Create(response); err != nil {
-			s.error(w, http.StatusBadRequest, err)
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 		s.respond(w, http.StatusOK, Response{
@@ -35,12 +40,18 @@ func (s *server) tournamentUpdate() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var response *models.Tournament
 
-		if err := json.NewDecoder(r.Body).Decode(&response); err != nil {
-			s.error(w, http.StatusBadRequest, err)
+		if err := s.decode(r, &response); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
+
+		if err := validator.Validate(response); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
 		if err := s.store.Tournament().Update(response); err != nil {
-			s.error(w, http.StatusBadRequest, err)
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 
@@ -57,7 +68,7 @@ func (s *server) tournamentRegister() http.HandlerFunc {
 		userId := r.Context().Value(ctxUserID).(string)
 
 		if err := s.store.Tournament().Register(&models.Register{TournamentID: tournament_id, UserID: userId}); err != nil {
-			s.error(w, http.StatusBadRequest, err)
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 
@@ -72,15 +83,20 @@ func (s *server) tournamentStart() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var request RequestBody
 
-		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-			s.error(w, http.StatusBadRequest, err)
+		if err := s.decode(r, &request); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		if err := validator.Validate(request); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 
 		matches, err := s.store.Tournament().Start(request.TournamentID, request.NumberOfSets)
 
 		if err != nil {
-			s.error(w, http.StatusBadRequest, err)
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 		s.respond(w, http.StatusOK, Response{
@@ -94,8 +110,8 @@ func (s *server) tournamentGenerate() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var request RequestBody
 
-		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-			s.error(w, http.StatusBadRequest, err)
+		if err := s.decode(r, &request); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 
@@ -110,7 +126,7 @@ func (s *server) tournamentGenerate() http.HandlerFunc {
 		}
 
 		if err != nil {
-			s.error(w, http.StatusBadRequest, err)
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 		s.respond(w, http.StatusOK, Response{
@@ -126,7 +142,7 @@ func (s *server) tournamentLeaderboard() http.HandlerFunc {
 
 		userList, err := s.store.Tournament().GetLeaderboard(tournament_id)
 		if err != nil {
-			s.error(w, http.StatusBadRequest, err)
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 

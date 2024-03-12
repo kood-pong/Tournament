@@ -50,9 +50,10 @@ func (m *MatchRepository) FindOngoing(tournament_id string) ([]models.Match, err
 }
 
 func (m *MatchRepository) UpdateStatus(match models.Match) error {
-	//check if match is not empty
-	if match.Status != "ongoing" && match.Status != "finished" {
-		return fmt.Errorf("only accepted statuses - finished, ongoing")
+	//check if match exists first of all
+	_, err := m.store.Match().Get(match.ID)
+	if err != nil {
+		return err
 	}
 
 	//check if match is won by someone
@@ -62,7 +63,7 @@ func (m *MatchRepository) UpdateStatus(match models.Match) error {
 
 	query := `UPDATE matches SET status = ? WHERE id = ?`
 
-	_, err := m.store.Db.Exec(query, match.Status, match.ID)
+	_, err = m.store.Db.Exec(query, match.Status, match.ID)
 	if err != nil {
 		return err
 	}

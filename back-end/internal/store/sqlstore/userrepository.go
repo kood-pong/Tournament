@@ -151,9 +151,17 @@ func (u *UserRepository) CompleteRegistration(user_id, status string) error {
 	//Update the application to approved / rejected
 	query := `UPDATE users SET status = ? WHERE id = ?`
 
-	_, err := u.store.Db.Exec(query, status, user_id)
+	result, err := u.store.Db.Exec(query, status, user_id)
 	if err != nil {
 		return err
+	}
+
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affected == 0 {
+		return errors.New("user does not exist or user's status can not be changed")
 	}
 
 	return nil

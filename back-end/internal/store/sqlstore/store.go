@@ -2,7 +2,6 @@ package sqlstore
 
 import (
 	"database/sql"
-	"reflect"
 	"tournament/back-end/internal/store"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -94,17 +93,4 @@ func (s *Store) Result() store.ResultRepository {
 	}
 
 	return s.resultRepository
-}
-
-
-func hasStructEmptyValues(s interface{}) bool {
-	val := reflect.ValueOf(s).Elem()
-	for i := 0; i < val.NumField(); i++ {
-		field := val.Field(i)
-		zeroValue := reflect.Zero(field.Type())
-		if reflect.DeepEqual(field.Interface(), zeroValue.Interface()) {
-			return true
-		}
-	}
-	return false
 }

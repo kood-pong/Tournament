@@ -199,7 +199,7 @@ func (s *server) userRegister() http.HandlerFunc {
 			Status string `json:"status" validate:"required|contains:approved,rejected"`
 		}
 		var requestBody RequestBody
-		if err := s.decode(r, requestBody); err != nil {
+		if err := s.decode(r, &requestBody); err != nil {
 			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}

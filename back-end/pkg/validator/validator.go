@@ -18,7 +18,7 @@ const (
 var (
 	rxEmail        = regexp.MustCompile(Email)
 	rxAlpha        = regexp.MustCompile("^[a-zA-Z ]+$")
-	rxAlphaNum     = regexp.MustCompile("^[a-zA-Z0-9]+$")
+	rxAlphaNum     = regexp.MustCompile("^[a-zA-Z0-9 ]+$")
 	rxInt          = regexp.MustCompile(Int)
 	rxBase64       = regexp.MustCompile(Base64)
 	rxHasLowerCase = regexp.MustCompile("^[a-z]+$")
@@ -172,12 +172,18 @@ func lengthValidation(val interface{}, parameter string, compare func(int, int) 
 func contains(val interface{}, param string) error {
 	switch reflect.TypeOf(val).Kind() {
 	case reflect.String:
-		value := val.(string)
-		if strings.Contains(param, value) {
-			return nil
+		value := strings.ToLower(val.(string))
+		stringValues := strings.Split(strings.ToLower(param), ",")
+
+		allowedValues := make(map[string]struct{})
+		for _, word := range stringValues {
+			allowedValues[word] = struct{}{}
 		}
 
-		return fmt.Errorf("type could only be %v", param)
+		if _, ok := allowedValues[value]; ok {
+			return nil
+		}
+		return fmt.Errorf("%s must be one of %v", value, param)
 	default:
 		return fmt.Errorf("only string allowed")
 	}

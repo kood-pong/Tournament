@@ -1,23 +1,28 @@
 package server
 
 import (
-	"encoding/json"
 	"net/http"
 	"tournament/back-end/internal/models"
+	"tournament/back-end/pkg/validator"
 )
 
 func (s *server) setCreate() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		set := &models.Set{}
 
-		if err := json.NewDecoder(r.Body).Decode(set); err != nil {
-			s.error(w, http.StatusBadRequest, err)
+		if err := s.decode(r, &set); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		if err := validator.Validate(set); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 
 		_, err := s.store.Set().Create(set)
 		if err != nil {
-			s.error(w, http.StatusBadRequest, err)
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 
