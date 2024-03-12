@@ -16,31 +16,31 @@ interface Props {
 
 const MainPage = ({ PORT }: Props) => {
     const [leaderboard, getLeaderboard] = useState([]);
-    // const [isLoggedIn, setIsLoggedIn] = useState(false);
     const { isLoggedIn } = useAuth();
 
     useEffect(() => {
-        (async () => {
-            console.log(PORT)
-            try {
-                const response = await fetch(`${PORT}/api/v1/users/all/approved`, {
-                    method: 'GET',
-                    credentials: 'include'
-                })
-                const json = await response.json()
+        const takeParticipants = async () => {
+            await fetch(`${PORT}/api/v1/users/all/approved`, {
+                method: 'GET',
+                credentials: 'include'
+            }).then(async data => {
+                const json = await data.json()
                 // TODO create class for users and modify it
                 const lb = json.data.sort(function (a: { ranking: number; }, b: { ranking: number; }) {
                     return a.ranking - b.ranking;
                 });
                 getLeaderboard(lb);
-            } catch (error) {
-                console.log('error', error)
-            }
-        })()
+            }).catch(error => {
+                console.error('Error checking login status:', error);
+            });
+        }
+
+        takeParticipants();
     }, [])
 
     const handleRegisteration = () => {
         console.log('registrated')
+        
     }
 
     return (
