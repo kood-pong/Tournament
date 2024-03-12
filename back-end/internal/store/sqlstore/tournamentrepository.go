@@ -2,6 +2,7 @@ package sqlstore
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"math/rand"
 	"tournament/back-end/internal/models"
@@ -29,10 +30,6 @@ func (t *TournamentRepository) Create(tournament *models.Tournament) error {
 
 func (t *TournamentRepository) Update(tournament *models.Tournament) error {
 	query := `UPDATE tournaments SET name = ?, start_date = ?, end_date = ?, status = ?, type = ? WHERE id = ?`
-
-	if hasStructEmptyValues(tournament) {
-		return fmt.Errorf("NO EMPTY FIELDS")
-	}
 
 	_, err := t.store.Db.Exec(query, tournament.Name, tournament.Start_date, tournament.End_date, tournament.Status, tournament.Type, tournament.ID)
 
@@ -74,7 +71,7 @@ func (t *TournamentRepository) Register(reg *models.Register) error {
 	err := t.store.Db.QueryRow(checkQuery, reg.TournamentID, reg.UserID).Scan(&existingRegistration)
 
 	if err == nil {
-		return fmt.Errorf("user is already registered for the tournament")
+		return errors.New("user is already registered for the tournament")
 	} else if err != sql.ErrNoRows {
 		return err
 	}
@@ -85,7 +82,7 @@ func (t *TournamentRepository) Register(reg *models.Register) error {
 	}
 	//check if status is open(users can register)
 	if tournament.Status != "open" {
-		return fmt.Errorf("registration is not open")
+		return errors.New("registration is not open")
 	}
 
 	reg.ID = uuid.New().String()

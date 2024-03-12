@@ -1,9 +1,19 @@
-.PHONY: build run-api 
-.SILENT:
+all: clean test build run
+
+test:
+	@echo "Running tests..."
+	@go test -v ./...
 
 build:
-	go build -o ./build/api ./cmd/main.go
+	@echo "Building binary..."
+	@go build -o ./build/api ./cmd/main.go
 
-run-api: build
-	export JWT_KEY=09aa18a89dee21de8382b9ef169dc5d39130d7036e8b61f20a350ffb0da330cf && \
-	./build/api
+clean:
+	@echo "Cleaning up..."
+	@rm -rf ./build
+
+run: build
+	@echo "Running API..."
+	@./build/api
+
+.PHONY: all test build clean run
