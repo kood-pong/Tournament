@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -9,70 +8,88 @@ import (
 	"time"
 	"tournament/back-end/internal/models"
 	"tournament/back-end/pkg/jwttoken"
-	"tournament/back-end/pkg/router"
+	"tournament/back-end/pkg/validator"
 )
 
-func (s *server) handlerCreateUser() http.HandlerFunc {
+func (s *server) userCreate() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user := &models.User{}
-		if err := json.NewDecoder(r.Body).Decode(user); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
+		if err := s.decode(r, &user); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		if err := validator.Validate(user); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 
 		if err := s.store.User().Create(user); err != nil {
-			s.error(w, r, http.StatusUnprocessableEntity, err)
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 
-		s.respond(w, r, http.StatusCreated, Response{
+		s.respond(w, http.StatusCreated, Response{
 			Message: "Successfully created user!",
 			Data:    user,
 		})
 	}
 }
 
-func (s *server) handlerGetAllUsers() http.HandlerFunc {
+func (s *server) userGetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		status := router.Param(r.Context(), "status")
-
-		data, err := s.store.User().GetAll(status)
-		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
+		status := r.PathValue("status")
+		if status != "approved" && status != "rejected" && status != "pending" {
+			s.error(w, http.StatusUnprocessableEntity, errors.New("only approved, rejected, pending allowed"))
 			return
 		}
 
-		s.respond(w, r, http.StatusOK, Response{
+		data, err := s.store.User().GetAll(r.PathValue("status"))
+		if err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		s.respond(w, http.StatusOK, Response{
 			Message: "Successfully retrieved all users!",
 			Data:    data,
 		})
 	}
 }
 
-func (s *server) handlerLogOut() http.HandlerFunc {
+func (s *server) userLogout() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		deletedCookie := s.deleteCookie()
 		http.SetCookie(w, &deletedCookie)
-		s.respond(w, r, http.StatusOK, Response{Message: "Successfully logged out"})
+		s.respond(w, http.StatusOK, Response{Message: "Successfully logged out"})
 	}
 }
 
-func (s *server) handlerLoginUser() http.HandlerFunc {
+func (s *server) userLogin() http.HandlerFunc {
 	type RequestBody struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
+		Email    string `json:"email" validate:"required|email"`
+		Password string `json:"password" validate:"required|min_len:8"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		var requestBody RequestBody
-		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
+		if err := s.decode(r, &requestBody); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		if err := validator.Validate(requestBody); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 
 		user, err := s.store.User().Check(requestBody.Email)
-		if err != nil || !user.ComparePassword(requestBody.Password) {
-			s.error(w, r, http.StatusUnauthorized, errors.New("invalid login credentials"))
+		if err != nil {
+			s.error(w, http.StatusUnauthorized, err)
+			return
+		}
+		if !user.ComparePassword(requestBody.Password) {
+			s.error(w, http.StatusUnauthorized, errors.New("incorrect password"))
 			return
 		}
 
@@ -81,7 +98,7 @@ func (s *server) handlerLoginUser() http.HandlerFunc {
 		claims := jwttoken.NewClaims(user.ID, expiration.Unix())
 		token, err := alg.Encode(claims)
 		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 
@@ -98,7 +115,7 @@ func (s *server) handlerLoginUser() http.HandlerFunc {
 		http.SetCookie(w, &cookie)
 
 		user.Sanitize()
-		s.respond(w, r, http.StatusOK, Response{
+		s.respond(w, http.StatusOK, Response{
 			Message: "Successfully logged in!",
 			Data:    user,
 		})
@@ -109,14 +126,14 @@ func (s *server) handlerCheckCookie() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie(sessionName)
 		if err != nil {
-			s.error(w, r, http.StatusUnauthorized, err)
+			s.error(w, http.StatusUnauthorized, err)
 			return
 		}
 
 		alg := jwttoken.HmacSha256(os.Getenv(jwtKey))
 		claims, err := alg.DecodeAndValidate(cookie.Value)
 		if err != nil {
-			s.error(w, r, http.StatusUnauthorized, err)
+			s.error(w, http.StatusUnauthorized, err)
 			return
 		}
 		// check if user exist
@@ -124,11 +141,11 @@ func (s *server) handlerCheckCookie() http.HandlerFunc {
 		if err != nil {
 			deletedCookie := s.deleteCookie()
 			http.SetCookie(w, &deletedCookie)
-			s.error(w, r, http.StatusBadRequest, err)
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 
-		s.respond(w, r, http.StatusOK, Response{
+		s.respond(w, http.StatusOK, Response{
 			Message: "Cookie is present",
 			Data:    claims.UserID,
 		})
@@ -147,58 +164,58 @@ func (s *server) deleteCookie() http.Cookie {
 	return deletedCookie
 }
 
-func (s *server) handlerGetUser() http.HandlerFunc {
+func (s *server) userGet() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// get id from cookie
-		id := router.Param(r.Context(), "id")
+		id := r.PathValue("id")
 
 		if id == "" {
 			id = r.Context().Value(ctxUserID).(string)
 		}
 		user, err := s.store.User().FindByID(id)
 		if err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 
 		notifications, err := s.store.Notification().GetForUser(user.ID)
 		if err != nil {
-			fmt.Println("test")
-			s.error(w, r, http.StatusBadRequest, err)
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
 		}
 		user.Notifications = notifications
 
-		s.respond(w, r, http.StatusOK, Response{
+		s.respond(w, http.StatusOK, Response{
 			Message: "Successfully got user!",
 			Data:    user,
 		})
 	}
 }
 
-func (s *server) handlerCompleteRegistration() http.HandlerFunc {
+func (s *server) userRegister() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		type RequestBody struct {
-			UserID string `json:"user_id"`
-			Status string `json:"status"`
+			UserID string `json:"user_id" validate:"required"`
+			Status string `json:"status" validate:"required|contains:approved,rejected"`
 		}
 		var requestBody RequestBody
-		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
+		if err := s.decode(r, requestBody); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 
-		if requestBody.Status == "approved" || requestBody.Status == "rejected" {
-			if err := s.store.User().CompleteRegistration(requestBody.UserID, requestBody.Status); err != nil {
-				s.error(w, r, http.StatusBadRequest, err)
-				return
-			}
-			s.respond(w, r, http.StatusOK, Response{
-				Message: fmt.Sprintf(`User successfully %v`, requestBody.Status),
-				Data:    nil,
-			})
-		} else {
-			s.error(w, r, http.StatusBadRequest, fmt.Errorf(`INVALID STATUS`))
+		if err := validator.Validate(requestBody); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
+
+		if err := s.store.User().CompleteRegistration(requestBody.UserID, requestBody.Status); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+		s.respond(w, http.StatusOK, Response{
+			Message: fmt.Sprintf(`User successfully %v`, requestBody.Status),
+			Data:    nil,
+		})
 	}
 }

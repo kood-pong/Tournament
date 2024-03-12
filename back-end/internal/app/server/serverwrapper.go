@@ -21,8 +21,6 @@ func Start(config *Config) error {
 	store := sqlstore.New(db)
 	srv := newServer(store)
 
-	srv.logger.Printf("The server is running on the port %v", config.Port)
-
 	return http.ListenAndServe(config.Port, srv)
 }
 

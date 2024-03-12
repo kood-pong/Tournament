@@ -8,6 +8,7 @@ import (
 	"tournament/back-end/internal/models"
 
 	"github.com/google/uuid"
+	"github.com/mattn/go-sqlite3"
 )
 
 type UserRepository struct {
@@ -22,6 +23,9 @@ func (u *UserRepository) FindByID(id string) (*models.User, error) {
 	// get the row and add it to the user variable
 	err := u.store.Db.QueryRow(query, id).Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.FirstName, &user.LastName, &user.Points, &user.Wins, &user.Losses, &user.Ranking, &user.Status, &user.Role)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("user does not exist")
+		}
 		return nil, err
 	}
 
@@ -40,8 +44,20 @@ func (u *UserRepository) Create(user *models.User) error {
 	_, err := u.store.Db.Exec(query, user.ID, user.Username, user.Email, user.Password, user.FirstName, user.LastName)
 	user.Sanitize()
 
-	if err != nil {
-		return err
+	//Print out according errors
+	if sqliteErr, ok := err.(sqlite3.Error); ok {
+		switch sqliteErr.ExtendedCode {
+		case sqlite3.ErrConstraintUnique:
+			if strings.Contains(sqliteErr.Error(), "username") {
+				return errors.New("username is already taken")
+			} else if strings.Contains(sqliteErr.Error(), "email") {
+				return errors.New("email is already taken")
+			} else {
+				return errors.New("unique constraint violation")
+			}
+		default:
+			return sqliteErr
+		}
 	}
 
 	//Get all admin users
@@ -52,9 +68,9 @@ func (u *UserRepository) Create(user *models.User) error {
 	}
 
 	//Create notification for each of them
-	for _, admin := range admins{
+	for _, admin := range admins {
 		err := u.store.Notification().Create(&models.Notification{
-			UserID: admin.ID,
+			UserID:  admin.ID,
 			Message: fmt.Sprintf("User %v registered and wants confirmation", user.Username),
 		})
 		if err != nil {
@@ -66,16 +82,20 @@ func (u *UserRepository) Create(user *models.User) error {
 
 func (u *UserRepository) Check(login string) (*models.User, error) {
 	// command to find a user no matter if its email or username
-	query := `SELECT * FROM users u WHERE u.email = ? OR u.username = ?`
+	query := `SELECT * FROM users u WHERE u.email = ?;`
 	var user models.User
 
 	err := u.store.Db.QueryRow(query, login, login).Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.FirstName, &user.LastName, &user.Points, &user.Wins, &user.Losses, &user.Ranking, &user.Status, &user.Role)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, err
+			return nil, errors.New("user does not exists with that email")
 		}
 	}
-	// check if passwords match
+
+	if user.Status == "pending" {
+		return nil, errors.New("user register status is pending")
+	}
+
 	return &user, nil
 }
 
@@ -132,7 +152,7 @@ func (u *UserRepository) CompleteRegistration(user_id, status string) error {
 	query := `UPDATE users SET status = ? WHERE id = ?`
 
 	_, err := u.store.Db.Exec(query, status, user_id)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
@@ -144,7 +164,7 @@ func (u *UserRepository) UpdatePoints(user_id string, points int) error {
 	query := `UPDATE users SET points = points + ? WHERE id = ?`
 
 	_, err := u.store.Db.Exec(query, points, user_id)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
@@ -156,7 +176,7 @@ func (u *UserRepository) UpdateWins(user_id string, wins int) error {
 	query := `UPDATE users SET wins = wins + ? WHERE id = ?`
 
 	_, err := u.store.Db.Exec(query, wins, user_id)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
@@ -168,7 +188,7 @@ func (u *UserRepository) UpdateLosses(user_id string, losses int) error {
 	query := `UPDATE users SET losses = losses + ? WHERE id = ?`
 
 	_, err := u.store.Db.Exec(query, losses, user_id)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
@@ -180,14 +200,9 @@ func (u *UserRepository) UpdateRanking(user_id string, ranking int) error {
 	query := `UPDATE users SET ranking = ranking + ? WHERE id = ?`
 
 	_, err := u.store.Db.Exec(query, ranking, user_id)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
 	return nil
 }
-
-
-
-
-

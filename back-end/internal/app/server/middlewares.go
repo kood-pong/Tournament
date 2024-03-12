@@ -67,7 +67,7 @@ func (s *server) jwtMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie(sessionName)
 		if err != nil {
-			s.error(w, r, http.StatusUnauthorized, err)
+			s.error(w, http.StatusUnauthorized, err)
 			return
 		}
 
@@ -75,7 +75,7 @@ func (s *server) jwtMiddleware(next http.Handler) http.Handler {
 		alg := jwttoken.HmacSha256(os.Getenv(jwtKey))
 		claims, err := alg.DecodeAndValidate(cookie.Value)
 		if err != nil {
-			s.error(w, r, http.StatusUnauthorized, err)
+			s.error(w, http.StatusUnauthorized, err)
 			return
 		}
 
@@ -89,19 +89,19 @@ func (s *server) adminMiddleware(next http.Handler) http.Handler {
 		id := r.Context().Value(ctxUserID).(string)
 
 		if id == "" {
-			s.error(w, r, http.StatusUnauthorized, fmt.Errorf("ONLY ADMIN"))
+			s.error(w, http.StatusUnauthorized, fmt.Errorf("ONLY ADMIN"))
 			return
 		}
 		user, err := s.store.User().FindByID(id)
 		if err != nil {
-			s.error(w, r, http.StatusUnauthorized, err)
+			s.error(w, http.StatusUnauthorized, err)
 			return
 		}
 		//check if user is admin
 		if user.Role == 1 {
 			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxUserID, id)))
 		} else {
-			s.error(w, r, http.StatusUnauthorized, fmt.Errorf("ONLY ADMIN"))
+			s.error(w, http.StatusUnauthorized, fmt.Errorf("ONLY ADMIN"))
 			return
 		}
 	})
