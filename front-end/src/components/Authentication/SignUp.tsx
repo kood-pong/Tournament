@@ -20,38 +20,24 @@ const SignUp = ({ PORT }: Props) => {
         event.preventDefault();
         console.log('Form submitted:', { email, username, password, 'first_name': firstName, 'last_name': lastName });
         if (password !== repeatedPassword) {
-            setError({isError: true, text: 'Wrong repeated password'})
+            setError({ isError: true, text: 'Wrong repeated password' })
             return
         }
-        try {
-            const res = await fetch(`${PORT}/api/v1/users/create`, {
+
+            await fetch(`${PORT}/api/v1/users/create`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "appliction/json" },
                 body: JSON.stringify({ email, password, username }),
-            })
-            if (res.ok) {
-                const data = await res.json()
+            }).then( data => {
                 navigate('/');
-                // if (data.success) {
-                // } else {
-                //     setError({
-                //         isError: true,
-                //         text: data.error,
-                //     })
-                // } TODO
-            } else {
+            }).catch(error => {
+                console.log(error)
                 setError({
                     isError: true,
-                    text: "There was a problem signing you up to Social Network. Please try again soon.",
-                })
-            }
-        } catch (error) {
-            setError({
-                isError: true,
-                text: "There was a problem signing you up to Social Network. Please try again soon.",
-            })
-        }
+                    text: 'Error'
+                });
+            });
     };
 
     return <div className="content-wrap-auth">

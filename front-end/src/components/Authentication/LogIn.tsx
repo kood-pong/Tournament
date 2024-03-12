@@ -15,36 +15,21 @@ const LogIn = ({ PORT }: Props) => {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         console.log('Form submitted:', { email, password });
-        try {
-            const res = await fetch(`${PORT}/api/v1/users/login`, {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "appliction/json" },
-                body: JSON.stringify({ email, password }),
-            })
-            if (res.ok) {
-                const data = await res.json()
-                navigate('/');
-                // if (data.success) {
-                //     navigate('/');
-                // } else {
-                //     setError({
-                //         isError: true,
-                //         text: data.error,
-                //     })
-                // } TODO
-            } else {
-                setError({
-                    isError: true,
-                    text: "Some error",
-                })
-            }
-        } catch (error) {
+
+        await fetch(`${PORT}/api/v1/users/login`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "appliction/json" },
+            body: JSON.stringify({ email, password }),
+        }).then( data => {
+            navigate('/');
+        }).catch(error => {
+            console.log(error)
             setError({
                 isError: true,
-                text: "There was a problem signing you up to Social Network. Please try again soon.",
-            })
-        }
+                text: 'Error'
+            });
+        });
     };
 
     return <div className="content-wrap-auth">
