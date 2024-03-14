@@ -115,6 +115,11 @@ func (s *server) tournamentGenerate() http.HandlerFunc {
 			return
 		}
 
+		if err := validator.Validate(request); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
 		matches, err := s.store.Tournament().Generate(request.TournamentID, request.NumberOfSets)
 
 		if matches == nil && err == nil {
@@ -139,7 +144,6 @@ func (s *server) tournamentGenerate() http.HandlerFunc {
 func (s *server) tournamentLeaderboard() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tournament_id := r.PathValue("id")
-
 		userList, err := s.store.Tournament().GetLeaderboard(tournament_id)
 		if err != nil {
 			s.error(w, http.StatusUnprocessableEntity, err)
