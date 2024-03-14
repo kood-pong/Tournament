@@ -26,8 +26,16 @@ func (s *server) setCreate() http.HandlerFunc {
 			return
 		}
 
+		if err := s.store.Match().UpdateStatus(models.Match{
+			ID: set.MatchID,
+			Status: "finished",
+		}); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
 		s.respond(w, http.StatusOK, Response{
-			Message: "Successfully created the set",
+			Message: "Successfully finished match - result created",
 			Data:    nil,
 		})
 	}

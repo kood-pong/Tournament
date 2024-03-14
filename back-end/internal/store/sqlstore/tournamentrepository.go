@@ -130,6 +130,7 @@ func (t *TournamentRepository) GetParticipants(tournament_id string) ([]models.U
 func (t *TournamentRepository) GetLeaderboard(tournament_id string) ([]models.User, error) {
 	//check tournament status leaderboard will only be generated, if tournament is finished
 	tournament, err := t.Get(tournament_id)
+
 	if err != nil {
 		return nil, err
 	}
@@ -147,25 +148,27 @@ func (t *TournamentRepository) GetLeaderboard(tournament_id string) ([]models.Us
 		u.wins,
 		u.losses,
 		u.ranking,
-    COUNT(DISTINCT w.id) AS wins,
-    COUNT(DISTINCT l.id) AS losses
+    	SUM(CASE WHEN r.loser_id = u.id THEN 1 ELSE 0 END) AS losses,
+    	SUM(CASE WHEN r.winner_id = u.id THEN 1 ELSE 0 END) AS wins,
+		COALESCE(SUM(CASE WHEN r.winner_id = u.id THEN r.points ELSE 0 END), 0) AS total_points
 	FROM
-    	users u
+    	tournaments t
+	LEFT JOIN 
+    	matches m ON t.id = m.tournament_id
+	LEFT JOIN 
+    	results r ON m.id = r.match_id
 	LEFT JOIN
-    	results w ON u.id = w.winner_id
-	LEFT JOIN
-    	results l ON u.id = l.loser_id
-	JOIN
-		matches m ON (w.match_id = m.id OR l.match_id = m.id)
-	JOIN
-		tournaments t ON m.tournament_id = t.id 
-	WHERE
-		t.id = ?
+    	users u ON u.id = r.winner_id OR u.id = r.loser_id
+	LEFT JOIN 
+    	users ul ON ul.id = r.loser_id
+	WHERE 
+    	m.tournament_id = ? 
 	GROUP BY
     	u.id,
     	u.username
 	ORDER BY
-    	wins DESC, losses ASC;`
+    	wins DESC, total_points DESC, losses ASC;
+`
 
 	rows, err := t.store.Db.Query(query, tournament_id)
 	if err != nil {
@@ -177,9 +180,9 @@ func (t *TournamentRepository) GetLeaderboard(tournament_id string) ([]models.Us
 
 	for rows.Next() {
 		var user models.User
-		var wins, losses int
+		var points int
 
-		if err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.FirstName, &user.LastName, &user.Points, &user.Wins, &user.Losses, &user.Ranking, &wins, &losses); err != nil {
+		if err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.FirstName, &user.LastName, &user.Points, &user.Wins, &user.Losses, &user.Ranking, &user.TournamentLosses, &user.TournamentWins, &points); err != nil {
 			return nil, fmt.Errorf("error scanning rows: %v", err)
 		}
 
@@ -234,6 +237,15 @@ func (t *TournamentRepository) GenerateMatches(participants []models.User, tourn
 	//Get how many matches we need to generate
 	matchNumber := calcMatches(len(participants))
 
+	var currentRound int
+	matchNumbers := []int{1, 2, 4, 8, 16, 32, 64, 128, 256}
+	for i, num := range matchNumbers {
+		if num == matchNumber {
+			currentRound = len(matchNumbers) - (i + 1)
+			break
+		}
+	}
+
 	var matches []models.Match
 	for i := 0; i < matchNumber; i++ {
 		//fill up the first half
@@ -244,23 +256,28 @@ func (t *TournamentRepository) GenerateMatches(participants []models.User, tourn
 				Player2:      "byebye",
 				SetsToWin:    numberOfSets,
 				Status:       "ongoing",
+				CurrentRound: currentRound,
 			})
 		} else {
 			if i >= len(shuffledParticipants) {
 				break
 			}
-			fmt.Println("CHAINGING: ", (matchNumber/2)-(matchNumber-i))
 			matches[(matchNumber/2)-(matchNumber-i)].Player2 = shuffledParticipants[i].ID
 		}
 	}
 
+	//return with actual ID
+	var returnMatches []models.Match
 	//Add matches to db
 	for _, m := range matches {
-		if err := t.store.Match().Create(m); err != nil {
+		match, err := t.store.Match().Create(m)
+		if err != nil {
 			return nil, err
 		}
+		returnMatches = append(returnMatches, *match)
 	}
-	return matches, nil
+
+	return returnMatches, nil
 }
 
 func (t *TournamentRepository) Generate(tournament_id string, numberOfSets int) ([]models.Match, error) {
@@ -281,7 +298,7 @@ func (t *TournamentRepository) Generate(tournament_id string, numberOfSets int) 
 		return matches, nil
 	}
 	//Find all the players who are still on tournament
-	winners, err := t.store.Result().GetWinners()
+	winners, err := t.store.Result().GetWinners(tournament_id)
 	if err != nil {
 		return nil, err
 	}
@@ -294,16 +311,29 @@ func (t *TournamentRepository) Generate(tournament_id string, numberOfSets int) 
 		return nil, nil
 	}
 	//check if its finale
+	var finaleRound []models.Match
 	if len(winners) <= 2 {
 		//it should generate matches for 3rd and 4th place also
 		//query information for 3rd and 4th
-		// finaleMatches, err := t.GenerateMatches()
-		fmt.Println("IMPLEMENT FINALE!")
+		customWinners, err := t.store.Result().GetFinalists(tournament_id)
+		if err != nil {
+			return nil, err
+		}
+
+		finaleRound, err = t.GenerateMatches(customWinners, tournament_id, numberOfSets)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	matches, err = t.GenerateMatches(winners, tournament_id, numberOfSets)
 	if err != nil {
 		return nil, err
+	}
+
+	//check if there is anything to append to finalist (for finale round only)
+	if len(finaleRound) != 0 {
+		matches = append(matches, finaleRound...)
 	}
 
 	return matches, nil

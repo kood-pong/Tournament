@@ -42,6 +42,11 @@ func (s *SetRepository) Create(set *models.Set) (*models.Set, error) {
 	if err = s.store.User().UpdatePoints(player2, set.Player2_Score); err != nil {
 		return nil, err
 	}
+
+	if err := s.DetermineWinner(set.MatchID); err != nil {
+		return nil, err
+	}
+
 	return set, nil
 }
 
@@ -74,16 +79,30 @@ func (s *SetRepository) DetermineWinner(match_id string) error {
 		return errors.New("no winner or loser determined")
 	}
 
+	match, err := s.store.Match().Get(match_id)
+	if err != nil {
+		return err
+	}
+
+	//Calculate the weight/points accordingly
+	//get current winner lose number
+	loseCount, err := s.store.Result().UserLosses(winnerID.String, match.TournamentID)
+	if err != nil {
+		return err
+	}
+
 	//Adding the stuff to database
 	result := &models.Result{
 		MatchID:  match_id,
 		WinnerID: winnerID.String,
 		LoserID:  loserID.String,
+		Points: (match.CurrentRound * 1000) / (loseCount + 1),
 	}
 	err = s.store.Result().Create(result)
 	if err != nil {
 		return err
 	}
+
 
 	//ADD INFORMATION for user in overall db
 	if err = s.store.User().UpdateWins(result.WinnerID, 1); err != nil {

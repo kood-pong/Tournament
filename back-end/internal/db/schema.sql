@@ -32,6 +32,7 @@ CREATE TABLE
         player_2 text NOT NULL,
         sets_to_win integer NOT NULL,
         status text DEFAULT 'ongoing',
+        current_round integer,
         FOREIGN KEY (tournament_id) REFERENCES tournaments (id),
         FOREIGN KEY (player_1) REFERENCES user (id),
         FOREIGN KEY (player_2) REFERENCES user (id)
@@ -53,6 +54,7 @@ CREATE TABLE
         match_id text NOT NULL,
         winner_id text NOT NULL,
         loser_id text NOT NULL,
+        points integer,
         FOREIGN KEY (match_id) REFERENCES matches (id),
         FOREIGN KEY (winner_id) REFERENCES user (id),
         FOREIGN KEY (loser_id) REFERENCES user (id)
@@ -109,12 +111,3 @@ CREATE TABLE
 --     ('d216b845-2c9d-44ad-83dd-28e1a7f5f6e3', 'd216b845-2c9d-44ad-83dd-28e1a7f5fabc', 'bc1c3523-bf22-4da0-b3b5-7df8cf5de03b'),
 --     ('d216b845-2c9d-44ad-83dd-28e1a7f5f6e4', 'd216b845-2c9d-44ad-83dd-28e1a7f5fabc', '6054980f-4db0-4b7f-8579-af31db422a64');
 
-
--- Inserting sample matches
--- INSERT INTO matches (id, tournament_id, player_1, player_2, sets_to_win, status) VALUES
---     ('6054980f-4db0-4b7f-8579-af31db422a61', 'd216b845-2c9d-44ad-83dd-28e1a7f5fabc', '3be5843d-a7ca-468a-af8f-7aaa5d5c7e5c', '671d27dd-df43-4824-8e1c-33cadea83b2b', '1', 'completed'),
---     ('6054980f-4db0-4b7f-8579-af31db422a62', 'd216b845-2c9d-44ad-83dd-28e1a7f5f6e7', 'bc1c3523-bf22-4da0-b3b5-7df8cf5de03b', '6054980f-4db0-4b7f-8579-af31db422a64', '3', 'completed'),
---     ('6054980f-4db0-4b7f-8579-af31db422a63', 'd216b845-2c9d-44ad-83dd-28e1a7f5f6e7', '3be5843d-a7ca-468a-af8f-7aaa5d5c7e5c', 'bc1c3523-bf22-4da0-b3b5-7df8cf5de03b', '3', 'completed'),
---     ('6054980f-4db0-4b7f-8579-af31db422a64', 'd216b845-2c9d-44ad-83dd-28e1a7f5f6e7', '671d27dd-df43-4824-8e1c-33cadea83b2b', '3', '3', 'ongoing'),
---     ('6054980f-4db0-4b7f-8579-af31db422a65', 'd216b845-2c9d-44ad-83dd-28e1a7f5f6e7', '2', '3', '3', 'ongoing'),
---     ('6054980f-4db0-4b7f-8579-af31db422a66', '2', '2', '3', '3', 'ongoing'),

@@ -7,4 +7,5 @@ type Match struct {
 	Player2      string `db:"player_2" json:"player_2" validate:"required"`
 	SetsToWin    int    `db:"sets_to_win" json:"sets_to_win"`
 	Status       string `db:"status" json:"status" validate:"required|contains:ongoing,finished"`
+	CurrentRound int    `db:"current_round" json:"current_round"`
 }

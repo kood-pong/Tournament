@@ -34,7 +34,7 @@ type NotificationRepository interface {
 }
 
 type MatchRepository interface {
-	Create(match models.Match) error
+	Create(match models.Match) (*models.Match, error)
 	FindOngoing(tournament_id string) ([]models.Match, error)
 	UpdateStatus(match models.Match) error
 	Get(match_id string) (*models.Match, error)
@@ -47,5 +47,8 @@ type SetRepository interface {
 
 type ResultRepository interface {
 	Create(result *models.Result) error
-	GetWinners() ([]models.User, error)
+	GetWinners(tournament_id string) ([]models.User, error)
+	MaxWins(tournament_id string) (int, error)
+	UserLosses(user_id, tournament_id string) (int, error)
+	GetFinalists(tournament_id string) ([]models.User, error)
 }
