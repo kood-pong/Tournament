@@ -39,17 +39,17 @@ function App() {
           <Route
             path='/calendar'
             element={
-              <Calendar />
+              <Calendar  PORT={PORT}/>
             } />
           <Route // authorised
             path='/user/:id'
             element={
-              <Profile />
+              <Profile PORT={PORT}/>
             } />
           <Route
             path='/tournament/:id'
             element={
-              <Tournament />
+              <Tournament PORT={PORT}/>
             } />
           <Route // only for admin
             path='/requests'
@@ -60,19 +60,19 @@ function App() {
           <Route // only for admin
             path='/create-tournament'
             element={
-              <CreateTournament />
+              <CreateTournament PORT={PORT}/>
             }
           />
           <Route // only for admin
             path='/tournament/:id/set-up'
             element={
-              <TournamentSetUp />
+              <TournamentSetUp PORT={PORT}/>
             }
           />
           <Route // only for admin
             path='/tournament/:id/matches'
             element={
-              <Matches />
+              <Matches PORT={PORT}/>
             }
           />
           <Route // only for admin

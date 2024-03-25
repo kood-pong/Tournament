@@ -22,6 +22,8 @@
   --title-font-size: 4em;
   --title-font-size-adapted: 1.5em;
 
+  --add-font-size: 0.75rem;
+
 }
 
 /* Light mode styles */
@@ -89,6 +91,10 @@ code {
 
 .text {
   font-size: var(--body-text-font-size);
+}
+
+.add-text {
+  font-size: var(--add-font-size);
 }
 
 @media (max-width: 815px) {

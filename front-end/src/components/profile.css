@@ -1,0 +1,113 @@
+.grid-profile {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 1.25rem;
+    margin: 100px 0;
+}
+
+.grid-profile-item {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.profile-img-holder {
+    width: 5.25rem;
+    height: 5.25rem;
+}
+
+.user-holder {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 1.25rem;
+    align-items: center;
+}
+
+.pr-t {
+    width: 100%;
+    text-align: left;
+}
+
+.circle-1, .circle-2, .circle-3 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+
+    margin: 0;
+    padding: 0;
+}
+
+.circle-1 {
+    position: relative; /* Ensure child elements position properly */
+    background-color: var(--bg-color);
+    width: 605px;
+    height: 605px;
+    z-index: 1; /* Ensure it's above other circles */
+}
+
+.circle-1::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: var(--color-3); /* Adjust background color opacity */
+    filter: blur(30px);
+    z-index: -1; /* Place the blurred background behind other content */
+}
+
+.circle-2 {
+    background-color: var(--color-2);
+    width: 550px;
+    height: 550px;
+}
+
+.circle-3 {
+    background-color: var(--color-1);
+    width: 397px;
+    height: 397px;
+    color: var(--color-3);
+}
+
+@media (max-width: 850px) {
+    .grid-profile-item {
+        align-items: center;
+    }
+
+    .grid-profile {
+        grid-template-columns: auto;
+        margin: 50px 0;
+    }
+
+    .profile-img-holder {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    .circle-1 {
+        width: 330px;
+        height: 330px;
+    }
+
+    .circle-1::before {
+        filter: blur(25px);
+    }
+
+    .circle-2 {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .circle-3 {
+        width: 190px;
+        height: 190px;
+    }
+}

@@ -29,5 +29,6 @@
 @media (max-width: 850px) {
     .content-wrap {
         margin: 0 5%;
+        padding-bottom: 0;
     }
 }

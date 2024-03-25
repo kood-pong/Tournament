@@ -27,7 +27,7 @@
 
 .table-entity {
     border-bottom: solid 1px var(--text-color);
-    /* width: 90%; */
+    width: 90%;
     height: 40px;
     margin: 0 20px;
 
@@ -35,6 +35,9 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+
+    text-decoration: none;
+    color: var(--text-color);
 }
 
 @media (max-width: 815px) {
