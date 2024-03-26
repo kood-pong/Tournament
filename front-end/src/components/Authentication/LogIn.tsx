@@ -18,8 +18,8 @@ const LogIn = ({ PORT }: Props) => {
 
         await fetch(`${PORT}/api/v1/users/login`, {
             method: "POST",
+            headers: { "Content-Type": "application/json" },
             credentials: "include",
-            headers: { "Content-Type": "appliction/json" },
             body: JSON.stringify({ email, password }),
         }).then( data => {
             navigate('/');

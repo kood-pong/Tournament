@@ -2,9 +2,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"tournament/back-end/internal/app/server"
 )
@@ -33,11 +31,4 @@ func main() {
 	// mux.HandleFunc("/", testHandler())
 	// http.ListenAndServe(":8080", mux)
 	log.Fatal(server.Start(config))
-	// fmt.Println("DSADASDASDAS")
-}
-
-func testHandler() http.HandlerFunc{
-	return func(w http.ResponseWriter, r *http.Request){
-		fmt.Println("TESTDSADSADSADSA")
-	}
 }
