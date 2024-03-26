@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"tournament/back-end/internal/store"
 	"tournament/back-end/pkg/router"
@@ -21,12 +22,14 @@ const ctxUserID ctxKey = 1
 type server struct {
 	router *router.Router
 	store  store.Store
+	logger *log.Logger
 }
 
 func newServer(store store.Store) *server {
 	s := &server{
 		router: router.New(),
 		store:  store,
+		logger: log.Default(),
 	}
 
 	s.configureRouter()
@@ -36,7 +39,7 @@ func newServer(store store.Store) *server {
 
 func (s *server) configureRouter() {
 	//Middleware usage
-	s.router.Use(s.CORSMiddleware)
+	s.router.Use(s.CORSMiddleware, s.logRequest, s.setRequestID)
 	s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
 	s.router.UseWithPrefix("/admin", s.adminMiddleware)
 	//USERS
