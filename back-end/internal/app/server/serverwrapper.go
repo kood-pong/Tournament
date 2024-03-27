@@ -2,12 +2,14 @@ package server
 
 import (
 	"database/sql"
-	"tournament/back-end/internal/store/sqlstore"
 	"log"
 	"net/http"
 	"os"
+	"tournament/back-end/internal/store/sqlstore"
+	"tournament/back-end/pkg/router"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/rs/cors"
 )
 
 func Start(config *Config) error {
@@ -19,9 +21,23 @@ func Start(config *Config) error {
 	defer db.Close()
 
 	store := sqlstore.New(db)
-	srv := newServer(store)
 
-	return http.ListenAndServe(config.Port, srv)
+	corsMiddleware := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Content-Type", "Content-Length", "Authorization"},
+		AllowCredentials: true,
+	})
+
+	router := router.New()
+
+	newHttpSrv := &http.Server{
+		Addr: ":7080",
+		Handler: corsMiddleware.Handler(router),
+	}
+	srv := newServer(store, newHttpSrv, router)
+
+	return srv.Server.ListenAndServe()
 }
 
 func newDB(databaseURL, dataBaseSchema string) (*sql.DB, error) {

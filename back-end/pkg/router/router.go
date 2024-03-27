@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -51,6 +52,7 @@ func (r *Router) Handle(pattern string, handler http.Handler) {
 	for i := len(r.middlewares) - 1; i >= 0; i-- {
 		handler = r.middlewares[i].Middleware(handler)
 	}
+	fmt.Println("registered route - ", pattern, "handler - ", handler)
 	r.mux.Handle(pattern, handler)
 }
 
@@ -70,6 +72,15 @@ func (r *Router) PUT(pattern string, fn http.HandlerFunc) {
 	r.Handle(http.MethodPut+" "+pattern, fn)
 }
 
+func (r *Router) OPTIONS(pattern string, fn http.HandlerFunc) {
+	r.Handle(http.MethodOptions+" "+pattern, fn)
+}
+
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	// for i := len(r.middlewares) - 1; i >= 0; i-- {
+	// 	handler := r.middlewares[i].Middleware(notFoundWithMiddleware)
+	// }
+
+	fmt.Println("1")
 	r.mux.ServeHTTP(w, req)
 }

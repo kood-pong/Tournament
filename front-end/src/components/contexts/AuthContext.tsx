@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
+import { User } from "../../models/user";
 
 interface AuthProviderProps {
     children: ReactNode;
@@ -8,22 +9,6 @@ interface AuthProviderProps {
 interface AuthContextType {
     isLoggedIn: boolean;
     user: User | null;
-}
-
-type User = {
-    email: string;
-    first_name: string;
-    id: string;
-    last_name: string;
-    losses: number;
-    notifications: null | any; // Assuming notifications can be any type or null
-    password: string;
-    points: number;
-    ranking: number;
-    role: number;
-    status: string;
-    username: string;
-    wins: number;
 }
 
 const AuthContext = createContext<AuthContextType>({ isLoggedIn: false, user: null });
@@ -37,11 +22,15 @@ export const AuthProvider = ({ children, PORT }: AuthProviderProps) => {
             await fetch(`http://localhost:7080/api/v1/auth/checkCookie`, {
                 method: 'GET',
                 credentials: 'include', // Include cookies in the request
-            }).then(async json => {
-                const res = await json.json();
-                let userID = res.data;
-                setIsLoggedIn(true);
-                GetCurrUser(userID);
+            }).then(async response => {
+                if (response.ok) {
+                    const res = await response.json();
+                    let userID = res.data;
+                    setIsLoggedIn(true);
+                    GetCurrUser(userID);
+                } else {
+                    throw new Error('Failed to fetch');
+                }
             }).catch(error => {
                 console.error('Error checking login status:', error);
             });
@@ -64,7 +53,7 @@ export const AuthProvider = ({ children, PORT }: AuthProviderProps) => {
     }
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, user}}>
+        <AuthContext.Provider value={{ isLoggedIn, user }}>
             {children}
         </AuthContext.Provider>
     );

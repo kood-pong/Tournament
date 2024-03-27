@@ -23,7 +23,6 @@ const SignUp = ({ PORT }: Props) => {
             setError({ isError: true, text: 'Wrong repeated password' })
             return
         }
-
             await fetch(`${PORT}/api/v1/users/create`, {
                 method: "POST",
                 credentials: "include",
