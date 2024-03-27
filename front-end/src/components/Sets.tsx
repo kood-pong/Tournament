@@ -3,6 +3,7 @@ import TableMainHeader from "./BasicElements/TableSMHeader";
 import TableHeader from "./BasicElements/TableSHeader";
 import TableEntity from "./BasicElements/TableSEntity";
 import './sets.css';
+import { useState } from "react";
 
 const Sets = () => {
     const match = {
@@ -11,6 +12,17 @@ const Sets = () => {
         participant2: 'PaddlePro',
         completed: false,
     }
+
+    const [pl1PointsList, setPl1PointsList] = useState<number>(0);
+    const [pl2PointsList, setPl2PointsList] = useState<number>(0);
+
+    const updatePl1Points = (plPoints: number) => {
+        setPl1PointsList(plPoints);
+    };
+
+    const updatePl2Points = (plPoints: number) => {
+        setPl2PointsList(plPoints);
+    };
 
     // TODO take match and update it after entering data
 
@@ -23,10 +35,10 @@ const Sets = () => {
                 </div>
                 <TableMainHeader match={match} />
                 <div className="set-cont">
-                    <div className="title-1">Set 1</div>
+                    <div className="title-1 set-h">Set 1</div>
                     <TableHeader />
-                    <TableEntity id={1} participantName={match.participant1} />
-                    <TableEntity id={2} participantName={match.participant2} />
+                    <TableEntity id={1} participantName={match.participant1} updatePlPoints={updatePl1Points} />
+                    <TableEntity id={2} participantName={match.participant2} updatePlPoints={updatePl2Points} />
                 </div>
                 <button className="btn-1" style={{ marginTop: '50px' }}>Done</button>
             </div>
