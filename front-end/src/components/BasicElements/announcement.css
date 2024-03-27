@@ -18,3 +18,10 @@
     justify-content: center;
     gap: 20px;
 }
+
+@media (max-width: 850px) {
+    .btns-cont {
+        gap: 15px;
+        flex-direction: column;
+    }
+}
