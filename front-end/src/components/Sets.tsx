@@ -1,24 +1,34 @@
 import Header from "./BasicElements/Header";
-import TableEntity from "./BasicElements/TableLBEntity";
-import TableHeader from "./BasicElements/TableLBHeader";
+import TableMainHeader from "./BasicElements/TableSMHeader";
+import TableHeader from "./BasicElements/TableSHeader";
+import TableEntity from "./BasicElements/TableSEntity";
+import './sets.css';
 
-type Props = {
-    match: any;
-}
+const Sets = () => {
+    const match = {
+        id: 1,
+        participant1: 'SpinMaster83',
+        participant2: 'PaddlePro',
+        completed: false,
+    }
 
+    // TODO take match and update it after entering data
 
-const Sets = ({match}: Props) => {
     return (
         <div className="page-container">
             <Header />
             <div className="content-wrap">
                 <div className="top-line big-title">
-                    Matches
+                    Match {match?.id}
                 </div>
-                <TableHeader />
-                <div style={{ height: '15px' }}></div>
-                {/*  */}
-                <button className="btn-1" style={{marginTop: '50px'}}>Done</button>
+                <TableMainHeader match={match} />
+                <div className="set-cont">
+                    <div className="title-1">Set 1</div>
+                    <TableHeader />
+                    <TableEntity id={1} participantName={match.participant1} />
+                    <TableEntity id={2} participantName={match.participant2} />
+                </div>
+                <button className="btn-1" style={{ marginTop: '50px' }}>Done</button>
             </div>
         </div>
     )
