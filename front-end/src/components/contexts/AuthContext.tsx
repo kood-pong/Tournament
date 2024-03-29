@@ -8,14 +8,14 @@ interface AuthProviderProps {
 
 interface AuthContextType {
     isLoggedIn: boolean;
-    user: User | null;
+    curruser: User | null;
 }
 
-const AuthContext = createContext<AuthContextType>({ isLoggedIn: false, user: null });
+const AuthContext = createContext<AuthContextType>({ isLoggedIn: false, curruser: null });
 
 export const AuthProvider = ({ children, PORT }: AuthProviderProps) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [user, setUser] = useState<User | null>(null);
+    const [curruser, setCurruser] = useState<User | null>(null);
 
     useEffect(() => {
         const checkLoggedIn = async () => {
@@ -25,9 +25,9 @@ export const AuthProvider = ({ children, PORT }: AuthProviderProps) => {
             }).then(async response => {
                 if (response.ok) {
                     const res = await response.json();
-                    let userID = res.data;
+                    let curruserID = res.data;
                     setIsLoggedIn(true);
-                    GetCurrUser(userID);
+                    Getcurruser(curruserID);
                 } else {
                     throw new Error('Failed to fetch');
                 }
@@ -39,21 +39,21 @@ export const AuthProvider = ({ children, PORT }: AuthProviderProps) => {
         checkLoggedIn();
     }, []);
 
-    const GetCurrUser = async (id: string) => {
+    const Getcurruser = async (id: string) => {
         await fetch(`http://localhost:7080/api/v1/users/${id}`, {
             method: 'GET',
             credentials: 'include', // Include cookies in the request
         }).then(async json => {
             const res = await json.json();
-            let user: User = res.data as User;
-            setUser(user);
+            let curruser: User = res.data as User;
+            setCurruser(curruser);
         }).catch(error => {
-            console.error('Error taking current user:', error);
+            console.error('Error taking current curruser:', error);
         });
     }
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, user }}>
+        <AuthContext.Provider value={{ isLoggedIn, curruser }}>
             {children}
         </AuthContext.Provider>
     );

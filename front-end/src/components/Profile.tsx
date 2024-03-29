@@ -5,13 +5,17 @@ import { useEffect, useState } from "react";
 import { User } from "../models/user";
 import './profile.css';
 import TournamentItem from "./BasicElements/TournamentItem";
+import { Tournament } from "../models/tournament";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
 interface Props {
     PORT: string;
 }
 
 const Profile = ({ PORT }: Props) => {
+    const { isLoggedIn, curruser } = useAuth();
     const { id } = useParams();
+    const [tournaments, setTournaments] = useState<Tournament[]>([]);
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
@@ -24,7 +28,6 @@ const Profile = ({ PORT }: Props) => {
                     const res = await response.json();
                     let user: User = res.data as User;
                     setUser(user);
-                    console.log(user)
                 } else {
                     throw new Error('Failed to fetch');
                 }
@@ -34,6 +37,26 @@ const Profile = ({ PORT }: Props) => {
         };
         takeUser();
     }, []);
+
+    useEffect(() => {
+        const takeUsersTournaments = async () => {
+            await fetch(`${PORT}/api/v1/jwt/tournaments`, {
+                method: 'GET',
+                credentials: 'include',
+            }).then(async response => {
+                if (response.ok) {
+                    const res = await response.json();
+                    let ts: Tournament[] = res.data as Tournament[];
+                    setTournaments(ts);
+                } else {
+                    throw new Error('Failed to fetch');
+                }
+            }).catch(error => {
+                console.error('Error taking current user:', error);
+            })
+        };
+        takeUsersTournaments();
+    })
 
     return (
         <div className="page-container">
@@ -57,16 +80,14 @@ const Profile = ({ PORT }: Props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="grid-profile-item">
-                        <div className="title-1 pr-t">Previous tournaments:</div>
-                        {/* {months.map((month, index) => (
-                        <div className='calendar-item text'>
-                            {month}
-                            <TournamentItem />
+                    {curruser?.id === id ? (
+                        <div className="grid-profile-item">
+                            <div className="title-1 pr-t">Previous tournaments:</div>
+                            {tournaments.map((tourn, index) => (
+                                <TournamentItem key={index} tournament={tourn} />
+                            ))}
                         </div>
-                    ))} */}
-                        {/* <TournamentItem /> */}
-                    </div>
+                    ) : null}
                 </div>
             </div>
             <div className="main-footer">

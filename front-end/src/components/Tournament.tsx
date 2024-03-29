@@ -16,7 +16,7 @@ interface Props {
 const Tournament = ({ PORT }: Props) => {
     const { id } = useParams();
     const [leaderboard, getLeaderboard] = useState([]);
-    const { isLoggedIn, user } = useAuth();
+    const { isLoggedIn, curruser } = useAuth();
     // const pictures: string[] = [];
     const pictures = [
         'https://cavtat-tenis.com/img/gallery-1.jpg',
@@ -69,7 +69,7 @@ const Tournament = ({ PORT }: Props) => {
                         </div>
                     </div>
                 ) : null}
-                {pictures.length == 0 && user != null && user.role == 1 ? (
+                {pictures.length == 0 && curruser != null && curruser.role == 1 ? (
                     <div className="upload-pict">
                         <DownloadIcon />
                         Select or drag file to upload
@@ -82,7 +82,7 @@ const Tournament = ({ PORT }: Props) => {
                         <>
                             {leaderboard.slice(3).map(user => (
                                 <div key={user["id"]}>
-                                    {/* TODO change user type */}
+                                    {/* TODO change curruser type */}
                                     <TableEntity key={user["id"]} user={user} />
                                 </div>
                             ))}

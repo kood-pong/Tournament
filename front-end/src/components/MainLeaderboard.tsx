@@ -16,7 +16,7 @@ interface Props {
 
 const MainPage = ({ PORT }: Props) => {
     const [leaderboard, getLeaderboard] = useState([]);
-    const { isLoggedIn, user } = useAuth();
+    const { isLoggedIn, curruser } = useAuth();
 
     useEffect(() => {
         const takeParticipants = async () => {
@@ -25,7 +25,7 @@ const MainPage = ({ PORT }: Props) => {
                 credentials: 'include'
             }).then(async data => {
                 const json = await data.json()
-                // TODO create class for users and modify it
+                // TODO create class for currusers and modify it
                 const lb = json.data.sort(function (a: { ranking: number; }, b: { ranking: number; }) {
                     return a.ranking - b.ranking;
                 });
@@ -48,10 +48,10 @@ const MainPage = ({ PORT }: Props) => {
             <Header />
             <div className="content-wrap">
                 {/* TODO try to use it as a component */}
-                {user != null && user.role == 1 ? (
+                {curruser != null && curruser.role == 1 ? (
                     // TODO check if there is any scheduled tournament otherwise add button start tournament
                     <>
-                        {user != null ? (
+                        {curruser != null ? (
                             <a href={`/create-tournament`} className="btn-1 ct-btn">Schedule new tournament</a>
                         ) : (
                             <div className="announc-cont">
@@ -65,7 +65,7 @@ const MainPage = ({ PORT }: Props) => {
                             </div>
                         )}
                     </>
-                ) : user != null ? (
+                ) : curruser != null ? (
                     <div className="announc-cont">
                         <p className='text'>Register Now for Our Upcoming Tournament!</p>
                         <div className="btns-cont">
@@ -81,10 +81,10 @@ const MainPage = ({ PORT }: Props) => {
                     <div style={{ height: '15px' }}></div>
                     {leaderboard.length >= 4 ? (
                         <>
-                            {leaderboard.slice(3).map(user => (
-                                <div key={user["id"]}>
-                                    {/* TODO change user type */}
-                                    <TableEntity user={user} />
+                            {leaderboard.slice(3).map(curruser => (
+                                <div key={curruser["id"]}>
+                                    {/* TODO change curruser type */}
+                                    <TableEntity user={curruser} />
                                 </div>
                             ))}
                         </>) : null}

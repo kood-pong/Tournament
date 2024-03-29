@@ -6,6 +6,7 @@ type Props = {
 }
 
 const Pedestal = ({ winers, name }: Props) => {
+    console.log(winers)
     return (
         <>
             <div className='pedestals-cont'>
@@ -23,7 +24,7 @@ const Pedestal = ({ winers, name }: Props) => {
                     </div>
                 </div>
                 <div className='pedestal-column'>
-                    <a className="user-link-cont" href={`/user/${winers[1].id}`}>
+                    <a className="user-link-cont" href={`/user/${winers[0].id}`}>
                         <div className='usr-img-holder img-holder'>
                             {/* TODO check real picture */}
                             <img src='https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg' />
@@ -36,7 +37,7 @@ const Pedestal = ({ winers, name }: Props) => {
                     </div>
                 </div>
                 <div className='pedestal-column'>
-                    <a className="user-link-cont" href={`/user/${winers[1].id}`}>
+                    <a className="user-link-cont" href={`/user/${winers[2].id}`}>
                         <div className='usr-img-holder img-holder'>
                             {/* TODO check real picture */}
                             <img src='https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg' />

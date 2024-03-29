@@ -12,7 +12,7 @@ import { useAuth } from "../contexts/AuthContext";
 const Header = () => {
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
-    const { isLoggedIn, user } = useAuth();
+    const { isLoggedIn, curruser } = useAuth();
 
     useState();
 
@@ -30,7 +30,7 @@ const Header = () => {
                     <button onClick={() => { navigate('/') }} className="btn-2">Leaderboard</button>
                     <button onClick={() => { navigate('/calendar') }} className="btn-2">Calendar</button>
                     <ModeSwitcher />
-                    {user != null && user?.role == 1 ? (
+                    {curruser != null && curruser?.role == 1 ? (
                         <div className="requests-btn" onClick={() => { navigate(`/requests`) }}>
                             <div className="request-icon-cont">
                                 <RequestsIcon />
@@ -45,11 +45,11 @@ const Header = () => {
                             <button onClick={() => { navigate('/signup') }} className='btn-1'>Sign Up</button>
                         </div>
                     ) : (
-                        <div className="profile-btn" onClick={() => { navigate(`/user/${user?.id}`) }}>
+                        <div className="profile-btn" onClick={() => { navigate(`/user/${curruser?.id}`) }}>
                             <div className="usr-img img-holder">
                                 <img src='https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg' />
                             </div>
-                            {user?.username}
+                            {curruser?.username}
                         </div>
                     )}
                 </div>
