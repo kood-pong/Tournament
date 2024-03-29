@@ -21,8 +21,16 @@ const LogIn = ({ PORT }: Props) => {
             headers: { "Content-Type": "application/json" },
             credentials: "include",
             body: JSON.stringify({ email, password }),
-        }).then( data => {
-            navigate('/');
+        }).then( async response => {
+            if (response.ok) {
+                navigate('/');
+            } else {
+                const res = await response.json();
+                setError({
+                    isError: true,
+                    text: res.error
+                });
+            }
         }).catch(error => {
             console.log(error)
             setError({
@@ -53,7 +61,7 @@ const LogIn = ({ PORT }: Props) => {
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
-                        <span className='text red'>{error.text}</span>
+                        {/* <span className='text red'>{error.text}</span> */}
                     </div>
                     <div className='input-field text'>
                         <label htmlFor="password" className={`${error.isError ? 'red' : ''}`}>Password:</label>

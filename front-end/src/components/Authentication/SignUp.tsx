@@ -18,7 +18,6 @@ const SignUp = ({ PORT }: Props) => {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log('Form submitted:', { email, username, password, 'first_name': firstName, 'last_name': lastName });
         if (password !== repeatedPassword) {
             setError({ isError: true, text: 'Wrong repeated password' })
             return
@@ -27,9 +26,17 @@ const SignUp = ({ PORT }: Props) => {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "appliction/json" },
-                body: JSON.stringify({ email, password, username }),
-            }).then( data => {
-                navigate('/');
+                body: JSON.stringify({ email, password, username, first_name: firstName, last_name: lastName }),
+            }).then( async response => {
+                if (response.ok) {
+                    navigate('/');
+                } else {
+                    const res = await response.json();
+                    setError({
+                        isError: true,
+                        text: res.error
+                    });
+                }
             }).catch(error => {
                 console.log(error)
                 setError({
@@ -56,7 +63,7 @@ const SignUp = ({ PORT }: Props) => {
                 <h1 className='title-1'>Sign Up</h1>
                 <form onSubmit={handleSubmit}>
                     <div className='input-field text'>
-                        <label htmlFor="first-name">First name:</label>
+                        <label htmlFor="first-name" className={`${error.isError ? 'red' : ''}`}>First name:</label>
                         <input
                             type="text"
                             id="first-name"
@@ -68,7 +75,7 @@ const SignUp = ({ PORT }: Props) => {
                         />
                     </div>
                     <div className='input-field text'>
-                        <label htmlFor="last-name">Last name:</label>
+                        <label htmlFor="last-name" className={`${error.isError ? 'red' : ''}`}>Last name:</label>
                         <input
                             type="text"
                             id="last-name"
@@ -80,7 +87,7 @@ const SignUp = ({ PORT }: Props) => {
                         />
                     </div>
                     <div className='input-field text'>
-                        <label htmlFor="email">Email:</label>
+                        <label htmlFor="email" className={`${error.isError ? 'red' : ''}`}>Email:</label>
                         <input
                             type="email"
                             id="email"
@@ -92,7 +99,7 @@ const SignUp = ({ PORT }: Props) => {
                         />
                     </div>
                     <div className='input-field text'>
-                        <label htmlFor="discord-name">Discord username:</label>
+                        <label htmlFor="discord-name" className={`${error.isError ? 'red' : ''}`}>Discord username:</label>
                         <input
                             type="text"
                             id="discord-name"
@@ -104,7 +111,7 @@ const SignUp = ({ PORT }: Props) => {
                         />
                     </div>
                     <div className='input-field text'>
-                        <label htmlFor="password">Password:</label>
+                        <label htmlFor="password" className={`${error.isError ? 'red' : ''}`}>Password:</label>
                         <input
                             id="password"
                             type='password'
@@ -128,7 +135,6 @@ const SignUp = ({ PORT }: Props) => {
                         ></input>
                         <span className='text red'>{error.text}</span>
                     </div>
-                    {error.text}
                     <button className='btn-1 submit-btn' type="submit">Submit</button>
                 </form>
                 <div>
