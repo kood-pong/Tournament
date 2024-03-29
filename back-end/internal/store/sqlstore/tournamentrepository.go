@@ -126,6 +126,43 @@ func (t *TournamentRepository) Register(reg *models.Register) error {
 	return nil
 }
 
+func (t *TournamentRepository) CheckRegister(user_id, tournament_id string) (bool, error) {
+	query := `SELECT * FROM registration WHERE user_id = ? AND tournament_id = ?`
+	var registration models.Register
+	err := t.store.Db.QueryRow(query, user_id, tournament_id).Scan(&registration.ID, &registration.TournamentID, &registration.UserID);
+	if err != nil {
+		return false, fmt.Errorf("error while getting registration: %v", err)
+	}
+	return true, nil
+}
+
+func (t *TournamentRepository) UnRegister(user_id, tournament_id string) error{
+	//check tournament state
+	tournament, err := t.Get(tournament_id)
+	if err != nil {
+		return err
+	}
+	if tournament.Status != "open" {
+		return errors.New("can not unregister anymore")
+	}
+
+	query := `DELETE FROM registration WHERE user_id = ? AND tournament_id = ?`
+
+	rows, err := t.store.Db.Exec(query, user_id, tournament_id)
+	if err != nil {
+		return err
+	}
+	aff, err := rows.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if aff == 0 {
+		return errors.New("nothing was deleted")
+	}
+
+	return nil
+}
+
 func (t *TournamentRepository) GetAllOngoing(state string) ([]models.Tournament, error) {
 	query := `SELECT * FROM tournaments WHERE status = ?`
 
@@ -314,20 +351,17 @@ func (t *TournamentRepository) Start(tournament_id string, numberOfSets int) ([]
 		return nil, err
 	}
 
-	fmt.Println("successfull 1")
 	//generate matches
 	matches, err := t.GenerateMatches(participants, tournament_id, numberOfSets)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("successfull ")
 
 	return matches, nil
 }
 
 func (t *TournamentRepository) GenerateMatches(participants []models.User, tournament_id string, numberOfSets int) ([]models.Match, error) {
 	//shuffle players
-	fmt.Println(participants)
 	shuffledParticipants := shuffle(participants)
 	//Get how many matches we need to generate
 	matchNumber := calcMatches(len(participants))
@@ -340,8 +374,7 @@ func (t *TournamentRepository) GenerateMatches(participants []models.User, tourn
 			break
 		}
 	}
-	fmt.Println("MATCHNUMBER: ", matchNumber)
-	fmt.Println("SHUFFELED: ", shuffledParticipants)
+
 	var matches []models.Match
 	for i := 0; i < matchNumber; i++ {
 		//fill up the first half

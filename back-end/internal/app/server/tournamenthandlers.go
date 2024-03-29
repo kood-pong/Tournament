@@ -204,7 +204,7 @@ func (s *server) getUserParticipatedTournaments() http.HandlerFunc {
 func (s *server) tournamentGetOngoing() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		state := r.PathValue("state")
-		if state != "ongoing" && state != "open" && state != "finished"{
+		if state != "ongoing" && state != "open" && state != "finished" {
 			s.error(w, http.StatusBadRequest, errors.New("only open, ongoing allowed"))
 			return
 		}
@@ -216,7 +216,54 @@ func (s *server) tournamentGetOngoing() http.HandlerFunc {
 
 		s.respond(w, http.StatusOK, Response{
 			Message: "Successfully retrieved all ongoing tournaments",
-			Data: tournaments,
+			Data:    tournaments,
+		})
+	}
+}
+
+func (s *server) tournamentRegisterCheck() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tournament_id := r.PathValue("id")
+		user_id := r.Context().Value(ctxUserID).(string)
+
+		if user_id == "" {
+			s.error(w, http.StatusUnauthorized, errors.New("unauthorized"))
+			return
+		}
+
+		b, err := s.store.Tournament().CheckRegister(user_id, tournament_id)
+		if err != nil {
+			s.respond(w, http.StatusOK, Response{
+				Message: err.Error(),
+				Data:    b,
+			})
+			return
+		}
+		s.respond(w, http.StatusOK, Response{
+			Message: "Checked successfully",
+			Data:    b,
+		})
+	}
+}
+
+func (s *server) tournamentUnRegister() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tournament_id := r.PathValue("id")
+		user_id := r.Context().Value(ctxUserID).(string)
+
+		if user_id == "" {
+			s.error(w, http.StatusUnauthorized, errors.New("unauthorized"))
+			return
+		}
+
+		if err := s.store.Tournament().UnRegister(user_id, tournament_id); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		s.respond(w, http.StatusOK, Response{
+			Message: "Successfully unregistered",
+			Data:    nil,
 		})
 	}
 }

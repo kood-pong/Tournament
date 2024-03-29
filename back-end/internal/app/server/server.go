@@ -41,12 +41,10 @@ func newServer(store store.Store, srv *http.Server, r *router.Router) *server {
 
 func (s *server) configureRouter() {
 	//Middleware usage
-	// s.router.Use(s.CORSMiddleware)
 	s.router.Use(s.setRequestID, s.logRequest)
 	s.router.UseWithPrefix("/jwt", s.jwtMiddleware)
 	s.router.UseWithPrefix("/admin", s.adminMiddleware)
 	//USERS
-	// s.router.OPTIONS("/", s.test())
 	s.router.POST("/api/v1/users/create", s.userCreate())
 	s.router.POST("/api/v1/users/login", s.userLogin())
 	s.router.GET("/api/v1/users/logout", s.userLogout())
@@ -59,6 +57,8 @@ func (s *server) configureRouter() {
 	//<------------AUTH MIDDLEWARE REQUIRED-------------->
 	//USERS
 	s.router.GET("/api/v1/jwt/tournaments/register/{id}", s.tournamentRegister())
+	s.router.GET("/api/v1/jwt/tournaments/unregister/{id}", s.tournamentUnRegister())
+	s.router.GET("/api/v1/jwt/tournaments/register/check/{id}", s.tournamentRegisterCheck())
 	s.router.GET("/api/v1/jwt/notifications/update/{id}", s.notificationUpdate())
 	s.router.GET("/api/v1/jwt/tournaments", s.getUserParticipatedTournaments())
 

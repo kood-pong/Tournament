@@ -20,7 +20,6 @@ func (n *NotificationRepository) Create(notification *models.Notification) error
 
 	res, err := n.store.Db.Exec(query, notification.ID, notification.UserID, notification.Message, notification.Status)
 
-	// fmt.Println("res", res, "Created a notification", notification)
 	if err != nil {
 		return err
 	}

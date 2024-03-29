@@ -27,6 +27,8 @@ type TournamentRepository interface {
 	Generate(tournament_id string, numberOfSets int) ([]models.Match, error)
 	GetUserParticipatedTournaments(user_id string) ([]models.TournamentWithWinner, error)
 	GetAllOngoing(state string) ([]models.Tournament, error)
+	CheckRegister(user_id, tournament_id string) (bool, error)
+	UnRegister(user_id, tournament_id string) error
 }
 
 type NotificationRepository interface {
