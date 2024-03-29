@@ -1,13 +1,21 @@
+import { Tournament } from "../../models/tournament";
 import "./tournamentItem.css";
 
-const TournamentItem = () => {
-    const id = 0;
+interface Props {
+    tournament: Tournament;
+}
+
+const TournamentItem = ({ tournament }: Props) => {
 
     return (
-        <a  href={`/tournament/${id}`} className='tournament-item'>
-            <div className='calendar-date text'>date</div>
-            <div className='title-1'>name</div>
-            <div className='text'>winner</div>
+        <a href={`/tournament/${tournament.id}`} className='tournament-item'>
+            <div className='calendar-date text'>{new Date(tournament.start_date).toLocaleDateString('en-US', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            })}</div>
+            <div className='title-1 br'>{tournament.name}</div>
+            <div className='text'>Winner - {tournament.winner.first_name} {tournament.winner.last_name}</div>
         </a>
     );
 }

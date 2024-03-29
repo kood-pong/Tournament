@@ -65,7 +65,7 @@ const Profile = ({ PORT }: Props) => {
                             <TournamentItem />
                         </div>
                     ))} */}
-                        <TournamentItem />
+                        {/* <TournamentItem /> */}
                     </div>
                 </div>
             </div>

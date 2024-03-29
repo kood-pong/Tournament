@@ -31,7 +31,7 @@ const Header = () => {
                     <button onClick={() => { navigate('/calendar') }} className="btn-2">Calendar</button>
                     <ModeSwitcher />
                     {user != null && user?.role == 1 ? (
-                        <div className="requests-btn">
+                        <div className="requests-btn" onClick={() => { navigate(`/requests`) }}>
                             <div className="request-icon-cont">
                                 <RequestsIcon />
                                 <div className="buble-num">1</div>

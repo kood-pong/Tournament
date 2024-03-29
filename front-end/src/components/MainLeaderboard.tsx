@@ -57,8 +57,10 @@ const MainPage = ({ PORT }: Props) => {
                             <div className="announc-cont">
                                 <p className='text'>Our Upcoming Tournament!</p>
                                 <div className="btns-cont">
+                                    {/* TODO handle onClick */}
                                     <button onClick={handleRegisteration} className='btn-1 variant-2 black'>Modify the tournament</button>
-                                    <button onClick={handleRegisteration} className='btn-1 variant-2 black'>Start the tournament</button>
+                                    {/* TODO add right id */}
+                                    <a href={`/tournament/0/set-up`} className='btn-1 variant-2 black'>Start the tournament</a>
                                 </div>
                             </div>
                         )}
@@ -71,15 +73,6 @@ const MainPage = ({ PORT }: Props) => {
                         </div>
                     </div>
                 ) : null}
-
-                <div className="announc-cont">
-                    <p className='text'>Our Upcoming Tournament!</p>
-                    <div className="btns-cont">
-                        <button onClick={handleRegisteration} className='btn-1 variant-2 black'>Modify the tournament</button>
-                        {/* TODO add right id */}
-                        <a href={`/tournament/0/set-up`} className='btn-1 variant-2 black'>Start the tournament</a>
-                    </div>
-                </div>
 
                 {/* <Announcement text="Register Now for Our Upcoming Tournament!" btnsText={['Register']} /> */}
                 {leaderboard.length >= 3 ? <Pedestal winers={leaderboard.slice(0, 3)} /> : null}

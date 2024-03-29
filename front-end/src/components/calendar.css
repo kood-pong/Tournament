@@ -13,7 +13,7 @@
 .grid-cont {
     width: 100%;
     display: grid;
-    grid-template-columns: auto auto auto auto;
+    grid-template-columns: calc(25% - 1.25rem * 3 / 4) calc(25% - 1.25rem * 3 / 4) calc(25% - 1.25rem * 3 / 4) calc(25% - 1.25rem * 3 / 4);
     gap: 1.25rem;
     margin-bottom: 100px;
 }
@@ -35,7 +35,7 @@
 
 @media (max-width: 850px) {
     .grid-cont {
-        grid-template-columns: auto auto;
+        grid-template-columns: calc(50% - 1.25rem / 2) calc(50% - 1.25rem / 2);
         margin-bottom: 50px;
     }
 

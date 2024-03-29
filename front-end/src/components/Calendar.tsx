@@ -6,46 +6,45 @@ import LeftArrow from './assets/LeftArrow';
 import RightArrow from './assets/RightArrow';
 import { useEffect, useState } from 'react';
 import TournamentItem from './BasicElements/TournamentItem';
+import { Tournament } from '../models/tournament';
 
 interface Props {
     PORT: string;
 }
 
 const Calendar = ({ PORT }: Props) => {
-    const [year, setYear] = useState<number>(0);
+    const [year, setYear] = useState<number>(2024);
+    const [tournaments, setTournaments] = useState<Tournament[]>([]);
     const months = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ];
 
-    const tournamentsList = [];
 
+    const handleYearBtns = (toAdd: boolean) => {
+        setYear(prevYear => toAdd ? prevYear + 1 : prevYear - 1);
+    };
 
     useEffect(() => {
-        const currDate = new Date();
-        const currYear = currDate.getFullYear();
-        setYear(currYear);
-    }, []);
+        GetTournaments();
+    }, [year]);
 
-    // TODO take tournaments for the year
-    const GetTournaments = async (id: string) => {
-        await fetch(`${PORT}`, {
+    const GetTournaments = async () => {
+        await fetch(`${PORT}/api/v1/tournaments/${year}`, {
             method: 'GET',
             credentials: 'include', // Include cookies in the request
         }).then(async response => {
             if (response.ok) {
-                // TODO
+                const res = await response.json();
+                let ts: Tournament[] = res.data as Tournament[];
+                setTournaments(ts);
             } else {
                 throw new Error('Failed to fetch');
             }
         }).catch(error => {
             console.error('Error take tournaments:', error);
         });
-    }
-
-    const handleYearBtns = (toAdd: boolean) => {
-        setYear(prevYear => toAdd ? prevYear + 1 : prevYear - 1);
-    }
+    };
 
     return (
         <div className="page-container">
@@ -58,9 +57,18 @@ const Calendar = ({ PORT }: Props) => {
                 </div>
                 <div className='grid-cont'>
                     {months.map((month, index) => (
-                        <div className='calendar-item text'>
+                        <div className='calendar-item text' key={index}>
                             {month}
-                            <TournamentItem />
+                            {tournaments ? (
+                                <>
+                                    {tournaments
+                                        .filter(tourn => tourn && new Date(tourn.start_date).getMonth() === index)
+                                        .map(filteredT => (
+                                            <TournamentItem tournament={filteredT} key={filteredT.id} />
+                                        ))
+                                    }
+                                </>
+                            ) : null}
                         </div>
                     ))}
                 </div>
