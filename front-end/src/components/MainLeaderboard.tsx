@@ -75,7 +75,7 @@ const MainPage = ({ PORT }: Props) => {
                 ) : null}
 
                 {/* <Announcement text="Register Now for Our Upcoming Tournament!" btnsText={['Register']} /> */}
-                {leaderboard.length >= 3 ? <Pedestal winers={leaderboard.slice(0, 3)} /> : null}
+                {leaderboard.length >= 3 ? <Pedestal winers={leaderboard.slice(0, 3)} name="Leaderboard" /> : null}
                 <div className="table-cont">
                     <TableHeader />
                     <div style={{ height: '15px' }}></div>

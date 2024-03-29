@@ -1,7 +1,8 @@
+import { User } from '../../models/user';
 import './table.css';
 
 type Props = {
-    user: any;
+    user: User;
 }
 
 const TableEntity = ({user}: Props) => {

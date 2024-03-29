@@ -1,10 +1,11 @@
 import './pedestal.css';
 
 type Props = {
-    winers: any[]; // TODO fix type
+    winers: any[];
+    name: string;
 }
 
-const Pedestal = ({ winers }: Props) => {
+const Pedestal = ({ winers, name }: Props) => {
     return (
         <>
             <div className='pedestals-cont'>
@@ -40,7 +41,6 @@ const Pedestal = ({ winers }: Props) => {
                             {/* TODO check real picture */}
                             <img src='https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg' />
                         </div>
-                        {/* TODO put real name */}
                         <p className='text'> {winers[2].first_name} {winers[2].last_name}</p>
                     </a>
                     <div className="pedestal num-3">
@@ -49,8 +49,7 @@ const Pedestal = ({ winers }: Props) => {
                     </div>
                 </div>
             </div>
-            {/* TODO if its tournament here should be tournament name */}
-            <p className='big-title p-title'>Leaderboard</p>
+            <p className='big-title p-title'>{name}</p>
         </>
     );
 }

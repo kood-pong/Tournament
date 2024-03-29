@@ -7,12 +7,14 @@ import TableEntity from "./BasicElements/TableLBEntity";
 import './tournament.css';
 import { useAuth } from "./contexts/AuthContext";
 import DownloadIcon from "./assets/DownloadIcon";
+import { useParams } from "react-router-dom";
 
 interface Props {
     PORT: string;
 }
 
 const Tournament = ({ PORT }: Props) => {
+    const { id } = useParams();
     const [leaderboard, getLeaderboard] = useState([]);
     const { isLoggedIn, user } = useAuth();
     // const pictures: string[] = [];
@@ -25,21 +27,23 @@ const Tournament = ({ PORT }: Props) => {
         'https://www.dilovamova.com/images/wpi.images/events/203193d.jpg'
     ];
 
-    // take tournament leaderboard with tournamnet id
     useEffect(() => {
         const takeParticipants = async () => {
-            await fetch(`${PORT}/api/v1/users/all/approved`, {
+            await fetch(`${PORT}/api/v1/jwt/admin/tournaments/leaderboard/${id}`, {
                 method: 'GET',
                 credentials: 'include'
-            }).then(async data => {
-                const json = await data.json()
-                // TODO create class for users and modify it
-                const lb = json.data.sort(function (a: { ranking: number; }, b: { ranking: number; }) {
-                    return a.ranking - b.ranking;
-                });
-                getLeaderboard(lb);
+            }).then(async response => {
+                const res = await response.json()
+                if (response.ok) {
+                    const lb = res.data.sort(function (a: { ranking: number; }, b: { ranking: number; }) {
+                        return a.ranking - b.ranking;
+                    });
+                    getLeaderboard(lb);
+                } else {
+                    console.log('empty tournament')
+                }
             }).catch(error => {
-                console.error('Error checking login status:', error);
+                console.error('Some issue with leaderboard:', error);
             });
         }
 
@@ -50,7 +54,7 @@ const Tournament = ({ PORT }: Props) => {
         <div className="page-container">
             <Header />
             <div className="content-wrap">
-                {leaderboard.length >= 3 ? <Pedestal winers={leaderboard.slice(0, 3)} /> : null}
+                {leaderboard.length >= 3 ? <Pedestal winers={leaderboard.slice(0, 3)}  name={"Leaderboard"} /> : null}
                 {pictures.length > 0 ? (
                     <div className="imgs-grid">
                         <div className="main-pict img-holder">
@@ -79,7 +83,7 @@ const Tournament = ({ PORT }: Props) => {
                             {leaderboard.slice(3).map(user => (
                                 <div key={user["id"]}>
                                     {/* TODO change user type */}
-                                    <TableEntity user={user} />
+                                    <TableEntity key={user["id"]} user={user} />
                                 </div>
                             ))}
                         </>) : null}
