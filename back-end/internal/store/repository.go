@@ -15,15 +15,18 @@ type UserRepository interface {
 }
 
 type TournamentRepository interface {
-	Create(tournament *models.Tournament) error
-	Update(tournament *models.Tournament) error
+	Create(tournament *models.Tournament) (*models.Tournament, error)
+	Update(tournament *models.Tournament) (*models.Tournament, error)
 	Get(tournament_id string) (*models.Tournament, error)
 	Register(reg *models.Register) error
 	GetLeaderboard(tournament_id string) ([]models.User, error)
 	Start(tournament_id string, numberOfSets int) ([]models.Match, error)
 	GetParticipants(tournament_id string) ([]models.User, error)
 	GenerateMatches(participants []models.User, tournament_id string, numberOfSets int) ([]models.Match, error)
+	GetAllByYear(year string) ([]models.TournamentWithWinner, error)
 	Generate(tournament_id string, numberOfSets int) ([]models.Match, error)
+	GetUserParticipatedTournaments(user_id string) ([]models.TournamentWithWinner, error)
+	GetAllOngoing(state string) ([]models.Tournament, error)
 }
 
 type NotificationRepository interface {

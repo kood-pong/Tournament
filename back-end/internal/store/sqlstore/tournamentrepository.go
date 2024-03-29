@@ -14,7 +14,7 @@ type TournamentRepository struct {
 	store *Store
 }
 
-func (t *TournamentRepository) Create(tournament *models.Tournament) error {
+func (t *TournamentRepository) Create(tournament *models.Tournament) (*models.Tournament, error) {
 	tournament.ID = uuid.New().String()
 
 	query := `INSERT INTO tournaments (id, name, start_date, end_date, type) VALUES (?, ?, ?, ?, ?)`
@@ -22,22 +22,22 @@ func (t *TournamentRepository) Create(tournament *models.Tournament) error {
 	_, err := t.store.Db.Exec(query, tournament.ID, tournament.Name, tournament.Start_date, tournament.End_date, tournament.Type)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return tournament, nil
 }
 
-func (t *TournamentRepository) Update(tournament *models.Tournament) error {
+func (t *TournamentRepository) Update(tournament *models.Tournament) (*models.Tournament, error) {
 	query := `UPDATE tournaments SET name = ?, start_date = ?, end_date = ?, status = ?, type = ? WHERE id = ?`
 
 	_, err := t.store.Db.Exec(query, tournament.Name, tournament.Start_date, tournament.End_date, tournament.Status, tournament.Type, tournament.ID)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return tournament, nil
 
 }
 
@@ -63,8 +63,38 @@ func (t *TournamentRepository) Get(tournament_id string) (*models.Tournament, er
 	return tournament, nil
 }
 
+func (t *TournamentRepository) GetAllByYear(year string) ([]models.TournamentWithWinner, error) {
+	query := `SELECT * FROM tournaments WHERE strftime('%Y', start_date) = ?`
+	rows, err := t.store.Db.Query(query, year)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tournaments []models.TournamentWithWinner
+	for rows.Next() {
+		var tournament models.TournamentWithWinner
+		err := rows.Scan(&tournament.ID, &tournament.Name, &tournament.Start_date, &tournament.End_date, &tournament.Type, &tournament.Status)
+		if err != nil {
+			return nil, err
+		}
+		winner, err := t.store.Result().GetWinners(tournament.ID)
+		if err != nil {
+			return nil, err
+		}
+		if len(winner) == 1 {
+			tournament.Winner = winner[0]
+		}
+		tournaments = append(tournaments, tournament)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return tournaments, nil
+}
+
 func (t *TournamentRepository) Register(reg *models.Register) error {
-	//check if user is already registered
 	// Check if the user is already registered for the tournament
 	checkQuery := `SELECT 1 FROM registration WHERE tournament_id = ? AND user_id = ? LIMIT 1`
 	var existingRegistration int
@@ -94,6 +124,66 @@ func (t *TournamentRepository) Register(reg *models.Register) error {
 	}
 
 	return nil
+}
+
+func (t *TournamentRepository) GetAllOngoing(state string) ([]models.Tournament, error) {
+	query := `SELECT * FROM tournaments WHERE status = ?`
+
+	rows, err := t.store.Db.Query(query, state)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tournaments []models.Tournament
+	for rows.Next() {
+		var tournament models.Tournament
+		err := rows.Scan(&tournament.ID, &tournament.Name, &tournament.Start_date, &tournament.End_date, &tournament.Type, &tournament.Status)
+		if err != nil {
+			return nil, err
+		}
+		tournaments = append(tournaments, tournament)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return tournaments, nil
+}
+
+func (t *TournamentRepository) GetUserParticipatedTournaments(user_id string) ([]models.TournamentWithWinner, error) {
+	query := `SELECT t.id, t.name, t.start_date, t.end_date, t.type, t.status FROM registration r JOIN tournaments t ON t.id = r.tournament_id WHERE user_id = ?`
+
+	rows, err := t.store.Db.Query(query, user_id)
+	if err != nil {
+		return nil, fmt.Errorf("error executing db query: %v", err)
+	}
+	defer rows.Close()
+
+	var tournaments []models.TournamentWithWinner
+
+	for rows.Next() {
+		var tournament models.TournamentWithWinner
+
+		if err := rows.Scan(&tournament.ID, &tournament.Name, &tournament.Start_date, &tournament.End_date, &tournament.Type, &tournament.Status); err != nil {
+			return nil, fmt.Errorf("error scanning rows: %v", err)
+		}
+
+		winner, err := t.store.Result().GetWinners(tournament.ID)
+		if err != nil {
+			return nil, err
+		}
+		if len(winner) == 1 {
+			tournament.Winner = winner[0]
+		}
+		tournaments = append(tournaments, tournament)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error retrieving rows: %v", err)
+	}
+
+	return tournaments, nil
 }
 
 func (t *TournamentRepository) GetParticipants(tournament_id string) ([]models.User, error) {
@@ -219,20 +309,25 @@ func (t *TournamentRepository) Start(tournament_id string, numberOfSets int) ([]
 
 	//actually start the tournament
 	tournament.Status = "ongoing"
-	if err = t.Update(tournament); err != nil {
+	_, err = t.Update(tournament)
+	if err != nil {
 		return nil, err
 	}
 
+	fmt.Println("successfull 1")
 	//generate matches
 	matches, err := t.GenerateMatches(participants, tournament_id, numberOfSets)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("successfull ")
+
 	return matches, nil
 }
 
 func (t *TournamentRepository) GenerateMatches(participants []models.User, tournament_id string, numberOfSets int) ([]models.Match, error) {
 	//shuffle players
+	fmt.Println(participants)
 	shuffledParticipants := shuffle(participants)
 	//Get how many matches we need to generate
 	matchNumber := calcMatches(len(participants))
@@ -245,7 +340,8 @@ func (t *TournamentRepository) GenerateMatches(participants []models.User, tourn
 			break
 		}
 	}
-
+	fmt.Println("MATCHNUMBER: ", matchNumber)
+	fmt.Println("SHUFFELED: ", shuffledParticipants)
 	var matches []models.Match
 	for i := 0; i < matchNumber; i++ {
 		//fill up the first half
@@ -305,7 +401,8 @@ func (t *TournamentRepository) Generate(tournament_id string, numberOfSets int) 
 	if len(winners) == 1 {
 		//finish tournament
 		tournament.Status = "finished"
-		if err = t.Update(tournament); err != nil {
+		_, err = t.Update(tournament)
+		if err != nil {
 			return nil, err
 		}
 		return nil, nil

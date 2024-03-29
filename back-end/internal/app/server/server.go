@@ -53,11 +53,14 @@ func (s *server) configureRouter() {
 	s.router.GET("/api/v1/auth/checkCookie", s.handlerCheckCookie())
 	s.router.GET("/api/v1/users/all/{status}", s.userGetAll())
 	s.router.GET("/api/v1/users/{id}", s.userGet())
+	s.router.GET("/api/v1/tournaments/{year}", s.tournamentGet())
+	s.router.GET("/api/v1/tournament/{state}", s.tournamentGetOngoing())
 
 	//<------------AUTH MIDDLEWARE REQUIRED-------------->
 	//USERS
 	s.router.GET("/api/v1/jwt/tournaments/register/{id}", s.tournamentRegister())
 	s.router.GET("/api/v1/jwt/notifications/update/{id}", s.notificationUpdate())
+	s.router.GET("/api/v1/jwt/tournaments", s.getUserParticipatedTournaments())
 
 	//<------------AUTH + ADMIN MIDDLEWARE REQUIRED-------------->
 	//USERS

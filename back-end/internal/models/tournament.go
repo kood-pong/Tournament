@@ -8,3 +8,8 @@ type Tournament struct {
 	Type       string `db:"type" json:"type" validate:"required|alphanumeric|contains:elimination"`
 	Status     string `db:"status" json:"status" validate:"required|contains:open,ongoing,finished"`
 }
+
+type TournamentWithWinner struct {
+	Tournament
+	Winner User `json:"winner"`
+}

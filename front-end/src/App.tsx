@@ -78,7 +78,7 @@ function App() {
           <Route // only for admin
             path='/tournament/:id/match/:id/sets'
             element={
-              <Sets />
+              <Sets match={PORT}/>
             } />
           <Route path='*' element={<Navigate to={"/"} />} />
         </Routes>
