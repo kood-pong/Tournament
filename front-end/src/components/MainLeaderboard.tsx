@@ -9,6 +9,7 @@ import TableHeader from "./BasicElements/TableLBHeader";
 import TableEntity from "./BasicElements/TableLBEntity";
 import './BasicElements/announcement.css';
 import { useAuth } from "./contexts/AuthContext";
+import { Tournament } from "../models/tournament";
 
 interface Props {
     PORT: string;
@@ -16,6 +17,8 @@ interface Props {
 
 const MainPage = ({ PORT }: Props) => {
     const [leaderboard, getLeaderboard] = useState([]);
+    const [upTournament, setUpTournament] = useState<Tournament | null>(null);
+    const [registered, setRegistration] = useState<boolean>(false);
     const { isLoggedIn, curruser } = useAuth();
 
     useEffect(() => {
@@ -38,29 +41,100 @@ const MainPage = ({ PORT }: Props) => {
         takeParticipants();
     }, [])
 
-    const handleRegisteration = () => {
-        console.log('registrated')
+    useEffect(() => {
+        const state = 'open';
+        const takeUpTournament = async () => {
+            await fetch(`${PORT}/api/v1/tournament/${state}`, {
+                method: 'GET',
+                credentials: 'include'
+            }).then(async response => {
+                if (response.ok) {
+                    const res = await response.json()
+                    setUpTournament(res.data[0]);
+                    checkRegistration(res.data[0].id);
+                } else {
+                    console.error('Something wrong with takingupcomming tournament')
+                }
+            }).catch(error => {
+                console.error('Error checking login status:', error);
+            });
+        }
 
+        takeUpTournament();
+    }, [])
+
+    const checkRegistration = async (id: string) => {
+        await fetch(`${PORT}/api/v1/jwt/tournaments/register/check/${id}`, {
+            method: 'GET',
+            credentials: 'include'
+        }).then(async response => {
+            if (response.ok) {
+                const res = await response.json()
+                setRegistration(res.data);
+            } else {
+                console.error('Something wrong with checking registartion')
+            }
+        }).catch(error => {
+            console.error('Error checking login status:', error);
+        });
+    }
+
+    const handleUnregisteration = async () => {
+        console.log('unregistrated')
+        await fetch(`${PORT}/api/v1/jwt/tournaments/unregister/${upTournament?.id}`, {
+            method: 'GET',
+            credentials: 'include'
+        }).then(async response => {
+            if (response.ok) {
+                const res = await response.json()
+                setRegistration(false);
+            } else {
+                console.error('Something wrong with checking registartion')
+            }
+        }).catch(error => {
+            console.error('Error unregistration:', error);
+        });
+    }
+
+    const handleRegisteration = async () => {
+        console.log('registrated')
+        await fetch(`${PORT}/api/v1/jwt/tournaments/register/${upTournament?.id}`, {
+            method: 'GET',
+            credentials: 'include'
+        }).then(async response => {
+            if (response.ok) {
+                const res = await response.json()
+                setRegistration(true);
+            } else {
+                console.error('Something wrong with checking registartion')
+            }
+        }).catch(error => {
+            console.error('Error registration:', error);
+        });
     }
 
     return (
         <div className="page-container">
             <Header />
             <div className="content-wrap">
-                {/* TODO try to use it as a component */}
                 {curruser != null && curruser.role == 1 ? (
                     // TODO check if there is any scheduled tournament otherwise add button start tournament
                     <>
-                        {curruser != null ? (
+                        {upTournament == null ? (
                             <a href={`/create-tournament`} className="btn-1 ct-btn">Schedule new tournament</a>
                         ) : (
                             <div className="announc-cont">
                                 <p className='text'>Our Upcoming Tournament!</p>
                                 <div className="btns-cont">
                                     {/* TODO handle onClick */}
-                                    <button onClick={handleRegisteration} className='btn-1 variant-2 black'>Modify the tournament</button>
+                                    {/* <button onClick={handleRegisteration} className='btn-1 variant-2 black'>Modify the tournament</button> */}
+                                    {registered ? (
+                                        <button onClick={handleUnregisteration} className='btn-1 variant-2 black'>Unregister</button>
+                                    ) : (
+                                        <button onClick={handleRegisteration} className='btn-1 variant-2 black'>Register</button>
+                                    )}
                                     {/* TODO add right id */}
-                                    <a href={`/tournament/0/set-up`} className='btn-1 variant-2 black'>Start the tournament</a>
+                                    <a href={`/tournament/${upTournament.id}/set-up`} className='btn-1 variant-2 black'>Start the tournament</a>
                                 </div>
                             </div>
                         )}
@@ -69,7 +143,11 @@ const MainPage = ({ PORT }: Props) => {
                     <div className="announc-cont">
                         <p className='text'>Register Now for Our Upcoming Tournament!</p>
                         <div className="btns-cont">
-                            <button onClick={handleRegisteration} className='btn-1 variant-2 black'>Register</button>
+                            {registered ? (
+                                <button onClick={handleUnregisteration} className='btn-1 variant-2 black'>Unregister</button>
+                            ) : (
+                                <button onClick={handleRegisteration} className='btn-1 variant-2 black'>Register</button>
+                            )}
                         </div>
                     </div>
                 ) : null}

@@ -13,11 +13,12 @@ const CreateTournament = ({ PORT }: Props) => {
     const [name, setName] = useState<string>('');
     const [date, setDate] = useState<string>('');
     const [time, setTime] = useState<string>('');
+    const [type, setType] = useState<string>('');
     const [error, setError] = useState<{ isError: boolean, text: string }>({ isError: false, text: "" });
-    
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log('Form submitted:', { name, date, time });
+        console.log('Form submitted:', { name, date, time, type });
 
         // TODO
         // await fetch(`${PORT}`, {
@@ -76,6 +77,14 @@ const CreateTournament = ({ PORT }: Props) => {
                             onChange={(e) => setTime(e.target.value)}
                             required
                         ></input>
+                    </div>
+                    <div className='input-field text'>
+                        <select value={type} onChange={(e) => setType(e.target.value)}>
+                            <option value="" disabled selected>Type</option>
+                            <option value="Elimination">Elimination</option>
+                            <option value="Robin round">Robin round</option>
+                            <option value="Double elimination">Double elimination</option>
+                        </select>
                     </div>
                     <button className='btn-1 submit-btn' type="submit">Submit</button>
                 </form>

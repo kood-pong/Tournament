@@ -6,7 +6,6 @@ type Props = {
 }
 
 const Pedestal = ({ winers, name }: Props) => {
-    console.log(winers)
     return (
         <>
             <div className='pedestals-cont'>
