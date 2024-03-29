@@ -36,7 +36,7 @@ func (s *server) setCreate() http.HandlerFunc {
 
 		s.respond(w, http.StatusOK, Response{
 			Message: "Successfully finished match - result created",
-			Data:    nil,
+			Data:    true,
 		})
 	}
 }

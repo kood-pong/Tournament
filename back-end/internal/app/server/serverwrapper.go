@@ -13,24 +13,28 @@ import (
 )
 
 func Start(config *Config) error {
+	//create database
 	db, err := newDB(config.DatabaseURL, config.DatabaseSchema)
 	if err != nil {
 		return err
 	}
-
 	defer db.Close()
 
 	store := sqlstore.New(db)
 
+	//create CORS middleware
 	corsMiddleware := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowOriginRequestFunc: func(r *http.Request, origin string) bool { return true
+		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Content-Type", "Content-Length", "Authorization"},
 		AllowCredentials: true,
 	})
 
+	//create router
 	router := router.New()
 
+	//new http.server with corsmiddleware
 	newHttpSrv := &http.Server{
 		Addr: ":7080",
 		Handler: corsMiddleware.Handler(router),

@@ -1,6 +1,8 @@
 package server
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"tournament/back-end/internal/models"
 	"tournament/back-end/pkg/validator"
@@ -25,13 +27,14 @@ func (s *server) tournamentCreate() http.HandlerFunc {
 			return
 		}
 
-		if err := s.store.Tournament().Create(response); err != nil {
+		t, err := s.store.Tournament().Create(response)
+		if err != nil {
 			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 		s.respond(w, http.StatusOK, Response{
 			Message: "Successfully created tournament!",
-			Data:    nil,
+			Data:    t,
 		})
 	}
 }
@@ -50,14 +53,15 @@ func (s *server) tournamentUpdate() http.HandlerFunc {
 			return
 		}
 
-		if err := s.store.Tournament().Update(response); err != nil {
+		t, err := s.store.Tournament().Update(response)
+		if err != nil {
 			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 
 		s.respond(w, http.StatusOK, Response{
 			Message: "Successfully updated tournament!",
-			Data:    nil,
+			Data:    t,
 		})
 	}
 }
@@ -125,7 +129,7 @@ func (s *server) tournamentGenerate() http.HandlerFunc {
 		if matches == nil && err == nil {
 			s.respond(w, http.StatusOK, Response{
 				Message: "We have a winner, closing a tournament",
-				Data:    nil,
+				Data:    true,
 			})
 			return
 		}
@@ -155,5 +159,64 @@ func (s *server) tournamentLeaderboard() http.HandlerFunc {
 			Data:    userList,
 		})
 
+	}
+}
+
+func (s *server) tournamentGet() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		year := r.PathValue("year")
+
+		tournaments, err := s.store.Tournament().GetAllByYear(year)
+		if err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		s.respond(w, http.StatusOK, Response{
+			Message: fmt.Sprintf("Successfully retrieved all tournaments for - %s year", year),
+			Data:    tournaments,
+		})
+	}
+}
+
+func (s *server) getUserParticipatedTournaments() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user_id := r.Context().Value(ctxUserID).(string)
+
+		if user_id == "" {
+			s.error(w, http.StatusUnauthorized, errors.New("only for logged in users"))
+			return
+		}
+
+		tournaments, err := s.store.Tournament().GetUserParticipatedTournaments(user_id)
+		if err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		s.respond(w, http.StatusOK, Response{
+			Message: "Successfully retrieved all user tournaments",
+			Data:    tournaments,
+		})
+	}
+}
+
+func (s *server) tournamentGetOngoing() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		state := r.PathValue("state")
+		if state != "ongoing" && state != "open" && state != "finished"{
+			s.error(w, http.StatusBadRequest, errors.New("only open, ongoing allowed"))
+			return
+		}
+		tournaments, err := s.store.Tournament().GetAllOngoing(state)
+		if err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		s.respond(w, http.StatusOK, Response{
+			Message: "Successfully retrieved all ongoing tournaments",
+			Data: tournaments,
+		})
 	}
 }

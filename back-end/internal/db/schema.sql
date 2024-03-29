@@ -88,12 +88,12 @@ CREATE TABLE
     );
 
 
--- -- --populate database
+-- --populate database
 -- INSERT INTO tournaments (id, name, start_date, end_date, type, status) VALUES
 --     ('d216b845-2c9d-44ad-83dd-28e1a7f5f6e7', 'Tournament A', '2024-02-14', '2024-02-20', 'Type A', 'finished'),
 --     ('d216b845-2c9d-44ad-83dd-28e1a7f5fabc', 'Tournament B', '2024-03-01', '2024-03-07', 'Type B', 'open');
 
--- -- -- Inserting sample users
+-- -- -- -- Inserting sample users
 
 -- INSERT INTO users (id, email, username, password, first_name, last_name, points, wins, losses, ranking, status, role) VALUES
 --     ('3be5843d-a7ca-468a-af8f-7aaa5d5c7e5c', 'test@gmail.com', 'testUsername', '$2a$04$VKgWVOAFGqKSJhdnxS/u.eCeel1qJ5AUKbzZ99kqCjmR5BoyH7Bh6', 'John', 'Doe', 100, 10, 5, 1, 'approved', 1),
