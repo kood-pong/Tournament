@@ -1,49 +1,43 @@
+import { useParams } from "react-router-dom";
 import Header from "./BasicElements/Header";
 import TableEntity from "./BasicElements/TableMEntity";
 import TableHeader from "./BasicElements/TableMHeader";
 import './tournament-admin.css';
+import { useEffect, useState } from "react";
+import { Match } from "../models/match";
 
 interface Props {
     PORT: string;
 }
 
 const Matches = ({ PORT }: Props) => {
-    const matches = [{
-        id: 1,
-        participant1: 'SpinMaster83',
-        participant2: 'PaddlePro',
-        completed: false,
-    },{
-        id: 2,
-        participant1: 'SmashNinja',
-        participant2: 'TableTornado',
-        completed: false,
-    },{
-        id: 3,
-        participant1: 'PingPongWizard',
-        participant2: 'AceAttacker',
-        completed: false,
-    },{
-        id: 4,
-        participant1: 'RapidReflexes',
-        participant2: 'TopSpinTerminator',
-        completed: false,
-    },{
-        id: 5,
-        participant1: 'BackhandBandit',
-        participant2: 'ServeSlayer',
-        completed: false,
-    },{
-        id: 6,
-        participant1: 'NetNinja',
-        participant2: 'PowerPaddle',
-        completed: false,
-    },{
-        id: 7,
-        participant1: 'SpinSavant',
-        participant2: 'SwiftSwinger',
-        completed: false,
-    }];
+    const { id, stw } = useParams();
+    console.log(id, stw)
+    const [matches, setMatches] = useState<Match[]>([]);
+
+    useEffect(() => {
+        const takeMatches = async () => {
+            await fetch(`${PORT}/api/v1/jwt/admin/tournaments/generate`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { "Content-Type": "appliction/json" },
+                body: JSON.stringify({ tournament_id: id, sets_to_win: typeof stw === 'string' ? parseInt(stw) : 0 }),
+            }).then(async response => {
+                const res = await response.json()
+                if (response.ok) {
+                    console.log(res.data)
+                    setMatches(res.data);
+                } else {
+                    console.error(res.error)
+                }
+            }).catch(error => {
+                console.error('Error checking login status:', error);
+            });
+        }
+
+        takeMatches();
+        
+    }, [])
 
     return (
         <div className="page-container">
@@ -55,9 +49,9 @@ const Matches = ({ PORT }: Props) => {
                 <TableHeader />
                 <div style={{ height: '15px' }}></div>
                 {matches.map((match, index) => (
-                    <TableEntity match={match} />
+                    <TableEntity PORT={PORT} match={match} tableId={index + 1} />
                 ))}
-                <button className="btn-1" style={{marginTop: '50px'}}>Generate new</button>
+                <button className="btn-1" style={{ marginTop: '50px' }}>Generate new</button>
             </div>
         </div>
     )

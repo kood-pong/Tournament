@@ -24,7 +24,7 @@ const TournamentSetUp = ({ PORT }: Props) => {
         }).then(async response => {
             const res = await response.json();
             if (response.ok) {
-                navigate(`/tournament/${id}/matches`);
+                navigate(`/tournament/${id}/matches/${type}`);
             } else {
                 setError({
                     isError: true,
