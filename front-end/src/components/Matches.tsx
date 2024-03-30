@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from "./BasicElements/Header";
 import TableEntity from "./BasicElements/TableMEntity";
 import TableHeader from "./BasicElements/TableMHeader";
@@ -11,6 +11,7 @@ interface Props {
 }
 
 const Matches = ({ PORT }: Props) => {
+    const navigate = useNavigate();
     const { id, stw } = useParams();
     console.log(id, stw)
     const [matches, setMatches] = useState<Match[]>([]);
@@ -51,7 +52,7 @@ const Matches = ({ PORT }: Props) => {
                 {matches.map((match, index) => (
                     <TableEntity PORT={PORT} match={match} tableId={index + 1} />
                 ))}
-                <button className="btn-1" style={{ marginTop: '50px' }}>Generate new</button>
+                <button onClick={() => {navigate(`/tournament/${id}/set-up`)}} className="btn-1" style={{ marginTop: '50px' }}>Generate new</button>
             </div>
         </div>
     )
