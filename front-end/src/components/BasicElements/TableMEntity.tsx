@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import './table.css';
 import { User } from '../../models/user';
+import { Match } from '../../models/match';
 
 type Props = {
     PORT: string;
-    match: any;
+    match: Match;
     tableId: number;
 }
 
@@ -59,7 +60,7 @@ const TableEntity = ({PORT, match, tableId }: Props) => {
             <div className="text col">{tableId}</div>
             <div className="text col tryper">{player1?.first_name} {player1?.last_name}</div>
             <div className="text col tryper">{player2?.first_name} {player2?.last_name}</div>
-            <div className="text col">{match.completed ? 'Yes' : 'No'}</div>
+            <div className="text col">{match.status === 'finnished' ? 'Yes' : 'No'}</div>
         </a>
     );
 }

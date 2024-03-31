@@ -76,7 +76,7 @@ function App() {
             }
           />
           <Route // only for admin
-            path='/tournament/:id/match/:id/sets'
+            path='/tournament/:tid/match/:id/sets'
             element={
               <Sets PORT={PORT}/>
             } />

@@ -13,7 +13,6 @@ interface Props {
 const Matches = ({ PORT }: Props) => {
     const navigate = useNavigate();
     const { id, stw } = useParams();
-    console.log(id, stw)
     const [matches, setMatches] = useState<Match[]>([]);
 
     useEffect(() => {
@@ -26,7 +25,6 @@ const Matches = ({ PORT }: Props) => {
             }).then(async response => {
                 const res = await response.json()
                 if (response.ok) {
-                    console.log(res.data)
                     setMatches(res.data);
                 } else {
                     console.error(res.error)
@@ -50,7 +48,7 @@ const Matches = ({ PORT }: Props) => {
                 <TableHeader />
                 <div style={{ height: '15px' }}></div>
                 {matches.map((match, index) => (
-                    <TableEntity PORT={PORT} match={match} tableId={index + 1} />
+                    <TableEntity key={index} PORT={PORT} match={match} tableId={index + 1} />
                 ))}
                 <button onClick={() => {navigate(`/tournament/${id}/set-up`)}} className="btn-1" style={{ marginTop: '50px' }}>Generate new</button>
             </div>

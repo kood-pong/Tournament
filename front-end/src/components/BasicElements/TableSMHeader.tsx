@@ -1,15 +1,17 @@
+import { Match } from '../../models/match';
 import './table.css';
 
 type Props = {
-    match: any;
+    player1Name: string;
+    player2Name: string;
 }
 
-const TableMainHeader = ({match}: Props) => {
+const TableMainHeader = ({player1Name, player2Name}: Props) => {
     return (
         <div className="table-header">
-            <div className="text col">{match.participant1}</div>
+            <div className="text col">{player1Name}</div>
             <div className="text col">-</div>
-            <div className="text col">{match.participant2}</div>
+            <div className="text col">{player2Name}</div>
         </div>
     );
 }

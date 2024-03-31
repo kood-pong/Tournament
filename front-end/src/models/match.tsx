@@ -1,5 +1,3 @@
-import { User } from "./user";
-
 export type Match = {
     current_round: number;
     id: string;

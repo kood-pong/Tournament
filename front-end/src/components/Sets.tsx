@@ -3,48 +3,161 @@ import TableMainHeader from "./BasicElements/TableSMHeader";
 import TableHeader from "./BasicElements/TableSHeader";
 import TableEntity from "./BasicElements/TableSEntity";
 import './sets.css';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Match } from "../models/match";
+import { useNavigate, useParams } from "react-router-dom";
+import { User } from "../models/user";
 
 interface Props {
     PORT: string;
 }
 
-const Sets = ({PORT}: Props) => {
-    const match = {
-        id: 1,
-        participant1: 'SpinMaster83',
-        participant2: 'PaddlePro',
-        completed: false,
-    }
+const Sets = ({ PORT }: Props) => {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [match, setMatch] = useState<Match | null>();
+    const [error, setError] = useState<{ isError: boolean, text: string }>({ isError: false, text: "" });
 
-    const [pl1PointsList, setPl1PointsList] = useState<number>(0);
-    const [pl2PointsList, setPl2PointsList] = useState<number>(0);
+    const [pl1Points, setPl1Points] = useState<number>(0);
+    const [pl2Points, setPl2Points] = useState<number>(0);
+
+    const [player1, setPlayer1] = useState<User>();
+    const [player2, setPlayer2] = useState<User>();
+
+    const [setNum, setSetNum] = useState<number>(1);
+
+    // TODO fetch match by id
+    useEffect(() => {
+        const getMatch = async () => {
+            await fetch(`${PORT}/api/v1/matches/${id}`, {
+                method: 'GET',
+                credentials: 'include',
+            }).then(async response => {
+                const res = await response.json();
+                console.log(res)
+                if (response.ok) {
+                    setMatch(res.data);
+                } else {
+                    throw new Error(res.error);
+                }
+            }).catch(error => {
+                console.error('Error checking login status:', error);
+            });
+        };
+
+        setMatch({
+            current_round: 6,
+            id: '0e0ea87b-7069-47dc-ac76-4fab6aeb8303',
+            player_1: '3be5843d-a7ca-468a-af8f-7aaa5d5c7e5c',
+            player_2: 'bc1c3523-bf22-4da0-b3b5-7df8cf5de03b',
+            sets_to_win: 2,
+            status: 'ongoing',
+            tournament_id: 'd216b845-2c9d-44ad-83dd-28e1a7f5fabc',
+        });
+        // getMatch();
+    }, [])
+
+
+    useEffect(() => {
+        if (match?.player_1) {
+            const takePlayer1 = async () => {
+                await fetch(`${PORT}/api/v1/users/${match?.player_1}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                }).then(async response => {
+                    const res = await response.json()
+                    if (response.ok) {
+                        setPlayer1(res.data)
+                    } else {
+                        console.error(res.error)
+                    }
+                }).catch(error => {
+                    console.error('Error checking login status:', error);
+                });
+            }
+
+            takePlayer1();
+        }
+    }, [match])
+
+    useEffect(() => {
+        if (match?.player_2) {
+            const takePlayer2 = async () => {
+                await fetch(`${PORT}/api/v1/users/${match?.player_2}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                }).then(async response => {
+                    const res = await response.json()
+                    if (response.ok) {
+                        setPlayer2(res.data)
+                    } else {
+                        console.error(res.error)
+                    }
+                }).catch(error => {
+                    console.error('Error checking login status:', error);
+                });
+            }
+
+            takePlayer2();
+        }
+    }, [match])
 
     const updatePl1Points = (plPoints: number) => {
-        setPl1PointsList(plPoints);
+        setPl1Points(plPoints);
     };
 
     const updatePl2Points = (plPoints: number) => {
-        setPl2PointsList(plPoints);
+        setPl2Points(plPoints);
     };
 
     // TODO take match and update it after entering data
 
+    const handleSubmit = async () => {
+
+        if (pl1Points != 11 && pl2Points != 11) {
+            setError(
+                {
+                    isError: true,
+                    text: "Not enought points to finish the set"
+                }
+            )
+            return
+        }
+        await fetch(`${PORT}/api/v1/jwt/admin/tournaments/set/create`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { "Content-Type": "appliction/json" },
+            body: JSON.stringify({ set_number: setNum, match_id: match?.id, player_1_score: pl1Points, player_2_score: pl2Points}),
+        }).then(async response => {
+            const res = await response.json()
+            console.log(res)
+            if (response.ok) {
+                navigate(`/tournament/${id}/matches/${match?.sets_to_win}`);
+            } else {
+                setSetNum(prev => prev + 1);
+                console.error(res.error)
+            }
+        }).catch(error => {
+            console.error('Error checking login status:', error);
+        });
+    }
+
     return (
         <div className="page-container">
-            <Header PORT={PORT}/>
+            <Header PORT={PORT} />
             <div className="content-wrap">
                 <div className="top-line big-title">
-                    Match {match?.id}
+                    Match
                 </div>
-                <TableMainHeader match={match} />
+                <TableMainHeader player1Name={`${player1?.first_name} ${player1?.last_name}`} player2Name={`${player2?.first_name} ${player2?.last_name}`} />
                 <div className="set-cont">
-                    <div className="title-1 set-h">Set 1</div>
+                    <div className="title-1 set-h">Set {setNum}</div>
                     <TableHeader />
-                    <TableEntity id={1} participantName={match.participant1} updatePlPoints={updatePl1Points} />
-                    <TableEntity id={2} participantName={match.participant2} updatePlPoints={updatePl2Points} />
+                    <TableEntity id={1} participantName={`${player1?.first_name} ${player1?.last_name}`} updatePlPoints={updatePl1Points} />
+                    <TableEntity id={2} participantName={`${player2?.first_name} ${player2?.last_name}`} updatePlPoints={updatePl2Points} />
+                    <div className="text red">{error.text}</div>
                 </div>
-                <button className="btn-1" style={{ marginTop: '50px' }}>Done</button>
+                <button onClick={handleSubmit} className="btn-1" style={{ marginTop: '50px' }}>Done</button>
             </div>
         </div>
     )
