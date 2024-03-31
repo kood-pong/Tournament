@@ -115,7 +115,7 @@ const MainPage = ({ PORT }: Props) => {
 
     return (
         <div className="page-container">
-            <Header  PORT={PORT}/>
+            <Header PORT={PORT} />
             <div className="content-wrap">
                 {curruser != null && curruser.role == 1 ? (
                     // TODO check if there is any scheduled tournament otherwise add button start tournament
@@ -124,7 +124,12 @@ const MainPage = ({ PORT }: Props) => {
                             <a href={`/create-tournament`} className="btn-1 ct-btn">Schedule new tournament</a>
                         ) : (
                             <div className="announc-cont">
-                                <p className='text'>Our Upcoming Tournament!</p>
+                                <p className='text'>Our Upcoming Tournament '{upTournament.name}' on {upTournament.start_date ?
+                                    new Date(upTournament.start_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) + ' at ' +
+                                    new Date(upTournament.start_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) :
+                                    'Unknown date'}!
+                                </p>
+
                                 <div className="btns-cont">
                                     {/* TODO handle onClick */}
                                     {/* <button onClick={handleRegisteration} className='btn-1 variant-2 black'>Modify the tournament</button> */}
@@ -139,9 +144,13 @@ const MainPage = ({ PORT }: Props) => {
                             </div>
                         )}
                     </>
-                ) : curruser != null ? (
+                ) : upTournament != null ? (
                     <div className="announc-cont">
-                        <p className='text'>Register Now for Our Upcoming Tournament!</p>
+                        <p className='text'>Register Now for Our Upcoming Tournament'{upTournament.name}' on {upTournament.start_date ?
+                            new Date(upTournament.start_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) + ' at ' +
+                            new Date(upTournament.start_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) :
+                            'Unknown date'}!
+                        </p>
                         <div className="btns-cont">
                             {registered ? (
                                 <button onClick={handleUnregisteration} className='btn-1 variant-2 black'>Unregister</button>
