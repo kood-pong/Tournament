@@ -168,10 +168,10 @@ const MainPage = ({ PORT }: Props) => {
                     <div style={{ height: '15px' }}></div>
                     {leaderboard.length >= 4 ? (
                         <>
-                            {leaderboard.slice(3).map(curruser => (
+                            {leaderboard.slice(3).map((curruser, index) => (
                                 <div key={curruser["id"]}>
                                     {/* TODO change curruser type */}
-                                    <TableEntity user={curruser} />
+                                    <TableEntity key={index} user={curruser} tableID={index+4} />
                                 </div>
                             ))}
                         </>) : null}

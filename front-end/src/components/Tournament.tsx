@@ -80,10 +80,10 @@ const Tournament = ({ PORT }: Props) => {
                     <div style={{ height: '15px' }}></div>
                     {leaderboard.length >= 4 ? (
                         <>
-                            {leaderboard.slice(3).map(user => (
+                            {leaderboard.slice(3).map((user, index) => (
                                 <div key={user["id"]}>
                                     {/* TODO change curruser type */}
-                                    <TableEntity key={user["id"]} user={user} />
+                                    <TableEntity key={user["id"]} user={user} tableID={index+4} />
                                 </div>
                             ))}
                         </>) : null}
