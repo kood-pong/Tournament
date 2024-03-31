@@ -18,23 +18,33 @@ const CreateTournament = ({ PORT }: Props) => {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log('Form submitted:', { name, date, time, type });
+        const startDate = new Date(`${date}T${time}`);
+        const endDate = new Date(startDate);
+        endDate.setHours(endDate.getHours() + 2);
+        console.log('Form submitted:', { name, startDate, endDate, time, type });
 
-        // TODO
-        // await fetch(`${PORT}`, {
-        //     method: "POST",
-        //     credentials: "include",
-        //     headers: { "Content-Type": "appliction/json" },
-        //     body: JSON.stringify({ name, date, time }),
-        // }).then(data => {
-        //     navigate('/');
-        // }).catch(error => {
-        //     console.log(error)
-        //     setError({
-        //         isError: true,
-        //         text: 'Error'
-        //     });
-        // });
+        await fetch(`${PORT}/api/v1/jwt/admin/tournaments/create`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "appliction/json" },
+            body: JSON.stringify({ name, start_date: startDate, end_date: endDate, type, status: 'open' }),
+        }).then(async response => {
+            const res = await response.json();
+            if (response.ok) {
+                navigate('/');
+            } else {
+                setError({
+                    isError: true,
+                    text: res.error
+                });
+            }
+        }).catch(error => {
+            console.log(error)
+            setError({
+                isError: true,
+                text: 'Error'
+            });
+        });
     };
     return (
         <div className="page-container">
@@ -80,7 +90,7 @@ const CreateTournament = ({ PORT }: Props) => {
                     </div>
                     <div className='input-field text'>
                         <select value={type} onChange={(e) => setType(e.target.value)}>
-                            <option value="" disabled selected>Type</option>
+                            <option value="" disabled>Type</option>
                             <option value="Elimination">Elimination</option>
                             <option value="Robin round">Robin round</option>
                             <option value="Double elimination">Double elimination</option>
