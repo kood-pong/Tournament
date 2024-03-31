@@ -60,7 +60,7 @@ const Profile = ({ PORT }: Props) => {
 
     return (
         <div className="page-container">
-            <Header />
+            <Header PORT={PORT}/>
             <div className="content-wrap">
                 <div className="grid-profile">
                     <div className="grid-profile-item">

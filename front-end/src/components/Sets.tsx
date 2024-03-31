@@ -5,7 +5,11 @@ import TableEntity from "./BasicElements/TableSEntity";
 import './sets.css';
 import { useState } from "react";
 
-const Sets = () => {
+interface Props {
+    PORT: string;
+}
+
+const Sets = ({PORT}: Props) => {
     const match = {
         id: 1,
         participant1: 'SpinMaster83',
@@ -28,7 +32,7 @@ const Sets = () => {
 
     return (
         <div className="page-container">
-            <Header />
+            <Header PORT={PORT}/>
             <div className="content-wrap">
                 <div className="top-line big-title">
                     Match {match?.id}

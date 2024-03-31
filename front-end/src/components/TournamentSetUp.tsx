@@ -45,7 +45,7 @@ const TournamentSetUp = ({ PORT }: Props) => {
             await fetch(`${PORT}/api/v1/jwt/admin/tournaments/start`, {
                 method: "POST",
                 credentials: "include",
-                headers: { "Content-Type": "appliction/json" },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ tournament_id: id, sets_to_win: type }),
             }).then(async response => {
                 const res = await response.json();
@@ -84,7 +84,7 @@ const TournamentSetUp = ({ PORT }: Props) => {
 
     return (
         <div className="page-container">
-            <Header />
+            <Header PORT={PORT}/>
             <div className="content-wrap">
                 <div className="top-line big-title">
                     <a href="/"><LeftArrow /></a>

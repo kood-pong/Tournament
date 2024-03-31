@@ -52,7 +52,7 @@ const Tournament = ({ PORT }: Props) => {
 
     return (
         <div className="page-container">
-            <Header />
+            <Header PORT={PORT}/>
             <div className="content-wrap">
                 {leaderboard.length >= 3 ? <Pedestal winers={leaderboard.slice(0, 3)}  name={"Leaderboard"} /> : null}
                 {pictures.length > 0 ? (

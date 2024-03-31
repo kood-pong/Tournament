@@ -115,7 +115,7 @@ const MainPage = ({ PORT }: Props) => {
 
     return (
         <div className="page-container">
-            <Header />
+            <Header  PORT={PORT}/>
             <div className="content-wrap">
                 {curruser != null && curruser.role == 1 ? (
                     // TODO check if there is any scheduled tournament otherwise add button start tournament

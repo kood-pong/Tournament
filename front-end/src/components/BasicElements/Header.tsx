@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import './basic.css';
 import ModeSwitcher from "./ModeSwitcher";
 import HamburgerMenu from "../assets/HamburgerMenu";
@@ -8,13 +8,36 @@ import RequestsIcon from "../assets/RequestsIcon";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
+interface Props {
+    PORT: string;
+}
 
-const Header = () => {
+const Header = ({PORT}:Props) => {
+    const status = 'pending';
+    const [reqNum, setReqNum] = useState<number>(0);
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const { isLoggedIn, curruser } = useAuth();
 
-    useState();
+    useEffect(() => {
+        const GetPendingUsers = async () => {
+            await fetch(`${PORT}/api/v1/users/all/${status}`, {
+                method: 'GET',
+                credentials: 'include',
+            }).then(async response => {
+                const res = await response.json();
+                if (response.ok) {
+                    if (res.data !== null) {
+                        setReqNum(res.data.length);
+                    }
+                } else {
+                    throw new Error(res.error);
+                }
+            })
+        }
+
+        GetPendingUsers()
+    }, [])    
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -34,7 +57,9 @@ const Header = () => {
                         <div className="requests-btn" onClick={() => { navigate(`/requests`) }}>
                             <div className="request-icon-cont">
                                 <RequestsIcon />
-                                <div className="buble-num">1</div>
+                                {reqNum > 0 ? (
+                                    <div className="buble-num">{reqNum}</div>
+                                ) : null}
                             </div>
                             Requests
                         </div>

@@ -54,7 +54,7 @@ function App() {
           <Route // only for admin
             path='/requests'
             element={
-              <Requests />
+              <Requests PORT={PORT}/>
             }
           />
           <Route // only for admin
@@ -78,7 +78,7 @@ function App() {
           <Route // only for admin
             path='/tournament/:id/match/:id/sets'
             element={
-              <Sets />
+              <Sets PORT={PORT}/>
             } />
           <Route path='*' element={<Navigate to={"/"} />} />
         </Routes>

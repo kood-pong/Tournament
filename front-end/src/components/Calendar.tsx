@@ -48,7 +48,7 @@ const Calendar = ({ PORT }: Props) => {
 
     return (
         <div className="page-container">
-            <Header />
+            <Header  PORT={PORT}/>
             <div className="content-wrap">
                 <div className='calendar-header'>
                     <button onClick={() => handleYearBtns(false)}><LeftArrow /></button>

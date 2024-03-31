@@ -42,7 +42,7 @@ const Matches = ({ PORT }: Props) => {
 
     return (
         <div className="page-container">
-            <Header />
+            <Header PORT={PORT}/>
             <div className="content-wrap">
                 <div className="top-line big-title">
                     Matches
