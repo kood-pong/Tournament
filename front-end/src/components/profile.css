@@ -19,6 +19,14 @@
     height: 5.25rem;
 }
 
+.un-log-out-cont {
+    display: flex;
+    flex-direction: row;
+    width: 80%;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .user-holder {
     width: 100%;
     display: flex;
@@ -85,6 +93,10 @@
     .grid-profile {
         grid-template-columns: auto;
         margin: 50px 0;
+    }
+
+    .un-log-out-cont {
+        width: 100%;
     }
 
     .profile-img-holder {
