@@ -9,4 +9,4 @@ require (
 
 require golang.org/x/crypto v0.19.0
 
-require github.com/rs/cors v1.10.1 // indirect
+require github.com/rs/cors v1.10.1 // direct

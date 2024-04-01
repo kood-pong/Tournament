@@ -32,3 +32,20 @@ func (s *server) matchUpdate() http.HandlerFunc {
 		})
 	}
 }
+
+func (s *server) matchGet() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		match_id := r.PathValue("id")
+
+		m, err := s.store.Match().Get(match_id)
+		if err != nil {
+			s.error(w, http.StatusBadRequest, err)
+			return
+		}
+
+		s.respond(w, http.StatusOK, Response{
+			Message: "Successfully retrieved a match",
+			Data: m,
+		})
+	}
+}
