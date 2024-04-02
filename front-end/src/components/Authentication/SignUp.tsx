@@ -66,6 +66,7 @@ const SignUp = ({ PORT }: Props) => {
                 </div>
                 <p className='text'>To participate in tournaments, you must be a student of Kood/Johvi.<br /><br />
                     Once you've filled out the sign-up form, your request will be sent to the admin for verification on Discord using the username you've provided. It's crucial to ensure that your Discord username is accurate when filling out the form.<br /><br />
+                    <span className='red'>Your registration will be reviewed by administrators. Only after this process is completed will you be able to log in to the platform.</span> <br /><br />
                     If you haven't been accepted within a few days, please contact @admin on Discord for assistance.</p>
             </div>
             <div className="form-cont">
