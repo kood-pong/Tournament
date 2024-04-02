@@ -26,7 +26,6 @@ const Sets = ({ PORT }: Props) => {
 
     const [setNum, setSetNum] = useState<number>(1);
 
-    // TODO fetch match by id
     useEffect(() => {
         const getMatch = async () => {
             await fetch(`${PORT}/api/v1/matches/${id}`, {
@@ -44,17 +43,7 @@ const Sets = ({ PORT }: Props) => {
                 console.error('Error checking login status:', error);
             });
         };
-
-        setMatch({
-            current_round: 6,
-            id: '0e0ea87b-7069-47dc-ac76-4fab6aeb8303',
-            player_1: '3be5843d-a7ca-468a-af8f-7aaa5d5c7e5c',
-            player_2: 'bc1c3523-bf22-4da0-b3b5-7df8cf5de03b',
-            sets_to_win: 2,
-            status: 'ongoing',
-            tournament_id: 'd216b845-2c9d-44ad-83dd-28e1a7f5fabc',
-        });
-        // getMatch();
+        getMatch();
     }, [])
 
 
