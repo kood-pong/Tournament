@@ -37,7 +37,7 @@ const Profile = ({ PORT }: Props) => {
             })
         };
         takeUser();
-    }, []);
+    }, [id]);
 
     useEffect(() => {
         const takeUsersTournaments = async () => {
@@ -57,7 +57,7 @@ const Profile = ({ PORT }: Props) => {
             })
         };
         takeUsersTournaments();
-    })
+    }, [id])
 
     const handleLogOut = async () => {
         fetch(`${PORT}/api/v1/users/logout`, {
