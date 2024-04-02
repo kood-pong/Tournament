@@ -10,12 +10,14 @@ import TableEntity from "./BasicElements/TableLBEntity";
 import './BasicElements/announcement.css';
 import { useAuth } from "./contexts/AuthContext";
 import { Tournament } from "../models/tournament";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
     PORT: string;
 }
 
 const MainPage = ({ PORT }: Props) => {
+    const navigate = useNavigate();
     const [leaderboard, getLeaderboard] = useState([]);
     const [upTournament, setUpTournament] = useState<Tournament | null>(null);
     const [registered, setRegistration] = useState<boolean>(false);
@@ -80,7 +82,10 @@ const MainPage = ({ PORT }: Props) => {
     }
 
     const handleUnregisteration = async () => {
-        console.log('unregistrated')
+        if (!isLoggedIn) {
+            navigate('/login')
+            return
+        }
         await fetch(`${PORT}/api/v1/jwt/tournaments/unregister/${upTournament?.id}`, {
             method: 'GET',
             credentials: 'include'
@@ -97,7 +102,10 @@ const MainPage = ({ PORT }: Props) => {
     }
 
     const handleRegisteration = async () => {
-        console.log('registrated')
+        if (!isLoggedIn) {
+            navigate('/login')
+            return
+        }
         await fetch(`${PORT}/api/v1/jwt/tournaments/register/${upTournament?.id}`, {
             method: 'GET',
             credentials: 'include'
