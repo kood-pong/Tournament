@@ -87,7 +87,9 @@ const Profile = ({ PORT }: Props) => {
                                 </div>
                                 {user?.username}
                             </div>
-                            <button className="btn-1" onClick={() => handleLogOut()}>LogOut</button>
+                            {curruser?.id === user?.id ? (
+                                <button className="btn-1" onClick={() => handleLogOut()}>LogOut</button>
+                            ) : null}
                         </div>
                         <div className="circle-1">
                             <div className="circle-2">
