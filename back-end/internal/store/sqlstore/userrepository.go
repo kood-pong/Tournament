@@ -95,6 +95,9 @@ func (u *UserRepository) Check(login string) (*models.User, error) {
 	if user.Status == "pending" {
 		return nil, errors.New("user register status is pending")
 	}
+	if user.Status == "rejected" {
+		return nil, errors.New("user register status is rejected")
+	}
 
 	return &user, nil
 }
