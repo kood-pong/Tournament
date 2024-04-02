@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { User } from '../../models/user';
 import './table.css';
 

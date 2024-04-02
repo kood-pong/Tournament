@@ -47,8 +47,10 @@ const Profile = ({ PORT }: Props) => {
             }).then(async response => {
                 if (response.ok) {
                     const res = await response.json();
-                    let ts: Tournament[] = res.data as Tournament[];
-                    setTournaments(ts);
+                    if (res.data != null) {
+                        let ts: Tournament[] = res.data as Tournament[];
+                        setTournaments(ts);
+                    }
                 } else {
                     throw new Error('Failed to fetch');
                 }
