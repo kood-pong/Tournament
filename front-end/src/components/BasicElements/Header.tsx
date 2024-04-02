@@ -45,7 +45,7 @@ const Header = ({ PORT }: Props) => {
 
     return (
         <header className="header">
-            <div className="logo title-1">
+            <div className="logo title-1" onClick={() => navigate('/')}>
                 <span className="bold">kood/</span><span className="light">pong</span>
             </div>
             <div className={`${isOpen ? 'responsive_nav' : ''}`}>
