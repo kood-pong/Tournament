@@ -7,7 +7,7 @@ import TableEntity from "./BasicElements/TableLBEntity";
 import './tournament.css';
 import { useAuth } from "./contexts/AuthContext";
 import DownloadIcon from "./assets/DownloadIcon";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 interface Props {
     PORT: string;
@@ -17,6 +17,7 @@ const Tournament = ({ PORT }: Props) => {
     const { id } = useParams();
     const [leaderboard, getLeaderboard] = useState([]);
     const { isLoggedIn, curruser } = useAuth();
+    const navigate = useNavigate();
     // const pictures: string[] = [];
     const pictures = [
         'https://cavtat-tenis.com/img/gallery-1.jpg',
@@ -43,7 +44,7 @@ const Tournament = ({ PORT }: Props) => {
                     console.log('empty tournament')
                 }
             }).catch(error => {
-                console.error('Some issue with leaderboard:', error);
+                navigate(`/error/404`); // TODO check if there is any tournament with this id
             });
         }
 

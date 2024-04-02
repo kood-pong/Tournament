@@ -33,7 +33,7 @@ const Profile = ({ PORT }: Props) => {
                     throw new Error('Failed to fetch');
                 }
             }).catch(error => {
-                console.error('Error taking current user:', error);
+                navigate(`/error/404`);
             })
         };
         takeUser();
@@ -55,7 +55,7 @@ const Profile = ({ PORT }: Props) => {
                     throw new Error('Failed to fetch');
                 }
             }).catch(error => {
-                console.error('Error taking current user:', error);
+                console.error('Error taking users tournaments:', error);
             })
         };
         takeUsersTournaments();
