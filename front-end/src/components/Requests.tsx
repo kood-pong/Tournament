@@ -10,7 +10,7 @@ interface Props {
 
 const Requests = ({ PORT }: Props) => {
     const status = 'pending';
-    const [users, getUsers] = useState<User[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
 
     useEffect(() => {
         const GetPendingUsers = async () => {
@@ -21,7 +21,7 @@ const Requests = ({ PORT }: Props) => {
                 const res = await response.json();
                 if (response.ok) {
                     if (res.data != null) {
-                        getUsers(res.data);
+                        setUsers(res.data);
                     }
                 } else {
                     throw new Error(res.error);
@@ -31,6 +31,10 @@ const Requests = ({ PORT }: Props) => {
 
         GetPendingUsers()
     }, [])
+
+    const handleUserActionComplete = (index: number) => {
+        setUsers((currentUsers) => currentUsers.filter((_, i) => i !== index));
+    };
 
     return (
         <div className="page-container">
@@ -42,7 +46,7 @@ const Requests = ({ PORT }: Props) => {
                 <TableHeader />
                 <div style={{ height: '15px' }}></div>
                 {users.map((user, index) => (
-                    <TableEntity key={index} PORT={PORT} request={user} />
+                    <TableEntity key={index} PORT={PORT} request={user} onActionComplete={() => handleUserActionComplete(index)}/>
                 ))}
 
                 {users.length === 0 ? (

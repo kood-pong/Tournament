@@ -5,9 +5,10 @@ import './table.css';
 type Props = {
     PORT: string;
     request: User;
+    onActionComplete: () => void;
 }
 
-const TableEntity = ({ PORT, request }: Props) => {
+const TableEntity = ({ PORT, request, onActionComplete }: Props) => {
     
     const handleRejection = () => {
         changeUserSatus('rejected');
@@ -27,7 +28,7 @@ const TableEntity = ({ PORT, request }: Props) => {
             const res = await response.json();
             console.log(res)
             if (response.ok) {
-                // 
+                onActionComplete();
             } else {
                 console.error(res.error);
             }
