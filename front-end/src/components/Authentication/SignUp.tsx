@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './auth.css';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { User } from '../../models/user';
 
 interface Props {
     PORT: string;
@@ -15,6 +17,13 @@ const SignUp = ({ PORT }: Props) => {
     const [password, setPassword] = useState<string>('');
     const [repeatedPassword, setRepeatedPassword] = useState<string>('');
     const [error, setError] = useState<{ isError: boolean, text: string }>({ isError: false, text: "" });
+    const { isLoggedIn } = useAuth();
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate('/')
+        }
+    }, [isLoggedIn])
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -22,28 +31,28 @@ const SignUp = ({ PORT }: Props) => {
             setError({ isError: true, text: 'Wrong repeated password' })
             return
         }
-            await fetch(`${PORT}/api/v1/users/create`, {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "appliction/json" },
-                body: JSON.stringify({ email, password, username, first_name: firstName, last_name: lastName }),
-            }).then( async response => {
-                if (response.ok) {
-                    navigate('/');
-                } else {
-                    const res = await response.json();
-                    setError({
-                        isError: true,
-                        text: res.error
-                    });
-                }
-            }).catch(error => {
-                console.log(error)
+        await fetch(`${PORT}/api/v1/users/create`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "appliction/json" },
+            body: JSON.stringify({ email, password, username, first_name: firstName, last_name: lastName }),
+        }).then(async response => {
+            const res = await response.json();
+            if (response.ok) {
+                navigate('/');
+            } else {
                 setError({
                     isError: true,
-                    text: 'Error'
+                    text: res.error
                 });
+            }
+        }).catch(error => {
+            console.log(error)
+            setError({
+                isError: true,
+                text: 'Error'
             });
+        });
     };
 
     return <div className="content-wrap-auth">

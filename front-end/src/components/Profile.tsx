@@ -13,7 +13,7 @@ interface Props {
 }
 
 const Profile = ({ PORT }: Props) => {
-    const { isLoggedIn, curruser } = useAuth();
+    const { logout, curruser } = useAuth();
     const { id } = useParams();
     const navigate = useNavigate();
     const [tournaments, setTournaments] = useState<Tournament[]>([]);
@@ -66,6 +66,7 @@ const Profile = ({ PORT }: Props) => {
         }).then(async response => {
             const res = await response.json();
             if (response.ok) {
+                logout();
                 navigate('/');
             } else {
                 console.error(res.error);

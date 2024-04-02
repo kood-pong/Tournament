@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './auth.css';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { User } from '../../models/user';
 
 interface Props {
     PORT: string;
@@ -11,6 +13,13 @@ const LogIn = ({ PORT }: Props) => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<{ isError: boolean, text: string }>({ isError: false, text: "" });
+    const { login, isLoggedIn } = useAuth();
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate('/')
+        }
+    }, [isLoggedIn])
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -21,11 +30,13 @@ const LogIn = ({ PORT }: Props) => {
             headers: { "Content-Type": "application/json" },
             credentials: "include",
             body: JSON.stringify({ email, password }),
-        }).then( async response => {
+        }).then(async response => {
+            const res = await response.json();
             if (response.ok) {
+                let curruser: User = res.data as User;
+                login(curruser);
                 navigate('/');
             } else {
-                const res = await response.json();
                 setError({
                     isError: true,
                     text: res.error

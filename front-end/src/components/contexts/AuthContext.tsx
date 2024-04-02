@@ -9,9 +9,11 @@ interface AuthProviderProps {
 interface AuthContextType {
     isLoggedIn: boolean;
     curruser: User | null;
+    login: (user: User) => void;
+    logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType>({ isLoggedIn: false, curruser: null });
+const AuthContext = createContext<AuthContextType>({ isLoggedIn: false, curruser: null, login: function(){ }, logout: function(){} });
 
 export const AuthProvider = ({ children, PORT }: AuthProviderProps) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -52,8 +54,18 @@ export const AuthProvider = ({ children, PORT }: AuthProviderProps) => {
         });
     }
 
+    const login = (user: User) => {
+        setIsLoggedIn(true);
+        setCurruser(user);
+    };
+
+    const logout = () => {
+        setIsLoggedIn(false);
+        setCurruser(null);
+    };
+
     return (
-        <AuthContext.Provider value={{ isLoggedIn, curruser }}>
+        <AuthContext.Provider value={{ isLoggedIn, curruser, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

@@ -12,7 +12,7 @@ interface Props {
     PORT: string;
 }
 
-const Header = ({PORT}:Props) => {
+const Header = ({ PORT }: Props) => {
     const status = 'pending';
     const [reqNum, setReqNum] = useState<number>(0);
     const navigate = useNavigate();
@@ -37,7 +37,7 @@ const Header = ({PORT}:Props) => {
         }
 
         GetPendingUsers()
-    }, [])    
+    }, [])
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -64,17 +64,17 @@ const Header = ({PORT}:Props) => {
                             Requests
                         </div>
                     ) : null}
-                    {!isLoggedIn ? (
-                        <div style={{ display: "flex", gap: "20px" }}>
-                            <button onClick={() => { navigate('/login') }} className='btn-1 variant-2'>Log In</button>
-                            <button onClick={() => { navigate('/signup') }} className='btn-1'>Sign Up</button>
-                        </div>
-                    ) : (
+                    {isLoggedIn && curruser ? (
                         <div className="profile-btn" onClick={() => { navigate(`/user/${curruser?.id}`) }}>
                             <div className="usr-img img-holder">
                                 <img src='https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg' />
                             </div>
                             {curruser?.username}
+                        </div>
+                    ) : (
+                        <div style={{ display: "flex", gap: "20px" }}>
+                            <button onClick={() => { navigate('/login') }} className='btn-1 variant-2'>Log In</button>
+                            <button onClick={() => { navigate('/signup') }} className='btn-1'>Sign Up</button>
                         </div>
                     )}
                 </div>
