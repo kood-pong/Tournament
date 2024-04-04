@@ -129,7 +129,7 @@ const Sets = ({ PORT }: Props) => {
         }).then(async response => {
             const res = await response.json()
             if (response.ok) {
-                navigate(`/tournament/${tid}/matches/${match?.sets_to_win}`);
+                navigate(`/tournament/${tid}/matches`);
             } else {
                 setSetNum(prev => prev + 1);
                 console.error(res.error)

@@ -12,8 +12,29 @@ interface Props {
 
 const Matches = ({ PORT }: Props) => {
     const navigate = useNavigate();
-    const { tid, stw } = useParams();
+    const { tid } = useParams();
+    const [stw, setStw] = useState<number>(0);
     const [matches, setMatches] = useState<Match[] | null>([]);
+
+    useEffect(() => {
+        const takeSets = async () => {
+            await fetch(`${PORT}/api/v1/jwt/admin/tournaments/sets/${tid}`, {
+                method: 'GET',
+                credentials: 'include',
+            }).then(async response => {
+                const res = await response.json()
+                if (response.ok) {
+                    setStw(res.data);
+                } else {
+                    console.error(res.error)
+                }
+            }).catch(error => {
+                console.error('Error checking login status:', error);
+            });
+        }
+
+        takeSets();
+    }, [])
 
     useEffect(() => {
         const takeMatches = async () => {
@@ -21,7 +42,7 @@ const Matches = ({ PORT }: Props) => {
                 method: 'POST',
                 credentials: 'include',
                 headers: { "Content-Type": "appliction/json" },
-                body: JSON.stringify({ tournament_id: tid, sets_to_win: typeof stw === 'string' ? parseInt(stw) : 0 }),
+                body: JSON.stringify({ tournament_id: tid, sets_to_win: stw }),
             }).then(async response => {
                 const res = await response.json()
                 console.log(res)
@@ -39,10 +60,9 @@ const Matches = ({ PORT }: Props) => {
                 console.error('Error checking login status:', error);
             });
         }
-
         takeMatches();
 
-    }, [])
+    }, [stw])
 
     return (
         <div className="page-container">

@@ -50,7 +50,7 @@ const TournamentSetUp = ({ PORT }: Props) => {
             }).then(async response => {
                 const res = await response.json();
                 if (response.ok) {
-                    navigate(`/tournament/${tid}/matches/${type}`);
+                    navigate(`/tournament/${tid}/matches`);
                 } else {
                     setError({
                         isError: true,
@@ -61,6 +61,7 @@ const TournamentSetUp = ({ PORT }: Props) => {
                 console.log(error)
             });
         } else {
+            // no need for now
             await fetch(`${PORT}/api/v1/jwt/admin/tournaments/generate`, {
                 method: 'POST',
                 credentials: 'include',
@@ -69,7 +70,7 @@ const TournamentSetUp = ({ PORT }: Props) => {
             }).then(async response => {
                 const res = await response.json()
                 if (response.ok) {
-                    navigate(`/tournament/${tid}/matches/${type}`);
+                    navigate(`/tournament/${tid}/matches`);
                 } else {
                     setError({
                         isError: true,

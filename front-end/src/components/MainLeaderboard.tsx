@@ -144,7 +144,7 @@ const MainPage = ({ PORT }: Props) => {
                                 {curruser.role == 1 ? (
                                     <div className="btns-cont">
                                         {/* TODO take the right num sets to win */}
-                                        <a href={`/tournament/${ongoingTournament.id}/matches/${2}`} className='btn-1 variant-2 black'>Continue with the tournament</a>
+                                        <a href={`/tournament/${ongoingTournament.id}/matches`} className='btn-1 variant-2 black'>Continue with the tournament</a>
                                     </div>
                                 ) : null}
                             </div>
