@@ -63,6 +63,12 @@ const Tournament = ({ PORT }: Props) => {
         }
     };
 
+    // function handleDrop(event: React.DragEvent<HTMLLabelElement>) {
+    //     event.preventDefault();
+    //     const files = event.dataTransfer.files;
+    //     handleImageChange(files);
+    // }
+
     const handleUpload = () => {
         if (selectedImages) {
             const formData = new FormData();
@@ -73,8 +79,9 @@ const Tournament = ({ PORT }: Props) => {
             console.log("formData: ", formData);
 
             // Send formData to your endpoint using fetch or any other HTTP client library
-            fetch('your-endpoint-url', {
+            fetch(`${PORT}/api/v1/jwt/admin/tournaments/image/upload`, {
                 method: 'POST',
+                credentials: "include",
                 body: formData
             })
                 .then(async response => {
@@ -117,6 +124,23 @@ const Tournament = ({ PORT }: Props) => {
                         />
                         <button onClick={handleUpload}>Upload</button>
                     </div>
+                    // <label
+                    //     htmlFor="fileInput"
+                    //     className="upload-pict"
+                    //     onDragOver={handleDragOver}
+                    //     onDrop={handleDrop}
+                    // >
+                    //     <DownloadIcon />
+                    //     Select or drag file to upload
+                    //     <input
+                    //         id="fileInput"
+                    //         type="file"
+                    //         accept="image/jpeg, image/jpg, image/png"
+                    //         multiple
+                    //         onChange={(e) => handleImageChange(e.target.files)}
+                    //     />
+                    //     <button onClick={handleUpload}>Upload</button>
+                    // </label>
                 ) : null}
                 <div className="table-cont">
                     <TableHeader />
