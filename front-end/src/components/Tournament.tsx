@@ -16,11 +16,12 @@ interface Props {
 const Tournament = ({ PORT }: Props) => {
     const { id } = useParams();
     const [leaderboard, getLeaderboard] = useState([]);
-    const { isLoggedIn, curruser } = useAuth();
+    const { curruser } = useAuth();
     const navigate = useNavigate();
-    const [selectedImages, setSelectedImages] = useState<FileList | null>(null);
+    const [selectedImages, setSelectedImages] = useState<File[]>([]);
     const [dragActive, setDragActive] = useState(false);
     const [pictures, setPictures] = useState([]);
+    const [error, setError] = useState<{ isError: boolean, text: string }>({ isError: false, text: "" });
 
     useEffect(() => {
         const takeParticipants = async () => {
@@ -44,33 +45,30 @@ const Tournament = ({ PORT }: Props) => {
         }
 
         takeParticipants();
-    }, [])
-
-    useEffect(() => {
-        const takeImgs = async () => {
-            await fetch(`${PORT}/api/v1/jwt/admin/tournaments/images/${id}`, {
-                method: 'GET',
-                credentials: 'include'
-            }).then(async response => {
-                const res = await response.json()
-                console.log(res)
-                if (response.ok) {
-                    if (res && res.length > 0) {
-                        const imageUrls = res.map((item: { image_url: any; }) => item.image_url);
-                        setPictures(imageUrls);
-                    } else {
-                        console.log("Response is empty or not an array");
-                    }
-                } else {
-                    console.log(res.error)
-                }
-            }).catch(error => {
-                console.error(error)
-            });
-        }
-
         takeImgs();
     }, [])
+
+    const takeImgs = async () => {
+        await fetch(`${PORT}/api/v1/jwt/admin/tournaments/images/${id}`, {
+            method: 'GET',
+            credentials: 'include'
+        }).then(async response => {
+            const res = await response.json()
+            console.log(res)
+            if (response.ok) {
+                if (res && res.length > 0) {
+                    const imageUrls = res.map((item: { image_url: any; }) => item.image_url);
+                    setPictures(imageUrls);
+                } else {
+                    console.log("Response is empty or not an array");
+                }
+            } else {
+                console.log(res.error)
+            }
+        }).catch(error => {
+            console.error(error)
+        });
+    }
 
     const handleUpload = () => {
         if (selectedImages) {
@@ -88,8 +86,7 @@ const Tournament = ({ PORT }: Props) => {
                 body: formData
             })
                 .then(async response => {
-                    // const res = await response.json();
-                    console.log("good")
+                    takeImgs();
                 })
                 .catch(error => {
                     console.error(error)
@@ -98,7 +95,16 @@ const Tournament = ({ PORT }: Props) => {
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSelectedImages(e.target.files);
+        if (selectedImages.length === 6) {
+            setError({
+                isError: true,
+                text: "Only 6 pictures can be uploaded"
+            });
+            return
+        }
+        if (e.target.files) {
+            setSelectedImages([...selectedImages, ...Array.from(e.target.files)]);
+        }
     };
 
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -109,10 +115,15 @@ const Tournament = ({ PORT }: Props) => {
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setDragActive(false);
-
-        const { files } = e.dataTransfer;
-        if (files) {
-            setSelectedImages(files);
+        if (selectedImages.length === 6) {
+            setError({
+                isError: true,
+                text: "Only 6 pictures can be uploaded"
+            });
+            return
+        }
+        if (e.dataTransfer.files) {
+            setSelectedImages([...selectedImages, ...Array.from(e.dataTransfer.files)]);
         }
     };
 
@@ -140,28 +151,30 @@ const Tournament = ({ PORT }: Props) => {
                         onDragOver={handleDragOver}
                         onDrop={handleDrop}
                     >
-                        {selectedImages === null ? (
-
-                            <DownloadIcon />
-                        ) : (
-
-                            <div>
-                                {selectedImages && Array.from(selectedImages).map((file, index) => (
-                                    <div className="attached-img img-holder">
-                                        <img className="" key={index} src={URL.createObjectURL(file)} alt={file.name} />
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                        Select or drag file to upload
-                        <input
-                            type="file"
-                            accept="image/jpeg, image/jpg, image/png"
-                            multiple
-                            onChange={handleImageChange}
-                        />
-                        <button className="btn-1" onClick={handleUpload}>Upload</button>
+                        <label className="upload-label">
+                            {selectedImages.length === 0 ? (
+                                <DownloadIcon />
+                            ) : (
+                                <div className="attached-img-cont">
+                                    {selectedImages.map((file, index) => (
+                                        <div className="attached-img img-holder" key={index}>
+                                            <img src={URL.createObjectURL(file)} alt={file.name} />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            <div>Select or drag file to upload</div>
+                            <input
+                                type="file"
+                                accept="image/jpeg, image/jpg, image/png"
+                                multiple
+                                onChange={handleImageChange}
+                                style={{ display: "none" }}
+                            />
+                        </label>
+                        <button className="btn-1 variant-2" disabled={selectedImages.length === 0} onClick={handleUpload}>Upload</button>
                     </div>
+
                 ) : null}
                 <div className="table-cont">
                     <TableHeader />

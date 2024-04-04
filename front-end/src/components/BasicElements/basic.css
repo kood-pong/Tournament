@@ -116,6 +116,13 @@
     border-color: var(--color-3);
 }
 
+.btn-1.disabled, .btn-1:disabled {
+    background-color: var(--bg-color-1);
+    color: var(--text-gray-color);
+    border-color: var(--text-gray-color);
+    cursor: not-allowed;
+}
+
 .black {
     border: solid 1px var(--color-1);
     background-color: transparent;
