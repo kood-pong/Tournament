@@ -36,6 +36,12 @@
     margin-bottom: 50px;
 }
 
+.attached-img {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 0.5rem;
+}
+
 @media (max-width: 850px) {
     .imgs-grid {
         grid-template-columns: 100%;

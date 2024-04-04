@@ -124,7 +124,7 @@ const Tournament = ({ PORT }: Props) => {
                 {pictures.length > 0 ? (
                     <div className="imgs-grid">
                         <div className="main-pict img-holder">
-                            <img src={pictures[0]}></img>
+                            <img src={`https://kood-pong-media.s3.eu-north-1.amazonaws.com/${pictures[0]}`}></img>
                         </div>
                         <div className="other-picts-cont">
                             {pictures.slice(1).map((pictureLink, index) => (
@@ -135,23 +135,24 @@ const Tournament = ({ PORT }: Props) => {
                         </div>
                     </div>
                 ) : pictures.length == 0 && curruser != null && curruser.role == 1 ? (
-                    // <div className="upload-pict" onDragOver={handleDragOver}>
-                    //     <DownloadIcon />
-                    //     Select or drag file to upload
-                    //     <input
-                    //         type="file"
-                    //         accept="image/jpeg, image/jpg, image/png"
-                    //         multiple
-                    //         onChange={handleImageChange}
-                    //     />
-                    //     <button onClick={handleUpload}>Upload</button>
-                    // </div>
                     <div
                         className={`upload-pict ${dragActive ? "drag-active" : ""}`}
                         onDragOver={handleDragOver}
                         onDrop={handleDrop}
                     >
-                        <DownloadIcon />
+                        {selectedImages === null ? (
+
+                            <DownloadIcon />
+                        ) : (
+
+                            <div>
+                                {selectedImages && Array.from(selectedImages).map((file, index) => (
+                                    <div className="attached-img img-holder">
+                                        <img className="" key={index} src={URL.createObjectURL(file)} alt={file.name} />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                         Select or drag file to upload
                         <input
                             type="file"
@@ -160,16 +161,6 @@ const Tournament = ({ PORT }: Props) => {
                             onChange={handleImageChange}
                         />
                         <button className="btn-1" onClick={handleUpload}>Upload</button>
-                        {/* {selectedImages && (
-                                <div>
-                                    <h2>Selected Images:</h2>
-                                    <ul>
-                                        {Array.from(selectedImages).map((image, index) => (
-                                            <li key={index}>{image.name}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )} */}
                     </div>
                 ) : null}
                 <div className="table-cont">
