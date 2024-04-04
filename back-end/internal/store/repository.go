@@ -29,6 +29,7 @@ type TournamentRepository interface {
 	GetAllOngoing(state string) ([]models.Tournament, error)
 	CheckRegister(user_id, tournament_id string) (bool, error)
 	UnRegister(user_id, tournament_id string) error
+	GetSetsToWin(tournament_id string) (int, error)
 }
 
 type NotificationRepository interface {

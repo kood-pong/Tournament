@@ -80,7 +80,7 @@ func (s *server) configureRouter() {
 	s.router.GET("/api/v1/jwt/admin/tournaments/match/{id}", s.matchGet())
 	s.router.POST("/api/v1/jwt/admin/tournaments/set/create", s.setCreate())
 	s.router.GET("/api/v1/jwt/admin/tournaments/leaderboard/{id}", s.tournamentLeaderboard())
-
+	s.router.GET("/api/v1/jwt/admin/tournaments/sets/{id}", s.tournamentSets())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {

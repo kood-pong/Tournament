@@ -63,6 +63,16 @@ func (t *TournamentRepository) Get(tournament_id string) (*models.Tournament, er
 	return tournament, nil
 }
 
+func (t *TournamentRepository) GetSetsToWin(tournament_id string) (int, error) {
+	query := `SELECT sets_to_win FROM matches WHERE tournament_id = ? AND status = 'ongoing'`
+
+	var setsToWin int 
+	if err := t.store.Db.QueryRow(query, tournament_id).Scan(&setsToWin);err != nil {
+		return -1, err
+	}
+	return setsToWin, nil
+}
+
 func (t *TournamentRepository) GetAllByYear(year string) ([]models.TournamentWithWinner, error) {
 	query := `SELECT * FROM tournaments WHERE strftime('%Y', start_date) = ?`
 	rows, err := t.store.Db.Query(query, year)

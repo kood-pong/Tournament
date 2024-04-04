@@ -346,6 +346,23 @@ func (s *server) imagesGet() http.HandlerFunc {
 	}
 }
 
+func (s *server) tournamentSets() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tournament_id := r.PathValue("id")
+
+		t, err := s.store.Tournament().GetSetsToWin(tournament_id)
+		if err != nil {
+			s.error(w, http.StatusBadRequest, err)
+			return
+		}
+
+		s.respond(w, http.StatusOK, Response{
+			Message: "Successfully recieved sets to win",
+			Data:    t,
+		})
+	}
+}
+
 func uploadToS3(file multipart.File, fileName string) error {
 	// Create a new AWS session
 	sess, err := session.NewSession(&aws.Config{
