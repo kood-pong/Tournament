@@ -54,6 +54,26 @@ const Tournament = ({ PORT }: Props) => {
         takeParticipants();
     }, [])
 
+    useEffect(() => {
+        const takeImgs = async () => {
+            await fetch(`${PORT}/api/v1/jwt/admin/tournaments/images/${id}`, {
+                method: 'GET',
+                credentials: 'include'
+            }).then(async response => {
+                const res = await response.json()
+                console.log(res)
+                if (response.ok) {
+                } else {
+                    console.log(res.error)
+                }
+            }).catch(error => {
+                console.error(error)
+            });
+        }
+
+        takeImgs();
+    }, [])
+
     const handleUpload = () => {
         if (selectedImages) {
             const formData = new FormData();
@@ -64,7 +84,7 @@ const Tournament = ({ PORT }: Props) => {
             console.log("formData: ", formData);
 
             // Send formData to your endpoint using fetch or any other HTTP client library
-            fetch(`${PORT}/api/v1/jwt/admin/tournaments/image/upload`, {
+            fetch(`${PORT}/api/v1/jwt/admin/tournaments/images/upload/${id}`, {
                 method: 'POST',
                 credentials: "include",
                 body: formData
