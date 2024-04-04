@@ -38,10 +38,6 @@
 
 .upload-label {
     cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
 }
 
 input[type="file"] {
@@ -62,9 +58,24 @@ input[type="file"] {
 }
 
 .attached-img {
+    position: relative;
     width: 5rem;
     height: 5rem;
     border-radius: 0.5rem;
+}
+
+.cross-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0 5px;
+    color: black;
+    cursor: pointer;
+    display: none;
+}
+
+.attached-img:hover .cross-icon {
+    display: block;
 }
 
 @media (max-width: 850px) {

@@ -30,17 +30,16 @@ const Tournament = ({ PORT }: Props) => {
                 credentials: 'include'
             }).then(async response => {
                 const res = await response.json()
-                console.log(res)
                 if (response.ok) {
                     const lb = res.data.sort(function (a: { ranking: number; }, b: { ranking: number; }) {
                         return a.ranking - b.ranking;
                     });
                     getLeaderboard(lb);
                 } else {
-                    console.log('empty tournament')
+                    navigate(`/error/404`);
                 }
             }).catch(error => {
-                navigate(`/error/404`); // TODO check if there is any tournament with this id
+                navigate(`/error/404`);
             });
         }
 
@@ -54,16 +53,13 @@ const Tournament = ({ PORT }: Props) => {
             credentials: 'include'
         }).then(async response => {
             const res = await response.json()
-            console.log(res)
             if (response.ok) {
                 if (res && res.length > 0) {
                     const imageUrls = res.map((item: { image_url: any; }) => item.image_url);
                     setPictures(imageUrls);
-                } else {
-                    console.log("Response is empty or not an array");
                 }
             } else {
-                console.log(res.error)
+                console.error(res.error)
             }
         }).catch(error => {
             console.error(error)
@@ -76,9 +72,6 @@ const Tournament = ({ PORT }: Props) => {
             for (let i = 0; i < selectedImages.length; i++) {
                 formData.append('images', selectedImages[i]);
             }
-
-            console.log("formData: ", formData);
-
             // Send formData to your endpoint using fetch or any other HTTP client library
             fetch(`${PORT}/api/v1/jwt/admin/tournaments/images/upload/${id}`, {
                 method: 'POST',
@@ -127,6 +120,10 @@ const Tournament = ({ PORT }: Props) => {
         }
     };
 
+    const removeImageAtIndex = (index: number) => {
+        setSelectedImages(currentImages => currentImages.filter((_, idx) => idx !== index));
+    };
+
     return (
         <div className="page-container">
             <Header PORT={PORT} />
@@ -151,19 +148,23 @@ const Tournament = ({ PORT }: Props) => {
                         onDragOver={handleDragOver}
                         onDrop={handleDrop}
                     >
+                        {selectedImages.length === 0 ? (
+                            <DownloadIcon />
+                        ) : (
+                            <div className="attached-img-cont">
+                                {selectedImages.map((file, index) => (
+                                    <div className="attached-img img-holder" key={index} onClick={() => removeImageAtIndex(index)}>
+                                        <img src={URL.createObjectURL(file)} alt={file.name} />
+                                        <span className="cross-icon">×</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                         <label className="upload-label">
-                            {selectedImages.length === 0 ? (
-                                <DownloadIcon />
-                            ) : (
-                                <div className="attached-img-cont">
-                                    {selectedImages.map((file, index) => (
-                                        <div className="attached-img img-holder" key={index}>
-                                            <img src={URL.createObjectURL(file)} alt={file.name} />
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
                             <div>Select or drag file to upload</div>
+                            {error.isError ? (
+                                <div className="red">{error.text}</div>
+                            ) : null}
                             <input
                                 type="file"
                                 accept="image/jpeg, image/jpg, image/png"

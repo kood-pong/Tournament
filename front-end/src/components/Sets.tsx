@@ -13,7 +13,7 @@ interface Props {
 }
 
 const Sets = ({ PORT }: Props) => {
-    const {tid, id } = useParams();
+    const { tid, id } = useParams();
     const navigate = useNavigate();
     const [match, setMatch] = useState<Match | null>();
     const [error, setError] = useState<{ isError: boolean, text: string }>({ isError: false, text: "" });
@@ -25,6 +25,7 @@ const Sets = ({ PORT }: Props) => {
     const [player2, setPlayer2] = useState<User>();
 
     const [setNum, setSetNum] = useState<number>(1);
+    const [resetTrigger, setResetTrigger] = useState(0);
 
     useEffect(() => {
         const getMatch = async () => {
@@ -33,7 +34,6 @@ const Sets = ({ PORT }: Props) => {
                 credentials: 'include',
             }).then(async response => {
                 const res = await response.json();
-                console.log(res)
                 if (response.ok) {
                     setMatch(res.data);
                 } else {
@@ -99,8 +99,6 @@ const Sets = ({ PORT }: Props) => {
         setPl2Points(plPoints);
     };
 
-    // TODO take match and update it after entering data
-
     const handleSubmit = async () => {
         setError(
             {
@@ -108,8 +106,6 @@ const Sets = ({ PORT }: Props) => {
                 text: ""
             }
         )
-
-        console.log(pl1Points, pl2Points)
 
         if (pl1Points < 11 && pl2Points < 11) {
             setError(
@@ -125,18 +121,27 @@ const Sets = ({ PORT }: Props) => {
             method: 'POST',
             credentials: 'include',
             headers: { "Content-Type": "appliction/json" },
-            body: JSON.stringify({ set_number: setNum, match_id: match?.id, player_1_score: pl1Points, player_2_score: pl2Points}),
+            body: JSON.stringify({ set_number: setNum, match_id: match?.id, player_1_score: pl1Points, player_2_score: pl2Points }),
         }).then(async response => {
             const res = await response.json()
             if (response.ok) {
                 navigate(`/tournament/${tid}/matches`);
             } else {
-                setSetNum(prev => prev + 1);
-                console.error(res.error)
+                if (res.error === 'no winner or loser determined') {
+                    setSetNum(prev => prev + 1);
+                } else {
+                    setError(
+                        {
+                            isError: true,
+                            text: res.error
+                        }
+                    )
+                }
             }
         }).catch(error => {
             console.error('Error checking login status:', error);
         });
+        setResetTrigger(prev => prev + 1);
     }
 
     return (
@@ -150,8 +155,8 @@ const Sets = ({ PORT }: Props) => {
                 <div className="set-cont">
                     <div className="title-1 set-h">Set {setNum}</div>
                     <TableHeader />
-                    <TableEntity id={1} participantName={`${player1?.first_name} ${player1?.last_name}`} updatePlPoints={updatePl1Points} />
-                    <TableEntity id={2} participantName={`${player2?.first_name} ${player2?.last_name}`} updatePlPoints={updatePl2Points} />
+                    <TableEntity id={1} participantName={`${player1?.first_name} ${player1?.last_name}`} updatePlPoints={updatePl1Points} resetTrigger={resetTrigger} />
+                    <TableEntity id={2} participantName={`${player2?.first_name} ${player2?.last_name}`} updatePlPoints={updatePl2Points} resetTrigger={resetTrigger} />
                     <div className="text red">{error.text}</div>
                 </div>
                 <button onClick={handleSubmit} className="btn-1" style={{ marginTop: '50px' }}>Done</button>
