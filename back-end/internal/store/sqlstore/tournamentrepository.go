@@ -66,18 +66,11 @@ func (t *TournamentRepository) Get(tournament_id string) (*models.Tournament, er
 func (t *TournamentRepository) GetSetsToWin(tournament_id string) (int, error) {
 	query := `SELECT sets_to_win FROM matches WHERE tournament_id = ? AND status = 'ongoing'`
 
-	var setsToWin int 
-	if err := t.store.Db.QueryRow(query, tournament_id).Scan(&setsToWin);err != nil {
+	var setsToWin int
+	if err := t.store.Db.QueryRow(query, tournament_id).Scan(&setsToWin); err != nil {
 		return -1, err
 	}
 
-	tournament, err := t.Get(tournament_id)
-	if err != nil {
-		return -1, err
-	}
-	if tournament.Status == "finised" {
-		return -1, errors.New("tournament is finished")
-	}
 	return setsToWin, nil
 }
 
@@ -147,14 +140,14 @@ func (t *TournamentRepository) Register(reg *models.Register) error {
 func (t *TournamentRepository) CheckRegister(user_id, tournament_id string) (bool, error) {
 	query := `SELECT * FROM registration WHERE user_id = ? AND tournament_id = ?`
 	var registration models.Register
-	err := t.store.Db.QueryRow(query, user_id, tournament_id).Scan(&registration.ID, &registration.TournamentID, &registration.UserID);
+	err := t.store.Db.QueryRow(query, user_id, tournament_id).Scan(&registration.ID, &registration.TournamentID, &registration.UserID)
 	if err != nil {
 		return false, fmt.Errorf("error while getting registration: %v", err)
 	}
 	return true, nil
 }
 
-func (t *TournamentRepository) UnRegister(user_id, tournament_id string) error{
+func (t *TournamentRepository) UnRegister(user_id, tournament_id string) error {
 	//check tournament state
 	tournament, err := t.Get(tournament_id)
 	if err != nil {

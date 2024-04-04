@@ -26,7 +26,11 @@ const Matches = ({ PORT }: Props) => {
                 if (response.ok) {
                     setStw(res.data);
                 } else {
-                    console.error(res.error)
+                    if (res.error === 'tournament is finished') {
+                        navigate(`/tournament/${tid}`);
+                    } else {
+                        navigate(`/tournament/${tid}/set-up`)
+                    }
                 }
             }).catch(error => {
                 console.error('Error checking login status:', error);

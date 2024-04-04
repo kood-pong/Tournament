@@ -61,7 +61,6 @@ const TournamentSetUp = ({ PORT }: Props) => {
                 console.log(error)
             });
         } else {
-            // no need for now
             await fetch(`${PORT}/api/v1/jwt/admin/tournaments/generate`, {
                 method: 'POST',
                 credentials: 'include',
