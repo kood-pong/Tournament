@@ -300,7 +300,6 @@ func (s *server) imageUpload() http.HandlerFunc {
 			defer file.Close()
 
 			extension := filepath.Ext(fileHeader.Filename)
-			fmt.Println("THIS IS EXTENSION ", extension)
 			// Check file content type
 			contentType := fileHeader.Header.Get("Content-Type")
 			if contentType != "image/jpeg" && contentType != "image/png" {
@@ -316,6 +315,14 @@ func (s *server) imageUpload() http.HandlerFunc {
 				s.error(w, http.StatusBadRequest, fmt.Errorf("failed to upload file to S3 %v", err))
 				return
 			}
+			//add file to database
+			newImg := models.NewImage()
+			newImg.TournamentID = tournament_id
+			newImg.ImageURL = fileName
+			_, err = s.store.Image().Create(*newImg)
+			if err != nil {
+				s.error(w, http.StatusBadRequest, fmt.Errorf("failed to insert path to database %v", err))
+			}
 		}
 
 		s.respond(w, http.StatusOK, Response{
@@ -327,7 +334,15 @@ func (s *server) imageUpload() http.HandlerFunc {
 
 func (s *server) imagesGet() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		tournament_id := r.PathValue("tournament_id")
 
+		imags, err := s.store.Image().GetAll(tournament_id)
+		if err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		s.respond(w, http.StatusOK, imags)
 	}
 }
 
@@ -340,18 +355,14 @@ func uploadToS3(file multipart.File, fileName string) error {
 	if err != nil {
 		return err
 	}
-
-	// Create a new S3 service client
 	svc := s3.New(sess)
 
-	// Upload params
 	params := &s3.PutObjectInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(fileName),
 		Body:   file,
 	}
 
-	// Upload file to S3
 	_, err = svc.PutObject(params)
 	if err != nil {
 		return err

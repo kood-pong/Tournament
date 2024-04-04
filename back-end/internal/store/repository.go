@@ -59,5 +59,6 @@ type ResultRepository interface {
 }
 
 type ImageRepository interface {
-	
+	Create(image models.Image) (*models.Image, error)
+	GetAll(tournament_id string) ([]models.Image, error)
 }
