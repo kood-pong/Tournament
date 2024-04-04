@@ -3,10 +3,18 @@ package server
 import (
 	"errors"
 	"fmt"
-	"io"
+	"math/rand"
+	"mime/multipart"
 	"net/http"
+	"os"
+	"strings"
 	"tournament/back-end/internal/models"
 	"tournament/back-end/pkg/validator"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 type RequestBody struct {
@@ -271,17 +279,76 @@ func (s *server) tournamentUnRegister() http.HandlerFunc {
 
 func (s *server) imageUpload() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		maxFileSize := 1024 * 1024 * 20 //2 MB
-
-		imageData, err := io.ReadAll(r.Body)
+		err := r.ParseMultipartForm(10 << 20) // 10 MB max file size
 		if err != nil {
-			s.error(w, http.StatusBadRequest, err)
+			http.Error(w, "Unable to parse form", http.StatusBadRequest)
 			return
 		}
-		_ = maxFileSize
 
-		fmt.Println(imageData)
+		// Get the image file from the form data
+		file, _, err := r.FormFile("images")
+		if err != nil {
+			http.Error(w, "Unable to get image file", http.StatusBadRequest)
+			return
+		}
+		defer file.Close()
 
-		s.respond(w, http.StatusOK, imageData)
+		// Generate a unique file name for the image
+		fileName := generateFileName()
+
+		// Upload the image to S3
+		err = uploadToS3(file, fileName)
+		if err != nil {
+			http.Error(w, "Failed to upload image to S3", http.StatusInternalServerError)
+			return
+		}
+
+		// Respond with a success message
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Image uploaded successfully"))
 	}
+}
+
+func uploadToS3(file multipart.File, fileName string) error {
+	// Create a new AWS session
+	sess, err := session.NewSession(&aws.Config{
+		Region:      aws.String(region),
+		Credentials: credentials.NewStaticCredentials(os.Getenv(awsAccessKey), os.Getenv(awsSecretKey), ""),
+	})
+	if err != nil {
+		return err
+	}
+
+	// Create a new S3 service client
+	svc := s3.New(sess)
+
+	// Upload params
+	params := &s3.PutObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(fileName),
+		Body:   file,
+	}
+
+	// Upload file to S3
+	_, err = svc.PutObject(params)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func generateFileName() string {
+	// Generate a random file name
+	return "image_" + randomString(10) + ".jpg"
+}
+
+func randomString(length int) string {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	var result strings.Builder
+	for i := 0; i < length; i++ {
+		randomIndex := rand.Intn(len(charset))
+		result.WriteByte(charset[randomIndex])
+	}
+	return result.String()
 }
