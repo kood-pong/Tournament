@@ -13,7 +13,7 @@ interface Props {
 const Matches = ({ PORT }: Props) => {
     const navigate = useNavigate();
     const { tid, stw } = useParams();
-    const [matches, setMatches] = useState<Match[]>([]);
+    const [matches, setMatches] = useState<Match[] | null>([]);
 
     useEffect(() => {
         const takeMatches = async () => {
@@ -28,7 +28,7 @@ const Matches = ({ PORT }: Props) => {
                 if (response.ok) {
                     setMatches(res.data);
                 } else {
-                    setMatches([]);
+                    setMatches(null);
                     if (res.error === 'tournament is finished') {
                         navigate(`/tournament/${tid}`);
                     } else {
@@ -53,7 +53,7 @@ const Matches = ({ PORT }: Props) => {
                 </div>
                 <TableHeader />
                 <div style={{ height: '15px' }}></div>
-                {matches.map((match, index) => (
+                {matches?.map((match, index) => (
                     <TableEntity key={index} PORT={PORT} match={match} tableId={index + 1} />
                 ))}
                 {/* TODO define when prev match is done */}

@@ -12,7 +12,7 @@ const TableEntity = ({ id, participantName, updatePlPoints }: Props) => {
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseInt(event.target.value);
-        if (!isNaN(value) && value >= 0 && value <= 11) {
+        if (!isNaN(value) && value >= 0) {
             setPlPoints(value);
             updatePlPoints(value); // Update the parent component's state
         }

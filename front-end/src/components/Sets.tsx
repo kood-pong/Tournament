@@ -111,7 +111,7 @@ const Sets = ({ PORT }: Props) => {
 
         console.log(pl1Points, pl2Points)
 
-        if (pl1Points !== 11 && pl2Points !== 11) {
+        if (pl1Points < 11 && pl2Points < 11) {
             setError(
                 {
                     isError: true,
