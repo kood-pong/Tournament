@@ -57,3 +57,7 @@ type ResultRepository interface {
 	UserLosses(user_id, tournament_id string) (int, error)
 	GetFinalists(tournament_id string) ([]models.User, error)
 }
+
+type ImageRepository interface {
+	
+}

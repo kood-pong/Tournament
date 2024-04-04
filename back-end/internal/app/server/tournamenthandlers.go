@@ -7,6 +7,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"tournament/back-end/internal/models"
 	"tournament/back-end/pkg/validator"
@@ -279,41 +280,59 @@ func (s *server) tournamentUnRegister() http.HandlerFunc {
 
 func (s *server) imageUpload() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseMultipartForm(10 << 20) // 10 MB max file size
+		err := r.ParseMultipartForm(20 << 20)
 		if err != nil {
-			s.error(w, http.StatusBadRequest, errors.New("we arehere 1" + err.Error()))
+			s.error(w, http.StatusBadRequest, fmt.Errorf("error parsing a formdata %v", err))
 			return
 		}
+		tournament_id := r.PathValue("tournament_id")
 
 		// Get the image file from the form data
-		file, _, err := r.FormFile("images")
-		if err != nil {
-			s.error(w, http.StatusBadRequest, errors.New("we arehere 2" + err.Error()))
-			return
+		fileHeaders := r.MultipartForm.File["images"]
+
+		for _, fileHeader := range fileHeaders {
+			// Open uploaded file
+			file, err := fileHeader.Open()
+			if err != nil {
+				s.error(w, http.StatusInternalServerError, fmt.Errorf("error while opening an uploaded file %v", err))
+				return
+			}
+			defer file.Close()
+
+			extension := filepath.Ext(fileHeader.Filename)
+			fmt.Println("THIS IS EXTENSION ", extension)
+			// Check file content type
+			contentType := fileHeader.Header.Get("Content-Type")
+			if contentType != "image/jpeg" && contentType != "image/png" {
+				s.error(w, http.StatusBadRequest, errors.New("only JPG or PNG files are allowed"))
+				return
+			}
+
+			// Generate a unique file name for the image
+			fileName := generateFileName(tournament_id, extension)
+
+			err = uploadToS3(file, fileName)
+			if err != nil {
+				s.error(w, http.StatusBadRequest, fmt.Errorf("failed to upload file to S3 %v", err))
+				return
+			}
 		}
-		defer file.Close()
 
-		// Generate a unique file name for the image
-		fileName := generateFileName()
+		s.respond(w, http.StatusOK, Response{
+			Message: "Successfully uploaded to S3",
+			Data:    nil,
+		})
+	}
+}
 
-		// Upload the image to S3
-		err = uploadToS3(file, fileName)
-		if err != nil {
-			s.error(w, http.StatusBadRequest, errors.New("we arehere 3" + err.Error()))
-			return
-		}
+func (s *server) imagesGet() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 
-		// Respond with a success message
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Image uploaded successfully"))
 	}
 }
 
 func uploadToS3(file multipart.File, fileName string) error {
 	// Create a new AWS session
-	fmt.Println(os.Getenv(awsAccessKey))
-	fmt.Println(os.Getenv(awsSecretKey))
-
 	sess, err := session.NewSession(&aws.Config{
 		Region:      aws.String(region),
 		Credentials: credentials.NewStaticCredentials(os.Getenv(awsAccessKey), os.Getenv(awsSecretKey), ""),
@@ -341,9 +360,8 @@ func uploadToS3(file multipart.File, fileName string) error {
 	return nil
 }
 
-func generateFileName() string {
-	// Generate a random file name
-	return "image_" + randomString(10) + ".jpg"
+func generateFileName(tournament_id, extension string) string {
+	return tournament_id + "_" + randomString(10) + extension
 }
 
 func randomString(length int) string {

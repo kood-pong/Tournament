@@ -7,4 +7,5 @@ type Store interface {
 	Match() MatchRepository
 	Set() SetRepository
 	Result() ResultRepository
+	Image() ImageRepository
 }

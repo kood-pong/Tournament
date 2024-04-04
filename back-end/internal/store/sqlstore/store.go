@@ -15,6 +15,7 @@ type Store struct {
 	matchRepository        *MatchRepository
 	setRepository          *SetRepository
 	resultRepository       *ResultRepository
+	imageRepository        *ImageRepository
 }
 
 func New(db *sql.DB) *Store {
@@ -93,4 +94,16 @@ func (s *Store) Result() store.ResultRepository {
 	}
 
 	return s.resultRepository
+}
+
+func (s *Store) Image() store.ImageRepository {
+	if s.imageRepository != nil {
+		return s.imageRepository
+	}
+
+	s.imageRepository = &ImageRepository{
+		store: s,
+	}
+
+	return s.imageRepository
 }
