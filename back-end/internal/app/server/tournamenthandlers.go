@@ -281,14 +281,14 @@ func (s *server) imageUpload() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseMultipartForm(10 << 20) // 10 MB max file size
 		if err != nil {
-			http.Error(w, "Unable to parse form", http.StatusBadRequest)
+			s.error(w, http.StatusBadRequest, errors.New("we arehere 1" + err.Error()))
 			return
 		}
 
 		// Get the image file from the form data
 		file, _, err := r.FormFile("images")
 		if err != nil {
-			http.Error(w, "Unable to get image file", http.StatusBadRequest)
+			s.error(w, http.StatusBadRequest, errors.New("we arehere 2" + err.Error()))
 			return
 		}
 		defer file.Close()
@@ -299,7 +299,7 @@ func (s *server) imageUpload() http.HandlerFunc {
 		// Upload the image to S3
 		err = uploadToS3(file, fileName)
 		if err != nil {
-			http.Error(w, "Failed to upload image to S3", http.StatusInternalServerError)
+			s.error(w, http.StatusBadRequest, errors.New("we arehere 3" + err.Error()))
 			return
 		}
 
@@ -311,6 +311,9 @@ func (s *server) imageUpload() http.HandlerFunc {
 
 func uploadToS3(file multipart.File, fileName string) error {
 	// Create a new AWS session
+	fmt.Println(os.Getenv(awsAccessKey))
+	fmt.Println(os.Getenv(awsSecretKey))
+
 	sess, err := session.NewSession(&aws.Config{
 		Region:      aws.String(region),
 		Credentials: credentials.NewStaticCredentials(os.Getenv(awsAccessKey), os.Getenv(awsSecretKey), ""),

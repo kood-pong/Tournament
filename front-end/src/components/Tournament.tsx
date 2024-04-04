@@ -19,6 +19,7 @@ const Tournament = ({ PORT }: Props) => {
     const { isLoggedIn, curruser } = useAuth();
     const navigate = useNavigate();
     const [selectedImages, setSelectedImages] = useState<FileList | null>(null);
+    const [dragActive, setDragActive] = useState(false);
     const pictures: string[] = [];
     // const pictures = [
     //     'https://cavtat-tenis.com/img/gallery-1.jpg',
@@ -53,22 +54,6 @@ const Tournament = ({ PORT }: Props) => {
         takeParticipants();
     }, [])
 
-    const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-        event.preventDefault();
-    }
-
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            setSelectedImages(event.target.files);
-        }
-    };
-
-    // function handleDrop(event: React.DragEvent<HTMLLabelElement>) {
-    //     event.preventDefault();
-    //     const files = event.dataTransfer.files;
-    //     handleImageChange(files);
-    // }
-
     const handleUpload = () => {
         if (selectedImages) {
             const formData = new FormData();
@@ -85,12 +70,31 @@ const Tournament = ({ PORT }: Props) => {
                 body: formData
             })
                 .then(async response => {
-                    const res = await response.json();
-                    console.log(res)
+                    // const res = await response.json();
+                    console.log("good")
                 })
                 .catch(error => {
                     console.error(error)
                 });
+        }
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSelectedImages(e.target.files);
+    };
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setDragActive(true);
+    };
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setDragActive(false);
+
+        const { files } = e.dataTransfer;
+        if (files) {
+            setSelectedImages(files);
         }
     };
 
@@ -113,7 +117,22 @@ const Tournament = ({ PORT }: Props) => {
                         </div>
                     </div>
                 ) : pictures.length == 0 && curruser != null && curruser.role == 1 ? (
-                    <div className="upload-pict" onDragOver={handleDragOver}>
+                    // <div className="upload-pict" onDragOver={handleDragOver}>
+                    //     <DownloadIcon />
+                    //     Select or drag file to upload
+                    //     <input
+                    //         type="file"
+                    //         accept="image/jpeg, image/jpg, image/png"
+                    //         multiple
+                    //         onChange={handleImageChange}
+                    //     />
+                    //     <button onClick={handleUpload}>Upload</button>
+                    // </div>
+                    <div
+                        className={`upload-pict ${dragActive ? "drag-active" : ""}`}
+                        onDragOver={handleDragOver}
+                        onDrop={handleDrop}
+                    >
                         <DownloadIcon />
                         Select or drag file to upload
                         <input
@@ -122,25 +141,18 @@ const Tournament = ({ PORT }: Props) => {
                             multiple
                             onChange={handleImageChange}
                         />
-                        <button onClick={handleUpload}>Upload</button>
+                        <button className="btn-1" onClick={handleUpload}>Upload</button>
+                        {/* {selectedImages && (
+                                <div>
+                                    <h2>Selected Images:</h2>
+                                    <ul>
+                                        {Array.from(selectedImages).map((image, index) => (
+                                            <li key={index}>{image.name}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )} */}
                     </div>
-                    // <label
-                    //     htmlFor="fileInput"
-                    //     className="upload-pict"
-                    //     onDragOver={handleDragOver}
-                    //     onDrop={handleDrop}
-                    // >
-                    //     <DownloadIcon />
-                    //     Select or drag file to upload
-                    //     <input
-                    //         id="fileInput"
-                    //         type="file"
-                    //         accept="image/jpeg, image/jpg, image/png"
-                    //         multiple
-                    //         onChange={(e) => handleImageChange(e.target.files)}
-                    //     />
-                    //     <button onClick={handleUpload}>Upload</button>
-                    // </label>
                 ) : null}
                 <div className="table-cont">
                     <TableHeader />

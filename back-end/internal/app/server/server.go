@@ -12,7 +12,7 @@ import (
 const (
 	sessionName     = "session"
 	jwtKey          = "JWT_KEY"
-	region          = "us-east-1"
+	region          = "eu-north-1"
 	bucketName      = "kood-pong-media"
 	awsAccessKey    = "AWS_ACCESS_KEY"
 	awsSecretKey    = "AWS_SECRET_KEY"
