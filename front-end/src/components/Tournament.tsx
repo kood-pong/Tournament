@@ -20,15 +20,7 @@ const Tournament = ({ PORT }: Props) => {
     const navigate = useNavigate();
     const [selectedImages, setSelectedImages] = useState<FileList | null>(null);
     const [dragActive, setDragActive] = useState(false);
-    const pictures: string[] = [];
-    // const pictures = [
-    //     'https://cavtat-tenis.com/img/gallery-1.jpg',
-    //     'https://cdn.pixabay.com/photo/2020/11/27/18/59/tennis-5782695_1280.jpg',
-    //     'https://vikna.if.ua/assets/gallery/2018/11/23/92626/61873_1_948x558__large.jpeg',
-    //     'https://www.nure.info/uploads/posts/2017-06/1498294724_sportivnyy-klub-sportivnye-sekcii-v-hnure-sekciya-tennis.jpg',
-    //     'https://onedeal.com.ua/wp-content/uploads/2021/02/2-5-3.jpg',
-    //     'https://www.dilovamova.com/images/wpi.images/events/203193d.jpg'
-    // ];
+    const [pictures, setPictures] = useState([]);
 
     useEffect(() => {
         const takeParticipants = async () => {
@@ -63,6 +55,12 @@ const Tournament = ({ PORT }: Props) => {
                 const res = await response.json()
                 console.log(res)
                 if (response.ok) {
+                    if (res && res.length > 0) {
+                        const imageUrls = res.map((item: { image_url: any; }) => item.image_url);
+                        setPictures(imageUrls);
+                    } else {
+                        console.log("Response is empty or not an array");
+                    }
                 } else {
                     console.log(res.error)
                 }
@@ -131,7 +129,7 @@ const Tournament = ({ PORT }: Props) => {
                         <div className="other-picts-cont">
                             {pictures.slice(1).map((pictureLink, index) => (
                                 <div className="other-pict img-holder">
-                                    <img src={pictureLink}></img>
+                                    <img src={`https://kood-pong-media.s3.eu-north-1.amazonaws.com/${pictureLink}`}></img>
                                 </div>
                             ))}
                         </div>
