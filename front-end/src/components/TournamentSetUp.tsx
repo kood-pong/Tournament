@@ -9,7 +9,7 @@ interface Props {
 }
 
 const TournamentSetUp = ({ PORT }: Props) => {
-    const { id } = useParams();
+    const { tid } = useParams();
     const navigate = useNavigate();
     const [type, setType] = useState<number>(2);
     const [error, setError] = useState<{ isError: boolean, text: string }>({ isError: false, text: "" });
@@ -25,7 +25,7 @@ const TournamentSetUp = ({ PORT }: Props) => {
             }).then(async response => {
                 const res = await response.json()
                 if (response.ok) {
-                    if (res.data[0].id === id) {
+                    if (res.data[0].id === tid) {
                         setState(true);
                     }
                 } else {
@@ -46,11 +46,11 @@ const TournamentSetUp = ({ PORT }: Props) => {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ tournament_id: id, sets_to_win: type }),
+                body: JSON.stringify({ tournament_id: tid, sets_to_win: type }),
             }).then(async response => {
                 const res = await response.json();
                 if (response.ok) {
-                    navigate(`/tournament/${id}/matches/${type}`);
+                    navigate(`/tournament/${tid}/matches/${type}`);
                 } else {
                     setError({
                         isError: true,
@@ -65,11 +65,11 @@ const TournamentSetUp = ({ PORT }: Props) => {
                 method: 'POST',
                 credentials: 'include',
                 headers: { "Content-Type": "appliction/json" },
-                body: JSON.stringify({ tournament_id: id, sets_to_win: type }),
+                body: JSON.stringify({ tournament_id: tid, sets_to_win: type }),
             }).then(async response => {
                 const res = await response.json()
                 if (response.ok) {
-                    navigate(`/tournament/${id}/matches/${type}`);
+                    navigate(`/tournament/${tid}/matches/${type}`);
                 } else {
                     setError({
                         isError: true,

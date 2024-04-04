@@ -13,7 +13,7 @@ interface Props {
 }
 
 const Sets = ({ PORT }: Props) => {
-    const { id } = useParams();
+    const {tid, id } = useParams();
     const navigate = useNavigate();
     const [match, setMatch] = useState<Match | null>();
     const [error, setError] = useState<{ isError: boolean, text: string }>({ isError: false, text: "" });
@@ -28,7 +28,7 @@ const Sets = ({ PORT }: Props) => {
 
     useEffect(() => {
         const getMatch = async () => {
-            await fetch(`${PORT}/api/v1/matches/${id}`, {
+            await fetch(`${PORT}/api/v1/jwt/admin/tournaments/match/${id}`, {
                 method: 'GET',
                 credentials: 'include',
             }).then(async response => {
@@ -102,8 +102,16 @@ const Sets = ({ PORT }: Props) => {
     // TODO take match and update it after entering data
 
     const handleSubmit = async () => {
+        setError(
+            {
+                isError: false,
+                text: ""
+            }
+        )
 
-        if (pl1Points != 11 && pl2Points != 11) {
+        console.log(pl1Points, pl2Points)
+
+        if (pl1Points !== 11 && pl2Points !== 11) {
             setError(
                 {
                     isError: true,
@@ -112,6 +120,7 @@ const Sets = ({ PORT }: Props) => {
             )
             return
         }
+
         await fetch(`${PORT}/api/v1/jwt/admin/tournaments/set/create`, {
             method: 'POST',
             credentials: 'include',
@@ -119,9 +128,8 @@ const Sets = ({ PORT }: Props) => {
             body: JSON.stringify({ set_number: setNum, match_id: match?.id, player_1_score: pl1Points, player_2_score: pl2Points}),
         }).then(async response => {
             const res = await response.json()
-            console.log(res)
             if (response.ok) {
-                navigate(`/tournament/${id}/matches/${match?.sets_to_win}`);
+                navigate(`/tournament/${tid}/matches/${match?.sets_to_win}`);
             } else {
                 setSetNum(prev => prev + 1);
                 console.error(res.error)

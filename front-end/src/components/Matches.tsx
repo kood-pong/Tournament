@@ -12,7 +12,7 @@ interface Props {
 
 const Matches = ({ PORT }: Props) => {
     const navigate = useNavigate();
-    const { id, stw } = useParams();
+    const { tid, stw } = useParams();
     const [matches, setMatches] = useState<Match[]>([]);
 
     useEffect(() => {
@@ -21,13 +21,19 @@ const Matches = ({ PORT }: Props) => {
                 method: 'POST',
                 credentials: 'include',
                 headers: { "Content-Type": "appliction/json" },
-                body: JSON.stringify({ tournament_id: id, sets_to_win: typeof stw === 'string' ? parseInt(stw) : 0 }),
+                body: JSON.stringify({ tournament_id: tid, sets_to_win: typeof stw === 'string' ? parseInt(stw) : 0 }),
             }).then(async response => {
                 const res = await response.json()
+                console.log(res)
                 if (response.ok) {
                     setMatches(res.data);
                 } else {
-                    console.error(res.error)
+                    setMatches([]);
+                    if (res.error === 'tournament is finished') {
+                        navigate(`/tournament/${tid}`);
+                    } else {
+                        console.error(res.error)
+                    }
                 }
             }).catch(error => {
                 console.error('Error checking login status:', error);
@@ -35,12 +41,12 @@ const Matches = ({ PORT }: Props) => {
         }
 
         takeMatches();
-        
+
     }, [])
 
     return (
         <div className="page-container">
-            <Header PORT={PORT}/>
+            <Header PORT={PORT} />
             <div className="content-wrap">
                 <div className="top-line big-title">
                     Matches
@@ -50,7 +56,8 @@ const Matches = ({ PORT }: Props) => {
                 {matches.map((match, index) => (
                     <TableEntity key={index} PORT={PORT} match={match} tableId={index + 1} />
                 ))}
-                <button onClick={() => {navigate(`/tournament/${id}/set-up`)}} className="btn-1" style={{ marginTop: '50px' }}>Generate new</button>
+                {/* TODO define when prev match is done */}
+                {/* <button onClick={() => {navigate(`/tournament/${tid}/set-up`)}} className="btn-1" style={{ marginTop: '50px' }}>Generate new</button> */}
             </div>
         </div>
     )

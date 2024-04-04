@@ -20,6 +20,7 @@ const MainPage = ({ PORT }: Props) => {
     const navigate = useNavigate();
     const [leaderboard, getLeaderboard] = useState([]);
     const [upTournament, setUpTournament] = useState<Tournament | null>(null);
+    const [ongoingTournament, setOnTournament] = useState<Tournament | null>(null);
     const [registered, setRegistration] = useState<boolean>(false);
     const { isLoggedIn, curruser } = useAuth();
 
@@ -44,15 +45,18 @@ const MainPage = ({ PORT }: Props) => {
     }, [])
 
     useEffect(() => {
-        const state = 'open';
-        const takeUpTournament = async () => {
+        const takeUpTournament = async (state: string) => {
             await fetch(`${PORT}/api/v1/tournament/${state}`, {
                 method: 'GET',
                 credentials: 'include'
             }).then(async response => {
                 if (response.ok) {
                     const res = await response.json()
-                    setUpTournament(res.data[0]);
+                    if (state === 'ongoing') {
+                        setOnTournament(res.data[0])
+                    } else if (state === 'open') {
+                        setUpTournament(res.data[0]);
+                    }
                     checkRegistration(res.data[0].id);
                 } else {
                     console.error('Something wrong with takingupcomming tournament')
@@ -62,7 +66,10 @@ const MainPage = ({ PORT }: Props) => {
             });
         }
 
-        takeUpTournament();
+        takeUpTournament('ongoing');
+        if (ongoingTournament === null) {
+            takeUpTournament('open');
+        }
     }, [])
 
     const checkRegistration = async (id: string) => {
@@ -128,9 +135,20 @@ const MainPage = ({ PORT }: Props) => {
                 {curruser != null && curruser.role == 1 ? (
                     // TODO check if there is any scheduled tournament otherwise add button start tournament
                     <>
-                        {upTournament == null ? (
+                        {upTournament === null && ongoingTournament === null ? (
                             <a href={`/create-tournament`} className="btn-1 ct-btn">Schedule new tournament</a>
-                        ) : (
+                        ) : ongoingTournament != null ? (
+                            <div className="announc-cont">
+                                <p className='text'>Ongoing Tournament '{ongoingTournament.name}'</p>
+
+                                {curruser.role == 1 ? (
+                                    <div className="btns-cont">
+                                        {/* TODO take the right num sets to win */}
+                                        <a href={`/tournament/${ongoingTournament.id}/matches/${2}`} className='btn-1 variant-2 black'>Continue with the tournament</a>
+                                    </div>
+                                ) : null}
+                            </div>
+                        ) : upTournament != null ? (
                             <div className="announc-cont">
                                 <p className='text'>Our Upcoming Tournament '{upTournament.name}' on {upTournament.start_date ?
                                     new Date(upTournament.start_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) + ' at ' +
@@ -150,7 +168,7 @@ const MainPage = ({ PORT }: Props) => {
                                     <a href={`/tournament/${upTournament.id}/set-up`} className='btn-1 variant-2 black'>Start the tournament</a>
                                 </div>
                             </div>
-                        )}
+                        ) : null}
                     </>
                 ) : upTournament != null ? (
                     <div className="announc-cont">
@@ -179,7 +197,7 @@ const MainPage = ({ PORT }: Props) => {
                             {leaderboard.slice(3).map((curruser, index) => (
                                 <div key={curruser["id"]}>
                                     {/* TODO change curruser type */}
-                                    <TableEntity key={index} user={curruser} tableID={index+4} />
+                                    <TableEntity key={index} user={curruser} tableID={index + 4} />
                                 </div>
                             ))}
                         </>) : null}

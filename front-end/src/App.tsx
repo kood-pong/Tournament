@@ -65,13 +65,13 @@ function App() {
               }
             />
             <Route // only for admin
-              path='/tournament/:id/set-up'
+              path='/tournament/:tid/set-up'
               element={
                 <TournamentSetUp PORT={PORT} />
               }
             />
             <Route // only for admin
-              path='/tournament/:id/matches/:stw'
+              path='/tournament/:tid/matches/:stw'
               element={
                 <Matches PORT={PORT} />
               }

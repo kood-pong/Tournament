@@ -35,6 +35,7 @@ const Tournament = ({ PORT }: Props) => {
                 credentials: 'include'
             }).then(async response => {
                 const res = await response.json()
+                console.log(res)
                 if (response.ok) {
                     const lb = res.data.sort(function (a: { ranking: number; }, b: { ranking: number; }) {
                         return a.ranking - b.ranking;

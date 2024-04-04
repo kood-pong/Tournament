@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import './auth.css';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { User } from '../../models/user';
 
 interface Props {
     PORT: string;
