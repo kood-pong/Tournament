@@ -278,6 +278,23 @@ func (s *server) tournamentUnRegister() http.HandlerFunc {
 	}
 }
 
+func (s *server) ongoingMatches() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tournament_id := r.PathValue("id")
+
+		ongoingMatches, err := s.store.Match().FindOngoing(tournament_id)
+		if err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		s.respond(w, http.StatusOK, Response{
+			Message: "Successfully retrieved ongoing matches",
+			Data:    ongoingMatches,
+		})
+	}
+}
+
 func (s *server) imageUpload() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseMultipartForm(20 << 20)

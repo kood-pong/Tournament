@@ -77,6 +77,7 @@ func (s *server) configureRouter() {
 	s.router.PUT("/api/v1/jwt/admin/tournaments/match/update", s.matchUpdate())
 	s.router.POST("/api/v1/jwt/admin/tournaments/images/upload/{tournament_id}", s.imageUpload())
 	s.router.GET("/api/v1/jwt/admin/tournaments/images/{tournament_id}", s.imagesGet())
+	s.router.GET("/api/v1/jwt/admin/tournaments/match/ongoing/{id}", s.ongoingMatches())
 	s.router.GET("/api/v1/jwt/admin/tournaments/match/{id}", s.matchGet())
 	s.router.POST("/api/v1/jwt/admin/tournaments/set/create", s.setCreate())
 	s.router.GET("/api/v1/jwt/admin/tournaments/leaderboard/{id}", s.tournamentLeaderboard())
