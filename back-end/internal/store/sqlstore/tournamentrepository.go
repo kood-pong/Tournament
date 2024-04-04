@@ -70,6 +70,14 @@ func (t *TournamentRepository) GetSetsToWin(tournament_id string) (int, error) {
 	if err := t.store.Db.QueryRow(query, tournament_id).Scan(&setsToWin);err != nil {
 		return -1, err
 	}
+
+	tournament, err := t.Get(tournament_id)
+	if err != nil {
+		return -1, err
+	}
+	if tournament.Status == "finised" {
+		return -1, errors.New("tournament is finished")
+	}
 	return setsToWin, nil
 }
 
