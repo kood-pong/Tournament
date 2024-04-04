@@ -15,32 +15,35 @@ const TournamentSetUp = ({ PORT }: Props) => {
     const [error, setError] = useState<{ isError: boolean, text: string }>({ isError: false, text: "" });
     const [isOngoing, setState] = useState<boolean>(false);
 
-    // check if its ongoing tournament
     useEffect(() => {
-        const state = 'ongoing';
-        const takeUpTournament = async () => {
+        const takeUpTournament = async (state: string) => {
             await fetch(`${PORT}/api/v1/tournament/${state}`, {
                 method: 'GET',
                 credentials: 'include'
             }).then(async response => {
                 const res = await response.json()
+                console.log(res)
                 if (response.ok) {
-                    if (res.data[0].id === tid) {
-                        setState(true);
-                    }
+                    res.data.forEach((item: { id: string | undefined; }) => {
+                        if (item.id === tid) {
+                            setState(true);
+                            return
+                        }
+                    });
                 } else {
                     console.error(res.error)
                 }
             }).catch(error => {
-                console.error('Error checking login status:', error);
+                console.error('Error checking tournament state:', error);
             });
         }
 
-        takeUpTournament();
+        takeUpTournament('ongoing');
     }, [])
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+
         if (!isOngoing) {
             await fetch(`${PORT}/api/v1/jwt/admin/tournaments/start`, {
                 method: "POST",
@@ -52,6 +55,9 @@ const TournamentSetUp = ({ PORT }: Props) => {
                 if (response.ok) {
                     navigate(`/tournament/${tid}/matches`);
                 } else {
+                    if (res.error === 'tournament is finished') {
+                        navigate(`/tournament/${tid}`);
+                    }
                     setError({
                         isError: true,
                         text: res.error
@@ -71,6 +77,9 @@ const TournamentSetUp = ({ PORT }: Props) => {
                 if (response.ok) {
                     navigate(`/tournament/${tid}/matches`);
                 } else {
+                    if (res.error === 'tournament is finished') {
+                        navigate(`/tournament/${tid}`);
+                    }
                     setError({
                         isError: true,
                         text: res.error
@@ -84,7 +93,7 @@ const TournamentSetUp = ({ PORT }: Props) => {
 
     return (
         <div className="page-container">
-            <Header PORT={PORT}/>
+            <Header PORT={PORT} />
             <div className="content-wrap">
                 <div className="top-line big-title">
                     <a href="/"><LeftArrow /></a>
