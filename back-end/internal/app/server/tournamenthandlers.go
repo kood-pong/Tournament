@@ -3,6 +3,7 @@ package server
 import (
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"tournament/back-end/internal/models"
 	"tournament/back-end/pkg/validator"
@@ -265,5 +266,22 @@ func (s *server) tournamentUnRegister() http.HandlerFunc {
 			Message: "Successfully unregistered",
 			Data:    nil,
 		})
+	}
+}
+
+func (s *server) imageUpload() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		maxFileSize := 1024 * 1024 * 20 //2 MB
+
+		imageData, err := io.ReadAll(r.Body)
+		if err != nil {
+			s.error(w, http.StatusBadRequest, err)
+			return
+		}
+		_ = maxFileSize
+
+		fmt.Println(imageData)
+
+		s.respond(w, http.StatusOK, imageData)
 	}
 }

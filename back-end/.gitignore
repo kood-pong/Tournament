@@ -1,2 +1,3 @@
 *.exe
 api
+/back-end/internal/db/database.db
