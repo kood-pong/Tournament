@@ -67,9 +67,9 @@ const Header = ({ PORT }: Props) => {
                     {isLoggedIn && curruser ? (
                         <div className="profile-btn" onClick={() => { navigate(`/user/${curruser?.id}`) }}>
                             <div className="usr-img img-holder">
-                                <img src='https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg' />
+                                <img src={`https://api.dicebear.com/8.x/adventurer-neutral/svg?seed=${curruser.id}`} />
                             </div>
-                            {curruser?.username}
+                            {curruser?.first_name} {curruser?.last_name}
                         </div>
                     ) : (
                         <div style={{ display: "flex", gap: "20px" }}>

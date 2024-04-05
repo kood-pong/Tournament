@@ -12,10 +12,9 @@ const Pedestal = ({ winers, name }: Props) => {
                 <div className='pedestal-column'>
                     <a className="user-link-cont" href={`/user/${winers[1].id}`}>
                         <div className='usr-img-holder img-holder'>
-                            {/* TODO check real picture */}
-                            <img src='https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg' />
+                        <img src={`https://api.dicebear.com/8.x/adventurer-neutral/svg?seed=${winers[1].id}`} />
                         </div>
-                        <p className='text'> {winers[1].first_name} {winers[1].last_name}</p>
+                        <p className='text'>{winers[1]?.first_name} {winers[1]?.last_name} <br/> <span className="gray add-text"> AKA {winers[1]?.username}</span></p>
                     </a>
                     <div className="pedestal num-2">
                         <div className='big-title'>2</div>
@@ -25,10 +24,9 @@ const Pedestal = ({ winers, name }: Props) => {
                 <div className='pedestal-column'>
                     <a className="user-link-cont" href={`/user/${winers[0].id}`}>
                         <div className='usr-img-holder img-holder'>
-                            {/* TODO check real picture */}
-                            <img src='https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg' />
+                            <img src={`https://api.dicebear.com/8.x/adventurer-neutral/svg?seed=${winers[0].id}`} />
                         </div>
-                        <p className='text'> {winers[0].first_name} {winers[0].last_name}</p>
+                        <p className='text'>{winers[0]?.first_name} {winers[0]?.last_name} <br/> <span className="gray add-text"> AKA {winers[0]?.username}</span></p>
                     </a>
                     <div className="pedestal num-1">
                         <div className='big-title'>1</div>
@@ -38,10 +36,9 @@ const Pedestal = ({ winers, name }: Props) => {
                 <div className='pedestal-column'>
                     <a className="user-link-cont" href={`/user/${winers[2].id}`}>
                         <div className='usr-img-holder img-holder'>
-                            {/* TODO check real picture */}
-                            <img src='https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg' />
+                        <img src={`https://api.dicebear.com/8.x/adventurer-neutral/svg?seed=${winers[2].id}`} />
                         </div>
-                        <p className='text'> {winers[2].first_name} {winers[2].last_name}</p>
+                        <p className='text'>{winers[2]?.first_name} {winers[2]?.last_name} <br/> <span className="gray add-text"> AKA {winers[2]?.username}</span></p>
                     </a>
                     <div className="pedestal num-3">
                         <div className='big-title'>3</div>

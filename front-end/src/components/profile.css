@@ -14,10 +14,28 @@
     text-align: left;
 }
 
+.mono {
+    width: 100%;
+    margin: 100px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.mono-item {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+    text-align: left;
+}
+
 .profile-img-holder {
     width: 5.25rem;
     height: 5.25rem;
 }
+
 
 .un-log-out-cont {
     display: flex;

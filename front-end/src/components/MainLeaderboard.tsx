@@ -141,7 +141,7 @@ const MainPage = ({ PORT }: Props) => {
                             <a href={`/create-tournament`} className="btn-1 ct-btn">Schedule new tournament</a>
                         ) : ongoingTournament != null ? (
                             <div className="announc-cont">
-                                <p className='text'>Ongoing Tournament '{ongoingTournament.name}'</p>
+                                <p className='text black-t'>Ongoing Tournament '{ongoingTournament.name}'</p>
 
                                 {curruser.role == 1 ? (
                                     <div className="btns-cont">
@@ -152,7 +152,7 @@ const MainPage = ({ PORT }: Props) => {
                             </div>
                         ) : upTournament != null ? (
                             <div className="announc-cont">
-                                <p className='text'>Our Upcoming Tournament '{upTournament.name}' on {upTournament.start_date ?
+                                <p className='text black-t'>Our Upcoming Tournament '{upTournament.name}' on {upTournament.start_date ?
                                     new Date(upTournament.start_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) + ' at ' +
                                     new Date(upTournament.start_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) :
                                     'Unknown date'}!
@@ -174,7 +174,7 @@ const MainPage = ({ PORT }: Props) => {
                     </>
                 ) : upTournament != null ? (
                     <div className="announc-cont">
-                        <p className='text'>Register Now for Our Upcoming Tournament'{upTournament.name}' on {upTournament.start_date ?
+                        <p className='text black-t'>Register Now for Our Upcoming Tournament'{upTournament.name}' on {upTournament.start_date ?
                             new Date(upTournament.start_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) + ' at ' +
                             new Date(upTournament.start_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) :
                             'Unknown date'}!

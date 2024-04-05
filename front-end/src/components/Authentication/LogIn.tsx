@@ -23,7 +23,6 @@ const LogIn = ({ PORT }: Props) => {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log('Form submitted:', { email, password });
 
         await fetch(`${PORT}/api/v1/users/login`, {
             method: "POST",

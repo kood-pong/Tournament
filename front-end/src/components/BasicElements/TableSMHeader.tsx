@@ -9,9 +9,9 @@ type Props = {
 const TableMainHeader = ({player1Name, player2Name}: Props) => {
     return (
         <div className="table-header">
-            <div className="text col">{player1Name}</div>
-            <div className="text col">-</div>
-            <div className="text col">{player2Name}</div>
+            <div className="text light-t col">{player1Name}</div>
+            <div className="text light-t col">-</div>
+            <div className="text light-t col">{player2Name}</div>
         </div>
     );
 }

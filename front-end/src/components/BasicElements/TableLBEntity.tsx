@@ -11,7 +11,7 @@ const TableEntity = ({user, tableID}: Props) => {
         <div className="table-entity" key={user.id}>
             {/* TODO should num be ranking or no? */}
             <div className="text col">{tableID}</div> 
-            <div className="text col tryper">{user.first_name} {user.last_name} ({user.username})</div>
+            <a href={`/user/${user?.id}`} className="text col tryper">{user?.first_name} {user?.last_name} (<span className="gray"> AKA {user?.username}</span>)</a>
             <div className="text col add">{user.wins}</div>
             <div className="text col add">{user.losses}</div>
             <div className="text col add">{user.points}</div>

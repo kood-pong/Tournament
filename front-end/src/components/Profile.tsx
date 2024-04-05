@@ -80,15 +80,14 @@ const Profile = ({ PORT }: Props) => {
         <div className="page-container">
             <Header PORT={PORT} />
             <div className="content-wrap">
-                <div className="grid-profile">
-                    <div className="grid-profile-item">
+                <div className={`${curruser?.id === user?.id ? 'grid-profile' : 'mono'}`}>
+                    <div className={`${curruser?.id === user?.id ? 'grid-profile-item' : 'mono-item'}`}>
                         <div className="un-log-out-cont">
                             <div className="user-holder title-1">
                                 <div className='usr-img-holder img-holder profile-img-holder'>
-                                    {/* TODO check real picture */}
-                                    <img src='https://st3.depositphotos.com/6672868/13701/v/450/depositphotos_137014128-stock-illustration-user-profile-icon.jpg' />
+                                <img src={`https://api.dicebear.com/8.x/adventurer-neutral/svg?seed=${user?.id}`} />
                                 </div>
-                                {user?.username}
+                                {user?.first_name} {user?.last_name} <span className="gray">AKA {user?.username}</span>
                             </div>
                             {curruser?.id === user?.id ? (
                                 <button className="btn-1" onClick={() => handleLogOut()}>LogOut</button>

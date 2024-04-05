@@ -25,16 +25,13 @@ const Tournament = ({ PORT }: Props) => {
 
     useEffect(() => {
         const takeParticipants = async () => {
-            await fetch(`${PORT}/api/v1/jwt/admin/tournaments/leaderboard/${id}`, {
+            await fetch(`${PORT}/api/v1/tournaments/leaderboard/${id}`, {
                 method: 'GET',
                 credentials: 'include'
             }).then(async response => {
                 const res = await response.json()
                 if (response.ok) {
-                    const lb = res.data.sort(function (a: { ranking: number; }, b: { ranking: number; }) {
-                        return a.ranking - b.ranking;
-                    });
-                    getLeaderboard(lb);
+                    getLeaderboard(res.data);
                 } else {
                     navigate(`/error/404`);
                 }
@@ -48,7 +45,7 @@ const Tournament = ({ PORT }: Props) => {
     }, [])
 
     const takeImgs = async () => {
-        await fetch(`${PORT}/api/v1/jwt/admin/tournaments/images/${id}`, {
+        await fetch(`${PORT}/api/v1/tournaments/images/${id}`, {
             method: 'GET',
             credentials: 'include'
         }).then(async response => {
