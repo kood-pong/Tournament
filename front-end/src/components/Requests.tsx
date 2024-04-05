@@ -3,6 +3,7 @@ import Header from "./BasicElements/Header";
 import TableEntity from "./BasicElements/TableREntity";
 import TableHeader from "./BasicElements/TableRHeader";
 import { User } from "../models/user";
+import Footer from "./BasicElements/Footer";
 
 interface Props {
     PORT: string;
@@ -52,6 +53,9 @@ const Requests = ({ PORT }: Props) => {
                 {users.length === 0 ? (
                     <div className="text">No requests yet</div>
                 ) : null}
+            </div>
+            <div className="main-footer">
+                <Footer />
             </div>
         </div>
     )
