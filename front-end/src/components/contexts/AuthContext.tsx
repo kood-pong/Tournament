@@ -34,7 +34,7 @@ export const AuthProvider = ({ children, PORT }: AuthProviderProps) => {
                     throw new Error('Failed to fetch');
                 }
             }).catch(error => {
-                console.error('Error checking login status:', error);
+                console.error('Error while checking cookies:', error);
             });
         };
 
@@ -50,7 +50,7 @@ export const AuthProvider = ({ children, PORT }: AuthProviderProps) => {
             let curruser: User = res.data as User;
             setCurruser(curruser);
         }).catch(error => {
-            console.error('Error taking current curruser:', error);
+            console.error('Error taking current user:', error);
         });
     }
 

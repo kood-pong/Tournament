@@ -57,7 +57,9 @@ const MainPage = ({ PORT }: Props) => {
                     } else if (state === 'open') {
                         setUpTournament(res.data[0]);
                     }
-                    checkRegistration(res.data[0].id);
+                    if (isLoggedIn && curruser != null) {
+                        checkRegistration(res.data[0].id);
+                    }
                 } else {
                     console.error('Something wrong with takingupcomming tournament')
                 }
