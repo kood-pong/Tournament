@@ -1,5 +1,7 @@
 {
   "port": ":7080",
   "database_url": "./internal/db/database.db",
-  "database_schema": "./internal/db/schema.sql"
+  "database_schema": "./internal/db/schema.sql",
+  "certfile_path": "*",
+  "keyfile_path": "*"
 }

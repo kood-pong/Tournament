@@ -36,13 +36,15 @@ func Start(config *Config) error {
 
 	//new http.server with corsmiddleware
 	newHttpSrv := &http.Server{
-		Addr: ":7080",
+		Addr: ":443",
 		Handler: corsMiddleware.Handler(router),
 	}
 	srv := newServer(store, newHttpSrv, router)
 
-	return srv.Server.ListenAndServe()
+	return srv.Server.ListenAndServeTLS( config.CertFilePath, config.KeyFilePath)
+
 }
+
 
 func newDB(databaseURL, dataBaseSchema string) (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", databaseURL)
