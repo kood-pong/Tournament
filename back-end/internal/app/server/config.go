@@ -9,8 +9,6 @@ type Config struct {
 	Port           string `json:"port"`
 	DatabaseURL    string `json:"database_url"`
 	DatabaseSchema string `json:"database_schema"`
-	CertFilePath   string `json:"certfile_path"`
-	KeyFilePath    string `json:"keyfile_path"`
 }
 
 func NewConfig() *Config {
