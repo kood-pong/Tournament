@@ -112,21 +112,16 @@ func (r *ResultRepository) UserLosses(user_id, tournament_id string) (int, error
 
 func (r *ResultRepository) GetFinalists(tournament_id string) ([]models.User, error) {
 	//Find max wins
-	maxWinsCount, err := r.MaxWins(tournament_id)
-	if err != nil {
-		return nil, err
-	}
+	// maxWinsCount, err := r.MaxWins(tournament_id)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// fmt.Println("MAX WINS", maxWinsCount)
 	query := `
-		SELECT loser_id AS loser
-		FROM results r
-		JOIN matches m ON r.match_id = m.id
-		WHERE m.tournament_id = ? 
-		GROUP BY loser_id
-			HAVING COUNT(CASE WHEN r.loser_id = winner_id THEN 1 ELSE NULL END) = ? - 1
-    		AND (SELECT COUNT(*) FROM results WHERE loser_id = loser AND match_id IN (SELECT id FROM matches WHERE tournament_id = ?)) = 1;`
+		SELECT r.loser_id, r.points FROM results r JOIN matches m ON r.match_id = m.id WHERE m.tournament_id = ? GROUP BY r.loser_id ORDER BY r.points DESC LIMIT 2`
 	var users []models.User
 
-	rows, err := r.store.Db.Query(query, tournament_id, maxWinsCount, tournament_id)
+	rows, err := r.store.Db.Query(query, tournament_id)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +129,8 @@ func (r *ResultRepository) GetFinalists(tournament_id string) ([]models.User, er
 
 	for rows.Next() {
 		var user_id string
-		if err := rows.Scan(&user_id); err != nil {
+		var points int
+		if err := rows.Scan(&user_id, &points); err != nil {
 			return nil, err
 		}
 		user, err := r.store.User().FindByID(user_id)
