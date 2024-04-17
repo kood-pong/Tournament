@@ -28,7 +28,7 @@ const TableEntity = ({ id, participantName, updatePlPoints, resetTrigger }: Prop
             <div className="text col">{id}</div>
             <div className="text col tryper">{participantName}</div>
             <div className="text col">
-                <input type="number" placeholder='0' value={plPoints} onChange={handleInputChange}></input>
+                <input className='text' type="number" placeholder='0' value={plPoints} onChange={handleInputChange}></input>
             </div>
         </div>
     );
