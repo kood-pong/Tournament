@@ -52,6 +52,7 @@
     margin: 15px 0;
     border-radius: 10px;
     background-color: var(--bg-color);
+    color: var(--text-color);
 }
 
 .red-border {

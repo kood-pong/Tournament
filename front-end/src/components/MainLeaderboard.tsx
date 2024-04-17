@@ -33,7 +33,7 @@ const MainPage = ({ PORT }: Props) => {
                 const json = await data.json()
                 // TODO create class for currusers and modify it
                 const lb = json.data.sort(function (a: { ranking: number; }, b: { ranking: number; }) {
-                    return a.ranking - b.ranking;
+                    return b.ranking - a.ranking;
                 });
                 getLeaderboard(lb);
             }).catch(error => {
