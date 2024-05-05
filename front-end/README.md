@@ -25,3 +25,6 @@ npm start
 ```
 
 This command will start a development server and open the application in your default web browser. Any changes you make to the code will be automatically reflected in the browser, making the development process efficient and straightforward.
+
+- Make everything editable (sets, matches, tournamentts, number of matches)
+- Buttons hovering fix it, some cursors headers (divs to btns) 
