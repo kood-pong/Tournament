@@ -13,6 +13,7 @@ import Requests from "./components/Requests";
 import { useState } from "react";
 import Authentication from "./components/Authentication/Authentication";
 import { AuthProvider } from './components/contexts/AuthContext';
+import SetsCounter from "./components/SetsCounter";
 
 const PORT: string = 'http://localhost:7080'
 
@@ -79,7 +80,8 @@ function App() {
             <Route // only for admin
               path='/tournament/:tid/match/:id/sets'
               element={
-                <Sets PORT={PORT} />
+                // <Sets PORT={PORT} />
+                <SetsCounter />
               } />
             <Route
               path='/error/:status'

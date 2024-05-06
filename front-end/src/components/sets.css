@@ -8,3 +8,102 @@
     padding-left: 5%;
     margin-bottom: 2rem;
 }
+
+.sets-h {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    position: relative;
+}
+
+.btn-back {
+    border-style: none;
+    position: absolute;
+    left: -80px;
+
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 100%;
+    background-color: var(--color-2);
+    color: white;
+}
+
+.counters-cont {
+    min-height: calc(100vh - 60px - 55px - 2.5rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 1.5rem;
+
+    position: relative;
+}
+
+.board {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.sets-count-cont {
+    background-color: var(--color-2);
+    color: var(--bg-color);
+    width: 45%;
+    aspect-ratio: 1 / 1.1;
+    height: 100%;
+    font-size: 6rem;
+}
+
+.points-count-cont {
+    background-color: var(--color-1);
+    color: var(--bg-color);
+    width: 100%;
+    aspect-ratio: 1 / 1.1;
+    font-size: 10rem;
+    border-style: none;
+}
+
+.count-cont {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 1.5rem;
+    font-family: var(--title-font);
+}
+
+.prev-sets-cont {
+    width: 100%;
+    display: grid;
+    gap: 1.5rem;
+}
+.prev-set-cont {
+    background-color: var(--bg-color-2);
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0.5rem 1.5rem;
+}
+
+.edit-btn {
+    position: absolute;
+    right: 0;
+    bottom: 50px;
+
+    width: 60px;
+    aspect-ratio: 1 / 1;
+    border-radius: 100%;
+    border-style: none;
+    background-color: var(--color-1);
+    color: var(--bg-color-2);
+}
+
+@media (max-width: 850px) {
+
+    .btn-back {
+        display: none;
+    }
+}
