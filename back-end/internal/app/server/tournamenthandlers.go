@@ -23,6 +23,12 @@ type RequestBody struct {
 	NumberOfSets int    `json:"sets_to_win" validate:"required"`
 }
 
+type RequestBodyUpdate struct {
+	TournamentID string `json:"tournament_id" validate:"required"`
+	NumberOfSets int    `json:"sets_to_win" validate:"required"`
+	CurrentRound int `json:"current_round" validate:"required"`
+}
+
 func (s *server) tournamentCreate() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var response *models.Tournament
@@ -108,11 +114,11 @@ func (s *server) tournamentStart() http.HandlerFunc {
 		}
 
 		matches, err := s.store.Tournament().Start(request.TournamentID, request.NumberOfSets)
-
 		if err != nil {
 			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
+
 		s.respond(w, http.StatusOK, Response{
 			Message: "Tournament started successfully",
 			Data:    matches,
@@ -376,6 +382,65 @@ func (s *server) tournamentSets() http.HandlerFunc {
 		s.respond(w, http.StatusOK, Response{
 			Message: "Successfully recieved sets to win",
 			Data:    t,
+		})
+	}
+}
+
+func (s *server) updateSetsToWin() http.HandlerFunc {
+	var reqBody RequestBodyUpdate
+	return func(w http.ResponseWriter, r *http.Request) {
+		if err := s.decode(r, &reqBody); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		if err := validator.Validate(reqBody); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		if err := s.store.Match().ChangeSetsToWin(reqBody.NumberOfSets, reqBody.CurrentRound, reqBody.TournamentID); err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		s.respond(w, http.StatusOK, Response{
+			Message: "Updated sets to win successfully",
+			Data:    nil,
+		})
+	}
+}
+
+func (s *server) calcResults() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tournament_id := r.PathValue("id")
+
+		_, err := s.store.Tournament().Get(tournament_id)
+		if err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		ongoingMatches, err := s.store.Match().FindOngoing(tournament_id)
+		if err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+		fmt.Println("ONDASDAS", ongoingMatches)
+
+		for _, match := range ongoingMatches {
+			s.store.Set().DetermineWinner(match.ID); 
+		}
+
+		ongoingMatches, err = s.store.Match().FindOngoing(tournament_id)
+		if err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+		
+		s.respond(w, http.StatusOK, Response{
+			Message: "Calculated results",
+			Data: ongoingMatches,
 		})
 	}
 }

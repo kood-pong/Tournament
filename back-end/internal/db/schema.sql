@@ -9,7 +9,7 @@ CREATE TABLE
     );
 
 CREATE TABLE
-    IF NOT EXISTS users (
+    IF NOT EXISTS user (
         id text PRIMARY KEY UNIQUE NOT NULL,
         email text UNIQUE NOT NULL,
         username text UNIQUE NOT NULL,

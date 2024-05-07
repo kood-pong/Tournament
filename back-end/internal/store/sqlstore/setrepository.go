@@ -30,22 +30,22 @@ func (s *SetRepository) Create(set *models.Set) (*models.Set, error) {
 	}
 
 	//Update both player overall scores
-	var player1, player2 string
-	query = `SELECT player_1, player_2 FROM matches m WHERE m.id = ?`
-	if err = s.store.Db.QueryRow(query, set.MatchID).Scan(&player1, &player2); err != nil {
-		return nil, err
-	}
+	// var player1, player2 string
+	// query = `SELECT player_1, player_2 FROM matches m WHERE m.id = ?`
+	// if err = s.store.Db.QueryRow(query, set.MatchID).Scan(&player1, &player2); err != nil {
+	// 	return nil, err
+	// }
 
-	if err = s.store.User().UpdatePoints(player1, set.Player1_Score); err != nil {
-		return nil, err
-	}
-	if err = s.store.User().UpdatePoints(player2, set.Player2_Score); err != nil {
-		return nil, err
-	}
+	// if err = s.store.User().UpdatePoints(player1, set.Player1_Score); err != nil {
+	// 	return nil, err
+	// }
+	// if err = s.store.User().UpdatePoints(player2, set.Player2_Score); err != nil {
+	// 	return nil, err
+	// }
 
-	if err := s.DetermineWinner(set.MatchID); err != nil {
-		return nil, err
-	}
+	// if err := s.DetermineWinner(set.MatchID); err != nil {
+	// 	return nil, err
+	// }
 
 	return set, nil
 }
@@ -96,13 +96,12 @@ func (s *SetRepository) DetermineWinner(match_id string) error {
 		MatchID:  match_id,
 		WinnerID: winnerID.String,
 		LoserID:  loserID.String,
-		Points: (match.CurrentRound * 1000) / (loseCount + 1),
+		Points:   (match.CurrentRound * 1000) / (loseCount + 1),
 	}
 	err = s.store.Result().Create(result)
 	if err != nil {
 		return err
 	}
-
 
 	//ADD INFORMATION for user in overall db
 	if err = s.store.User().UpdateWins(result.WinnerID, 1); err != nil {
@@ -118,5 +117,62 @@ func (s *SetRepository) DetermineWinner(match_id string) error {
 	if err = s.store.User().UpdateRanking(result.LoserID, 1); err != nil {
 		return err
 	}
+	//change match status
+	if err := s.store.Match().UpdateStatus(models.Match{
+		ID:     match_id,
+		Status: "finished",
+	}); err != nil {
+		return err
+	}
 	return nil
+}
+
+func (s *SetRepository) Update(set models.Set) (*models.Set, error) {
+	query := `UPDATE sets SET player_1_score = ?, player_2_score = ? WHERE id = ?`
+
+	rows, err := s.store.Db.Exec(query, set.Player1_Score, set.Player2_Score, set.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	affected, err := rows.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+
+	if affected == 0 {
+		return nil, errors.New("nothing changed")
+	}
+
+	return &set, nil
+}
+
+func (s *SetRepository) Exists(set models.Set) (bool, error) {
+	query := `SELECT COUNT(*) FROM sets WHERE match_id = ? AND set_number = ? AND player_1_score = ? AND player_2_score = ?`
+
+	var count int
+	err := s.store.Db.QueryRow(query, set.MatchID, set.SetNumber, set.Player1_Score, set.Player2_Score).Scan(&count)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
+func (s *SetRepository) CurrentSets(set models.Set) (int, error) {
+	query := `SELECT COUNT(id) FROM sets WHERE match_id = ?`
+
+	var sets int
+	err := s.store.Db.QueryRow(query, set.MatchID, set.SetNumber).Scan(&sets)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, nil
+		}
+		return -1, err
+	}
+
+	return sets, nil
 }

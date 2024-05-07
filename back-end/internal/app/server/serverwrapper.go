@@ -24,7 +24,8 @@ func Start(config *Config) error {
 
 	//create CORS middleware
 	corsMiddleware := cors.New(cors.Options{
-		AllowOriginRequestFunc: func(r *http.Request, origin string) bool { return true
+		AllowOriginRequestFunc: func(r *http.Request, origin string) bool {
+			return true
 		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Content-Type", "Content-Length", "Authorization"},
@@ -36,14 +37,15 @@ func Start(config *Config) error {
 
 	//new http.server with corsmiddleware
 	newHttpSrv := &http.Server{
-		Addr: ":443",
+		// Addr:    ":443",
+		Addr: ":7080",
 		Handler: corsMiddleware.Handler(router),
 	}
 	srv := newServer(store, newHttpSrv, router)
 
-	return srv.Server.ListenAndServeTLS("tls/cert.pem", "tls/key.pem")
+	return srv.Server.ListenAndServe()
+	// return srv.Server.ListenAndServeTLS("tls/cert.pem", "tls/key.pem")
 
-	
 }
 
 func newDB(databaseURL, dataBaseSchema string) (*sql.DB, error) {

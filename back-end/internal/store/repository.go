@@ -44,11 +44,15 @@ type MatchRepository interface {
 	FindOngoing(tournament_id string) ([]models.Match, error)
 	UpdateStatus(match models.Match) error
 	Get(match_id string) (*models.Match, error)
+	ChangeSetsToWin(setsToWin, current_round int, tournament_id string) error 
 }
 
 type SetRepository interface {
 	Create(set *models.Set) (*models.Set, error)
 	DetermineWinner(match_id string) error
+	Update(set models.Set) (*models.Set, error)
+	Exists(set models.Set) (bool, error)
+	CurrentSets(set models.Set) (int, error)
 }
 
 type ResultRepository interface {

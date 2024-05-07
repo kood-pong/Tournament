@@ -237,7 +237,7 @@ func (t *TournamentRepository) GetUserParticipatedTournaments(user_id string) ([
 func (t *TournamentRepository) GetParticipants(tournament_id string) ([]models.User, error) {
 	query := `SELECT r.user_id, u.username, u.email, u.first_name, u.last_name, u.points, u.wins, u.losses, u.ranking 
 		FROM registration r
-		JOIN users u ON r.user_id = u.id
+		JOIN user u ON r.user_id = u.id
 		WHERE r.tournament_id = ?`
 
 	rows, err := t.store.Db.Query(query, tournament_id)
@@ -296,9 +296,9 @@ func (t *TournamentRepository) GetLeaderboard(tournament_id string) ([]models.Us
 	LEFT JOIN 
     	results r ON m.id = r.match_id
 	LEFT JOIN
-    	users u ON u.id = r.winner_id OR u.id = r.loser_id
+    	user u ON u.id = r.winner_id OR u.id = r.loser_id
 	LEFT JOIN 
-    	users ul ON ul.id = r.loser_id
+    	user ul ON ul.id = r.loser_id
 	WHERE 
     	m.tournament_id = ? 
 	GROUP BY

@@ -2,6 +2,7 @@ package sqlstore
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"tournament/back-end/internal/models"
 
@@ -26,7 +27,7 @@ func (m *MatchRepository) Create(match models.Match) (*models.Match, error) {
 }
 
 func (m *MatchRepository) FindOngoing(tournament_id string) ([]models.Match, error) {
-	query := `SELECT * FROM matches as m WHERE tournament_id = ? AND status = "ongoing"`
+	query := `SELECT * FROM matches as m WHERE tournament_id = ? AND (status = "ongoing" OR STATUS = "completed")`
 
 	var matches []models.Match
 	rows, err := m.store.Db.Query(query, tournament_id)
@@ -87,4 +88,36 @@ func (m *MatchRepository) Get(match_id string) (*models.Match, error) {
 	}
 
 	return match, nil
+}
+
+func (m *MatchRepository) ChangeSetsToWin(setsToWin, current_round int, tournament_id string) error {
+	//check if rounds have already started
+	query := `SELECT COUNT(id) FROM matches as m WHERE tournament_id = ? AND status = "completed"`
+	var count int
+	err := m.store.Db.QueryRow(query, tournament_id).Scan(&count)
+	if err != nil {
+		return err
+	}
+
+	if count > 0 {
+		return errors.New("round is already started, can not change sets to win anymore")
+	}
+
+	query = `UPDATE matches SET sets_to_win = ? WHERE current_round = ? AND tournament_id = ?`
+
+	result, err := m.store.Db.Exec(query, setsToWin, current_round, tournament_id)
+	if err != nil {
+		return err
+	}
+
+	aff, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if aff == 0 {
+		return errors.New("nothing changed")
+	}
+
+	return nil
 }

@@ -90,6 +90,8 @@ func runValidationFunction(function, parameter string, val interface{}) error {
 		return hasUpperCase(val)
 	case "contains":
 		return contains(val, parameter)
+	case "requiredInt":
+		return requiredInt(val)
 	default:
 		return errors.New("unkown validation function: " + function)
 	}
@@ -104,6 +106,15 @@ func ValidateString(val interface{}, regex *regexp.Regexp, errorMsg string) erro
 		return errors.New(errorMsg)
 	}
 	return nil
+}
+
+func requiredInt(val interface{}) error {
+	switch val.(type) {
+	case int, int64:
+		return nil
+	default:
+		return fmt.Errorf("value is not an integer: %v", val)
+	}
 }
 
 func email(val interface{}) error {

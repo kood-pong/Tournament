@@ -57,6 +57,7 @@ func (s *server) configureRouter() {
 	s.router.GET("/api/v1/users/{id}", s.userGet())
 	s.router.GET("/api/v1/tournaments/{year}", s.tournamentGet())
 	s.router.GET("/api/v1/tournament/{state}", s.tournamentGetOngoing())
+	s.router.GET("/api/v1/tournaments/leaderboard/{id}", s.tournamentLeaderboard())
 
 	//<------------AUTH MIDDLEWARE REQUIRED-------------->
 	//USERS
@@ -80,8 +81,13 @@ func (s *server) configureRouter() {
 	s.router.GET("/api/v1/jwt/admin/tournaments/match/ongoing/{id}", s.ongoingMatches())
 	s.router.GET("/api/v1/jwt/admin/tournaments/match/{id}", s.matchGet())
 	s.router.POST("/api/v1/jwt/admin/tournaments/set/create", s.setCreate())
-	s.router.GET("/api/v1/tournaments/leaderboard/{id}", s.tournamentLeaderboard())
 	s.router.GET("/api/v1/jwt/admin/tournaments/sets/{id}", s.tournamentSets())
+	
+
+	//----------NEWLY ADDED STUFF---------------//
+	s.router.PUT("/api/v1/jwt/admin/tournaments/set/update", s.updateSet())
+	s.router.POST("/api/v1/jwt/admin/tournaments/match/setstowin", s.updateSetsToWin())
+	s.router.GET("/api/v1/jwt/admin/tournaments/calculate/{id}", s.calcResults())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
