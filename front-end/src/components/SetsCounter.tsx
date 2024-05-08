@@ -8,11 +8,11 @@ import { Match } from "../models/match";
 import { useNavigate, useParams } from "react-router-dom";
 import { User } from "../models/user";
 
-// interface Props {
-//     PORT: string;
-// }
+interface Props {
+    PORT: string;
+}
 
-const SetsCounter = (/*{ PORT }: Props*/) => {
+const SetsCounter = ({ PORT }: Props) => {
     const { tid, id } = useParams();
     const navigate = useNavigate();
     const [match, setMatch] = useState<Match | null>();
@@ -27,9 +27,80 @@ const SetsCounter = (/*{ PORT }: Props*/) => {
     const [player1, setPlayer1] = useState<User>();
     const [player2, setPlayer2] = useState<User>();
 
+    const [type, setType] = useState<number>(2);
+
     const [sets, setSets] = useState<number[][]>([]);
 
     const [serve, setServe] = useState(true);
+
+    const [isMatchOver, setMatchOver] = useState(false);
+    const [isEditMode, setEditMode] = useState(false);
+
+    useEffect(() => {
+        const getMatch = async () => {
+            await fetch(`${PORT}/api/v1/jwt/admin/tournaments/match/${id}`, {
+                method: 'GET',
+                credentials: 'include',
+            }).then(async response => {
+                const res = await response.json();
+                if (response.ok) {
+                    setMatch(res.data);
+                } else {
+                    throw new Error(res.error);
+                }
+            }).catch(error => {
+                console.error('Error checking login status:', error);
+            });
+        };
+        getMatch();
+
+        // TODO should be called somewhere else
+        handleSetCreation();
+    }, [])
+
+    useEffect(() => {
+        if (match?.player_1) {
+            const takePlayer1 = async () => {
+                await fetch(`${PORT}/api/v1/users/${match?.player_1}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                }).then(async response => {
+                    const res = await response.json()
+                    if (response.ok) {
+                        setPlayer1(res.data)
+                    } else {
+                        console.error(res.error)
+                    }
+                }).catch(error => {
+                    console.error('Error checking login status:', error);
+                });
+            }
+
+            takePlayer1();
+        }
+    }, [match])
+
+    useEffect(() => {
+        if (match?.player_2) {
+            const takePlayer2 = async () => {
+                await fetch(`${PORT}/api/v1/users/${match?.player_2}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                }).then(async response => {
+                    const res = await response.json()
+                    if (response.ok) {
+                        setPlayer2(res.data)
+                    } else {
+                        console.error(res.error)
+                    }
+                }).catch(error => {
+                    console.error('Error checking login status:', error);
+                });
+            }
+
+            takePlayer2();
+        }
+    }, [match])
 
     useEffect(() => {
         if ((pl1Points + pl2Points) % 2 === 0) {
@@ -37,13 +108,33 @@ const SetsCounter = (/*{ PORT }: Props*/) => {
         }
 
         if (pl1Points === 11) {
-            setPl1WonSets(prev => prev + 1)
-            cleanPoints()
+            handlePl1PointsChange()
         } else if (pl2Points === 11) {
-            setPl2WonSets(prev => prev + 1)
+            handlePl2PointsChange()
+        }
+
+        if (pl1WonSets === type || pl2WonSets === type) {
+            setMatchOver(true)
+        }
+
+
+        if (pl1Points === 11 || pl2Points === 11) {
             cleanPoints()
         }
     }, [pl1Points, pl2Points])
+
+    const handlePl1PointsChange = () => {
+        setPl1WonSets(prev => prev + 1)
+    }
+
+    const handlePl2PointsChange = () => {
+        setPl2WonSets(prev => prev + 1)
+    }
+
+    const handleSetCreation = () => {
+        let currSet = pl1WonSets + pl2WonSets
+        console.log(currSet)
+    }
 
     const cleanPoints = () => {
         setSets(prev => [...prev, [pl1Points, pl2Points]]);
@@ -51,10 +142,21 @@ const SetsCounter = (/*{ PORT }: Props*/) => {
         setPl2Points(0)
     }
 
+    const toogleMatchOver = () => {
+        setMatchOver(prev => !prev)
+    }
+
+    const handleMatchOver = () => {
+        console.log('Match over')
+    }
+
+    const toogleEditMode = () => {
+        setEditMode(prev => !prev)
+    }
 
     return (
         <div className="page-container">
-            {/* <Header PORT={PORT} /> */}
+            <Header PORT={PORT} />
             <div className="content-wrap">
                 <div className="sets-h">
                     <button className="btn-back">
@@ -85,19 +187,43 @@ const SetsCounter = (/*{ PORT }: Props*/) => {
                         className="prev-sets-cont"
                         style={{ gridTemplateColumns: `repeat(${sets.length < 3 ? 3 : sets.length}, 1fr)` }}>
                         {sets.map((item, index) => (
-                            <div className="prev-set-cont">
-                                Set {index+1}:
+                            <div key={index} className="prev-set-cont">
+                                Set {index + 1}:
                                 <span>{item[0]}</span> - <span>{item[1]}</span>
                             </div>
                         ))}
                     </div>
-                    <div>
-                        <button className="edit-btn">
+                    <div className="edit-cont">
+                        {isEditMode ? (
+                            <div className="edit-panel">
+                                edit panel
+                            </div>
+                        ) : null}
+                        <button className="edit-btn"
+                            onClick={toogleEditMode}>
                             edit
                         </button>
                     </div>
                 </div>
             </div>
+            {isMatchOver ? (
+                <div className="back-rect">
+                    <div className="popup">
+                        <h1 className="title-1">Match Over</h1>
+                        <span>Winner: { } Congratulations!</span>
+                        <div className="popup-btns">
+                            <button className="btn-1"
+                                onClick={handleMatchOver}>
+                                Back to all matches
+                            </button>
+                            <button className="btn-2"
+                                onClick={toogleMatchOver}>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
         </div>
     )
 }

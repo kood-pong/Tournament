@@ -80,8 +80,7 @@ function App() {
             <Route // only for admin
               path='/tournament/:tid/match/:id/sets'
               element={
-                // <Sets PORT={PORT} />
-                <SetsCounter />
+                <SetsCounter PORT={PORT}/>
               } />
             <Route
               path='/error/:status'

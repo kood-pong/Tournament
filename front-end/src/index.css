@@ -121,6 +121,38 @@ code {
   color: var(--text-gray-color);
 }
 
+.back-rect {
+  background-color: rgba(35, 40, 48, 0.5);
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup {
+  background-color: var(--bg-color-2);
+  padding: 2rem 1.5rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  border-radius: 1.5rem;
+  min-width: 20rem;
+  max-width: 30rem;
+}
+
+.popup-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 @media (max-width: 815px) {
 
   .text {
