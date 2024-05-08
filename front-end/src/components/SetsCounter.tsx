@@ -7,6 +7,9 @@ import { useEffect, useState } from "react";
 import { Match } from "../models/match";
 import { useNavigate, useParams } from "react-router-dom";
 import { User } from "../models/user";
+import BackIcon from "./assets/Back";
+import EditIcon from "./assets/Edit";
+import TickIcon from "./assets/Tick";
 
 interface Props {
     PORT: string;
@@ -120,6 +123,7 @@ const SetsCounter = ({ PORT }: Props) => {
 
         if (pl1Points === 11 || pl2Points === 11) {
             cleanPoints()
+            handleSetCreation();
         }
     }, [pl1Points, pl2Points])
 
@@ -142,6 +146,28 @@ const SetsCounter = ({ PORT }: Props) => {
         setPl2Points(0)
     }
 
+    const handleSetsEdit = (newValue: number, index: number, index2: number) => {
+        setSets(prevSets => {
+            // Map over the outer array
+            return prevSets.map((set, idx) => {
+                if (idx === index) {
+                    // Copy the current sub-array to avoid mutating the original state
+                    const updatedSet = [...set];
+                    // Update the specific element in the sub-array
+                    updatedSet[index2] = newValue;
+                    // Return the modified sub-array
+                    return updatedSet;
+                }
+                // Return other sub-arrays unchanged
+                return set;
+            });
+        });
+    };
+
+    const handleServeChanges = () => {
+        //
+    }
+
     const toogleMatchOver = () => {
         setMatchOver(prev => !prev)
     }
@@ -160,7 +186,7 @@ const SetsCounter = ({ PORT }: Props) => {
             <div className="content-wrap">
                 <div className="sets-h">
                     <button className="btn-back">
-                        back
+                        <BackIcon />
                     </button>
                     <TableMainHeader player1Name={`${player1?.first_name} ${player1?.last_name}`} player2Name={`${player2?.first_name} ${player2?.last_name}`} />
                 </div>
@@ -169,16 +195,40 @@ const SetsCounter = ({ PORT }: Props) => {
                         <div className="sets-count-cont count-cont big-title">
                             {pl1WonSets}
                         </div>
-                        <button className="points-count-cont count-cont big-title"
-                            style={{ border: `${serve ? '5px solid var(--color-3)' : ''}` }}
-                            onClick={() => setPl1Points(prev => prev + 1)}>
-                            {pl1Points}
-                        </button>
-                        <button className="points-count-cont count-cont big-title"
-                            style={{ border: `${!serve ? '5px solid var(--color-3)' : ''}` }}
-                            onClick={() => setPl2Points(prev => prev + 1)}>
-                            {pl2Points}
-                        </button>
+                        {isEditMode ? (
+                            <div
+                                className="points-count-cont count-cont big-title"
+                                style={{ border: `${serve ? '5px solid var(--color-3)' : ''}` }}>
+                                <input
+                                    type="number"
+                                    value={pl1Points}
+                                    className="points-count-input count-cont big-title"
+                                    onChange={(e) => setPl1Points(parseInt(e.target.value, 10))} />
+                            </div>
+                        ) : (
+                            <button className="points-count-cont count-cont big-title"
+                                style={{ border: `${serve ? '5px solid var(--color-3)' : ''}` }}
+                                onClick={() => setPl1Points(prev => prev + 1)}>
+                                {pl1Points}
+                            </button>
+                        )}
+                        {isEditMode ? (
+                            <div
+                                className="points-count-cont count-cont big-title"
+                                style={{ border: `${!serve ? '5px solid var(--color-3)' : ''}` }}>
+                                <input
+                                    type="number"
+                                    value={pl2Points}
+                                    className="points-count-input count-cont big-title"
+                                    onChange={(e) => setPl2Points(parseInt(e.target.value, 10))} />
+                            </div>
+                        ) : (
+                            <button className="points-count-cont count-cont big-title"
+                                style={{ border: `${!serve ? '5px solid var(--color-3)' : ''}` }}
+                                onClick={() => setPl2Points(prev => prev + 1)}>
+                                {pl2Points}
+                            </button>
+                        )}
                         <div className="sets-count-cont count-cont big-title">
                             {pl2WonSets}
                         </div>
@@ -189,19 +239,45 @@ const SetsCounter = ({ PORT }: Props) => {
                         {sets.map((item, index) => (
                             <div key={index} className="prev-set-cont">
                                 Set {index + 1}:
-                                <span>{item[0]}</span> - <span>{item[1]}</span>
+                                {isEditMode ? (
+
+                                    <input
+                                        type="number"
+                                        value={item[0]}
+                                        className="sets-input text"
+                                        onChange={(e) => handleSetsEdit(parseInt(e.target.value, 10), index, 0)} />
+                                ) : (
+                                    <span>{item[0]}</span>
+                                )} -
+                                {isEditMode ? (
+                                    <input
+                                        type="number"
+                                        value={item[1]}
+                                        className="sets-input text"
+                                        onChange={(e) => handleSetsEdit(parseInt(e.target.value, 10), index, 1)} />
+                                ) : (
+                                    <span>{item[1]}</span>
+                                )}
                             </div>
                         ))}
                     </div>
                     <div className="edit-cont">
                         {isEditMode ? (
-                            <div className="edit-panel">
-                                edit panel
+                            <div className="edit-panel text">
+                                <label htmlFor="select-input">Serve:</label>
+                                <select className="text" id="select-input" value={serve ? `true` : `false`} onChange={(event) => setServe(event.target.value == 'true' ? true : false)}>
+                                    <option value="true">{player1?.first_name} {player1?.last_name}</option>
+                                    <option value="false">{player2?.first_name} {player2?.last_name}</option>
+                                </select>
                             </div>
                         ) : null}
                         <button className="edit-btn"
                             onClick={toogleEditMode}>
-                            edit
+                            {isEditMode ? (
+                                <TickIcon />
+                            ) : (
+                                <EditIcon />
+                            )}
                         </button>
                     </div>
                 </div>
