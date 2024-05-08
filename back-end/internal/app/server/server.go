@@ -85,9 +85,11 @@ func (s *server) configureRouter() {
 	
 
 	//----------NEWLY ADDED STUFF---------------//
-	s.router.PUT("/api/v1/jwt/admin/tournaments/set/update", s.updateSet())
 	s.router.POST("/api/v1/jwt/admin/tournaments/match/setstowin", s.updateSetsToWin())
+	s.router.PUT("/api/v1/jwt/admin/tournaments/set/update", s.updateSet())
 	s.router.GET("/api/v1/jwt/admin/tournaments/calculate/{id}", s.calcResults())
+	s.router.GET("/api/v1/jwt/admin/tournaments/match/sets/{id}", s.getSets())
+	s.router.GET("/api/v1/jwt/admin/tournaments/users/registered/{tournament_id}", s.getRegisteredUsers())
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {

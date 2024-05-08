@@ -45,6 +45,7 @@ type MatchRepository interface {
 	UpdateStatus(match models.Match) error
 	Get(match_id string) (*models.Match, error)
 	ChangeSetsToWin(setsToWin, current_round int, tournament_id string) error 
+	GetAllSets(match_id string) ([]models.Set, error)
 }
 
 type SetRepository interface {
