@@ -54,6 +54,7 @@ type SetRepository interface {
 	Update(set models.Set) (*models.Set, error)
 	Exists(set models.Set) (bool, error)
 	CurrentSets(set models.Set) (int, error)
+	GetWinnerAndLoserId(match_id string) (string, string, error)
 }
 
 type ResultRepository interface {

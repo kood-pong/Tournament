@@ -83,7 +83,6 @@ func (s *server) configureRouter() {
 	s.router.POST("/api/v1/jwt/admin/tournaments/set/create", s.setCreate())
 	s.router.GET("/api/v1/jwt/admin/tournaments/sets/{id}", s.tournamentSets())
 	
-
 	//----------NEWLY ADDED STUFF---------------//
 	s.router.POST("/api/v1/jwt/admin/tournaments/match/setstowin", s.updateSetsToWin())
 	s.router.PUT("/api/v1/jwt/admin/tournaments/set/update", s.updateSet())

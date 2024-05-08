@@ -21,6 +21,12 @@ func (s *server) setCreate() http.HandlerFunc {
 			return
 		}
 
+		_, _, err := s.store.Set().GetWinnerAndLoserId(set.MatchID)
+		if err == nil {
+			s.error(w, http.StatusUnprocessableEntity, errors.New("match has winner"))
+			return
+		}
+
 		t, err := s.store.Set().Exists(*set)
 		if err != nil {
 			s.error(w, http.StatusUnprocessableEntity, err)
