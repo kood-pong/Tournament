@@ -34,6 +34,10 @@ func (s *server) matchUpdate() http.HandlerFunc {
 }
 
 func (s *server) matchGet() http.HandlerFunc {
+	type Rbody struct {
+		Match models.Match `json:"match"`
+		Sets  []models.Set `json:"sets"`
+	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		match_id := r.PathValue("id")
 
@@ -43,9 +47,18 @@ func (s *server) matchGet() http.HandlerFunc {
 			return
 		}
 
+		sets, err := s.store.Match().GetAllSets(match_id)
+		if err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
 		s.respond(w, http.StatusOK, Response{
 			Message: "Successfully retrieved a match",
-			Data: m,
+			Data:    Rbody{
+				Match: *m,
+				Sets: sets,
+			},
 		})
 	}
 }
