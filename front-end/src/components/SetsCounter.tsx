@@ -62,48 +62,68 @@ const SetsCounter = ({ PORT }: Props) => {
     }, [])
 
     useEffect(() => {
-        if (match?.player_1) {
-            const takePlayer1 = async () => {
-                await fetch(`${PORT}/api/v1/users/${match?.player_1}`, {
-                    method: 'GET',
-                    credentials: 'include'
-                }).then(async response => {
-                    const res = await response.json()
-                    if (response.ok) {
-                        setPlayer1(res.data)
-                    } else {
-                        console.error(res.error)
-                    }
-                }).catch(error => {
-                    console.error('Error checking login status:', error);
-                });
-            }
-
-            takePlayer1();
-        }
-    }, [match])
-
-    useEffect(() => {
-        if (match?.player_2) {
-            const takePlayer2 = async () => {
-                await fetch(`${PORT}/api/v1/users/${match?.player_2}`, {
-                    method: 'GET',
-                    credentials: 'include'
-                }).then(async response => {
-                    const res = await response.json()
-                    if (response.ok) {
-                        setPlayer2(res.data)
-                    } else {
-                        console.error(res.error)
-                    }
-                }).catch(error => {
-                    console.error('Error checking login status:', error);
-                });
-            }
-
+        if (match != null && match?.player_2 && match?.player_1) {
             takePlayer2();
+            takePlayer1();
+            getMatch();
         }
     }, [match])
+
+    const takePlayer1 = async () => {
+        await fetch(`${PORT}/api/v1/users/${match?.player_1}`, {
+            method: 'GET',
+            credentials: 'include'
+        }).then(async response => {
+            const res = await response.json()
+            if (response.ok) {
+                setPlayer1(res.data)
+            } else {
+                console.error(res.error)
+            }
+        }).catch(error => {
+            console.error('Error checking login status:', error);
+        });
+    }
+    
+    const takePlayer2 = async () => {
+        await fetch(`${PORT}/api/v1/users/${match?.player_2}`, {
+            method: 'GET',
+            credentials: 'include'
+        }).then(async response => {
+            const res = await response.json()
+            if (response.ok) {
+                setPlayer2(res.data)
+            } else {
+                console.error(res.error)
+            }
+        }).catch(error => {
+            console.error('Error checking login status:', error);
+        });
+    }
+
+    const getMatch = async () => {
+        await fetch(`${PORT}/api/v1/jwt/admin/tournaments/match/sets/${id}`, {
+            method: 'GET',
+            credentials: 'include'
+        }).then(async response => {
+            const res = await response.json();
+            console.log(res)
+            // if (response.ok) {
+            //     navigate('/');
+            // } else {
+            //     setError({
+            //         isError: true,
+            //         text: res.error
+            //     });
+            // }
+        }).catch(error => {
+            console.log(error)
+            setError({
+                isError: true,
+                text: 'Error'
+            });
+        });
+    }
 
     useEffect(() => {
         if ((pl1Points + pl2Points) % 2 === 0) {
@@ -111,9 +131,9 @@ const SetsCounter = ({ PORT }: Props) => {
         }
 
         if (pl1Points === 11) {
-            handlePl1PointsChange()
+            setPl1WonSets(prev => prev + 1)
         } else if (pl2Points === 11) {
-            handlePl2PointsChange()
+            setPl2WonSets(prev => prev + 1)
         }
 
         if (pl1WonSets === type || pl2WonSets === type) {
@@ -127,23 +147,87 @@ const SetsCounter = ({ PORT }: Props) => {
         }
     }, [pl1Points, pl2Points])
 
-    const handlePl1PointsChange = () => {
-        setPl1WonSets(prev => prev + 1)
+    const handlePl1PointsChange = (num: number) => {
+        setPl1Points(num)
+        handleChangePoints()
     }
 
-    const handlePl2PointsChange = () => {
-        setPl2WonSets(prev => prev + 1)
-    }
-
-    const handleSetCreation = () => {
-        let currSet = pl1WonSets + pl2WonSets
-        console.log(currSet)
+    const handlePl2PointsChange = (num: number) => {
+        setPl2Points(num)
+        handleChangePoints()
     }
 
     const cleanPoints = () => {
         setSets(prev => [...prev, [pl1Points, pl2Points]]);
         setPl1Points(0)
         setPl2Points(0)
+    }
+
+    const handleSetCreation = async () => {
+        let currSet = pl1WonSets + pl2WonSets + 1
+
+        await fetch(`${PORT}/api/v1/jwt/admin/tournaments/set/create`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "appliction/json" },
+            body: JSON.stringify({
+                set_number: currSet,
+                match_id: id,
+                player_1_score: pl1Points,
+                player_2_score: pl2Points,
+            }),
+        }).then(async response => {
+            const res = await response.json();
+            console.log(res)
+            if (response.ok) {
+                // navigate('/');
+            } else {
+                setError({
+                    isError: true,
+                    text: res.error
+                });
+            }
+        }).catch(error => {
+            console.log(error)
+            setError({
+                isError: true,
+                text: 'Error'
+            });
+        });
+    }
+
+    const handleChangePoints = async () => {
+        let currSet = pl1WonSets + pl2WonSets + 1
+
+        await fetch(`${PORT}/api/v1/jwt/admin/tournaments/set/update`, {
+            method: "PUT",
+            credentials: "include",
+            headers: { "Content-Type": "appliction/json" },
+            body: JSON.stringify({
+                id: "608389bb-e4ea-4af1-add6-619195adc71c",
+                set_number: currSet,
+                match_id: id,
+                player_1_score: pl1Points,
+                player_2_score: pl2Points,
+            }),
+        }).then(async response => {
+            const res = await response.json();
+            console.log(res)
+            if (response.ok) {
+                // navigate('/');
+            } else {
+                setError({
+                    isError: true,
+                    text: res.error
+                });
+            }
+        }).catch(error => {
+            console.log(error)
+            setError({
+                isError: true,
+                text: 'Error'
+            });
+        });
     }
 
     const handleSetsEdit = (newValue: number, index: number, index2: number) => {
@@ -203,12 +287,12 @@ const SetsCounter = ({ PORT }: Props) => {
                                     type="number"
                                     value={pl1Points}
                                     className="points-count-input count-cont big-title"
-                                    onChange={(e) => setPl1Points(parseInt(e.target.value, 10))} />
+                                    onChange={(e) => handlePl1PointsChange(parseInt(e.target.value, 10))} />
                             </div>
                         ) : (
                             <button className="points-count-cont count-cont big-title"
                                 style={{ border: `${serve ? '5px solid var(--color-3)' : ''}` }}
-                                onClick={() => setPl1Points(prev => prev + 1)}>
+                                onClick={() => handlePl1PointsChange(pl1Points+1)}>
                                 {pl1Points}
                             </button>
                         )}
@@ -220,12 +304,12 @@ const SetsCounter = ({ PORT }: Props) => {
                                     type="number"
                                     value={pl2Points}
                                     className="points-count-input count-cont big-title"
-                                    onChange={(e) => setPl2Points(parseInt(e.target.value, 10))} />
+                                    onChange={(e) => handlePl2PointsChange(parseInt(e.target.value, 10))} />
                             </div>
                         ) : (
                             <button className="points-count-cont count-cont big-title"
                                 style={{ border: `${!serve ? '5px solid var(--color-3)' : ''}` }}
-                                onClick={() => setPl2Points(prev => prev + 1)}>
+                                onClick={() => handlePl2PointsChange(pl2Points+1)}>
                                 {pl2Points}
                             </button>
                         )}
