@@ -125,10 +125,10 @@ func (s *SetRepository) Update(set models.Set) (*models.Set, error) {
 }
 
 func (s *SetRepository) Exists(set models.Set) (bool, error) {
-	query := `SELECT COUNT(*) FROM sets WHERE match_id = ? AND set_number = ? AND player_1_score = ? AND player_2_score = ?`
+	query := `SELECT COUNT(*) FROM sets WHERE match_id = ? AND set_number = ?`
 
 	var count int
-	err := s.store.Db.QueryRow(query, set.MatchID, set.SetNumber, set.Player1_Score, set.Player2_Score).Scan(&count)
+	err := s.store.Db.QueryRow(query, set.MatchID, set.SetNumber).Scan(&count)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return false, nil
