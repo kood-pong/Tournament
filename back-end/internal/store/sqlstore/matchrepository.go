@@ -121,3 +121,25 @@ func (m *MatchRepository) ChangeSetsToWin(setsToWin, current_round int, tourname
 
 	return nil
 }
+
+func (m *MatchRepository) GetAllSets(match_id string) ([]models.Set, error) {
+	query := `SELECT * FROM sets WHERE match_id = ?`
+
+	var sets []models.Set
+
+	rows, err := m.store.Db.Query(query, match_id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var set models.Set
+		if err := rows.Scan(&set.ID, &set.SetNumber, &set.MatchID, &set.Player1_Score, &set.Player2_Score); err != nil {
+			return nil, err
+		}
+		sets = append(sets, set)
+	}
+
+	return sets, nil
+}

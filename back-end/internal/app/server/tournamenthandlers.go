@@ -426,7 +426,6 @@ func (s *server) calcResults() http.HandlerFunc {
 			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
-		fmt.Println("ONDASDAS", ongoingMatches)
 
 		for _, match := range ongoingMatches {
 			s.store.Set().DetermineWinner(match.ID); 
@@ -441,6 +440,40 @@ func (s *server) calcResults() http.HandlerFunc {
 		s.respond(w, http.StatusOK, Response{
 			Message: "Calculated results",
 			Data: ongoingMatches,
+		})
+	}
+}
+
+func (s *server) getRegisteredUsers() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tournament_id := r.PathValue("tournament_id")
+
+		users, err := s.store.Tournament().GetParticipants(tournament_id)
+		if err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		s.respond(w, http.StatusOK, Response{
+			Message: "Successfully retrieved registered users",
+			Data: users,
+		})
+	}
+}
+
+func (s *server) getSets() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		match_id := r.PathValue("id")
+
+		sets, err := s.store.Match().GetAllSets(match_id)
+		if err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		s.respond(w, http.StatusOK, Response{
+			Message: "Successfully retrieved sets",
+			Data: sets,
 		})
 	}
 }
