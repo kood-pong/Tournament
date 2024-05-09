@@ -10,6 +10,7 @@ import { User } from "../models/user";
 import BackIcon from "./assets/Back";
 import EditIcon from "./assets/Edit";
 import TickIcon from "./assets/Tick";
+import { Set } from "../models/set";
 
 interface Props {
     PORT: string;
@@ -32,7 +33,7 @@ const SetsCounter = ({ PORT }: Props) => {
 
     const [type, setType] = useState<number>(2);
 
-    const [sets, setSets] = useState<number[][]>([]);
+    const [sets, setSets] = useState<Set[]>([]);
 
     const [serve, setServe] = useState(true);
 
@@ -108,14 +109,16 @@ const SetsCounter = ({ PORT }: Props) => {
         }).then(async response => {
             const res = await response.json();
             console.log(res)
-            // if (response.ok) {
-            //     navigate('/');
-            // } else {
-            //     setError({
-            //         isError: true,
-            //         text: res.error
-            //     });
-            // }
+            if (response.ok) {
+                if (res.data != null) {
+                    setSets(res.data)
+                }
+            } else {
+                setError({
+                    isError: true,
+                    text: res.error
+                });
+            }
         }).catch(error => {
             console.log(error)
             setError({
@@ -158,7 +161,8 @@ const SetsCounter = ({ PORT }: Props) => {
     }
 
     const cleanPoints = () => {
-        setSets(prev => [...prev, [pl1Points, pl2Points]]);
+        let currSet = pl1WonSets + pl2WonSets
+        setSets(prev => [...prev, {player_1_score: pl1Points, player_2_score: pl2Points, set_number: currSet}]);
         setPl1Points(0)
         setPl2Points(0)
     }
@@ -235,14 +239,15 @@ const SetsCounter = ({ PORT }: Props) => {
             // Map over the outer array
             return prevSets.map((set, idx) => {
                 if (idx === index) {
-                    // Copy the current sub-array to avoid mutating the original state
-                    const updatedSet = [...set];
-                    // Update the specific element in the sub-array
-                    updatedSet[index2] = newValue;
-                    // Return the modified sub-array
+                    const updatedSet = set;
+
+                    if (index2 == 1) {
+                        updatedSet.player_1_score = newValue
+                    } else {
+                        updatedSet.player_2_score = newValue
+                    }
                     return updatedSet;
                 }
-                // Return other sub-arrays unchanged
                 return set;
             });
         });
@@ -327,20 +332,20 @@ const SetsCounter = ({ PORT }: Props) => {
 
                                     <input
                                         type="number"
-                                        value={item[0]}
+                                        value={item.player_1_score}
                                         className="sets-input text"
                                         onChange={(e) => handleSetsEdit(parseInt(e.target.value, 10), index, 0)} />
                                 ) : (
-                                    <span>{item[0]}</span>
+                                    <span>{item.player_1_score}</span>
                                 )} -
                                 {isEditMode ? (
                                     <input
                                         type="number"
-                                        value={item[1]}
+                                        value={item.player_2_score}
                                         className="sets-input text"
                                         onChange={(e) => handleSetsEdit(parseInt(e.target.value, 10), index, 1)} />
                                 ) : (
-                                    <span>{item[1]}</span>
+                                    <span>{item.player_2_score}</span>
                                 )}
                             </div>
                         ))}
