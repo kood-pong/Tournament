@@ -51,32 +51,9 @@ func (s *SetRepository) Create(set *models.Set) (*models.Set, error) {
 }
 
 func (s *SetRepository) DetermineWinner(match_id string) error {
-	query := `
-	SELECT
-		CASE
-			WHEN SUM(CASE WHEN s.player_1_score > s.player_2_score THEN 1 ELSE 0 END) >= m.sets_to_win THEN m.player_1
-			WHEN SUM(CASE WHEN s.player_2_score > s.player_1_score THEN 1 ELSE 0 END) >= m.sets_to_win THEN m.player_2
-			ELSE NULL
-		END AS winner_id,
-		CASE
-			WHEN SUM(CASE WHEN s.player_1_score > s.player_2_score THEN 1 ELSE 0 END) >= m.sets_to_win THEN m.player_2
-			WHEN SUM(CASE WHEN s.player_2_score > s.player_1_score THEN 1 ELSE 0 END) >= m.sets_to_win THEN m.player_1
-			ELSE NULL
-		END AS loser_id
-	FROM sets s
-	JOIN matches m ON s.match_id = m.id
-	WHERE m.id = ?;
-	`
-
-	var winnerID, loserID sql.NullString
-
-	err := s.store.Db.QueryRow(query, match_id).Scan(&winnerID, &loserID)
+	winnerID, loserID, err := s.GetWinnerAndLoserId(match_id)
 	if err != nil {
-		return fmt.Errorf("error determining winner and loser: %v", err)
-	}
-
-	if !winnerID.Valid && !loserID.Valid {
-		return errors.New("no winner or loser determined")
+		return nil
 	}
 
 	match, err := s.store.Match().Get(match_id)
@@ -86,7 +63,7 @@ func (s *SetRepository) DetermineWinner(match_id string) error {
 
 	//Calculate the weight/points accordingly
 	//get current winner lose number
-	loseCount, err := s.store.Result().UserLosses(winnerID.String, match.TournamentID)
+	loseCount, err := s.store.Result().UserLosses(winnerID, match.TournamentID)
 	if err != nil {
 		return err
 	}
@@ -94,8 +71,8 @@ func (s *SetRepository) DetermineWinner(match_id string) error {
 	//Adding the stuff to database
 	result := &models.Result{
 		MatchID:  match_id,
-		WinnerID: winnerID.String,
-		LoserID:  loserID.String,
+		WinnerID: winnerID,
+		LoserID:  loserID,
 		Points:   (match.CurrentRound * 1000) / (loseCount + 1),
 	}
 	err = s.store.Result().Create(result)
@@ -175,4 +152,36 @@ func (s *SetRepository) CurrentSets(set models.Set) (int, error) {
 	}
 
 	return sets, nil
+}
+
+func (s *SetRepository) GetWinnerAndLoserId(match_id string) (string, string, error) {
+	query := `
+	SELECT
+		CASE
+			WHEN SUM(CASE WHEN s.player_1_score > s.player_2_score THEN 1 ELSE 0 END) >= m.sets_to_win THEN m.player_1
+			WHEN SUM(CASE WHEN s.player_2_score > s.player_1_score THEN 1 ELSE 0 END) >= m.sets_to_win THEN m.player_2
+			ELSE NULL
+		END AS winner_id,
+		CASE
+			WHEN SUM(CASE WHEN s.player_1_score > s.player_2_score THEN 1 ELSE 0 END) >= m.sets_to_win THEN m.player_2
+			WHEN SUM(CASE WHEN s.player_2_score > s.player_1_score THEN 1 ELSE 0 END) >= m.sets_to_win THEN m.player_1
+			ELSE NULL
+		END AS loser_id
+	FROM sets s
+	JOIN matches m ON s.match_id = m.id
+	WHERE m.id = ?;
+	`
+
+	var winnerID, loserID sql.NullString
+
+	err := s.store.Db.QueryRow(query, match_id).Scan(&winnerID, &loserID)
+	if err != nil {
+		return winnerID.String, loserID.String, fmt.Errorf("error determining winner and loser: %v", err)
+	}
+
+	if !winnerID.Valid && !loserID.Valid {
+		return winnerID.String, loserID.String ,errors.New("no winner or loser determined")
+	}
+
+	return winnerID.String, loserID.String, nil
 }
