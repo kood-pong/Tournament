@@ -24,12 +24,16 @@ const TournamentSetUp = ({ PORT }: Props) => {
                 const res = await response.json()
                 console.log(res)
                 if (response.ok) {
-                    res.data.forEach((item: { id: string | undefined; }) => {
-                        if (item.id === tid) {
-                            setState(true);
-                            return
-                        }
-                    });
+                    if (res.data != null) {
+                        res.data.forEach((item: { id: string | undefined; }) => {
+                            if (item.id === tid) {
+                                setState(true);
+                                return
+                            }
+                        });
+                    } else {
+                        navigate(`/tournament/${tid}`);
+                    }
                 } else {
                     console.error(res.error)
                 }
@@ -67,6 +71,7 @@ const TournamentSetUp = ({ PORT }: Props) => {
                 console.log(error)
             });
         } else {
+            console.log('generate')
             await fetch(`${PORT}/api/v1/jwt/admin/tournaments/generate`, {
                 method: 'POST',
                 credentials: 'include',
@@ -74,6 +79,7 @@ const TournamentSetUp = ({ PORT }: Props) => {
                 body: JSON.stringify({ tournament_id: tid, sets_to_win: type }),
             }).then(async response => {
                 const res = await response.json()
+                console.log(res)
                 if (response.ok) {
                     navigate(`/tournament/${tid}/matches`);
                 } else {

@@ -43,6 +43,8 @@ const SetsCounter = ({ PORT }: Props) => {
 
     const [winner, setWinner] = useState();
 
+    const [setNum, setSetNum] = useState(1);
+
     useEffect(() => {
         const getMatch = async () => {
             await fetch(`${PORT}/api/v1/jwt/admin/tournaments/match/${id}`, {
@@ -53,8 +55,6 @@ const SetsCounter = ({ PORT }: Props) => {
                 console.log(res)
                 if (response.ok) {
                     if (res != null) {
-                        setMatch(res.data.match);
-
                         if (res.data.sets != null) {
                             let setsList = res.data.sets;
 
@@ -65,6 +65,10 @@ const SetsCounter = ({ PORT }: Props) => {
                                 setCurrSetId(setsList[setsList.length - 1].id)
                                 setPl1Points(setsList[setsList.length - 1].player_1_score)
                                 setPl2Points(setsList[setsList.length - 1].player_2_score)
+                                setSetNum(setsList.length)
+                                console.log('am I here', setsList.length, setNum)
+                            } else {
+                                setSetNum(setsList.length + 1)
                             }
 
                             setPl1WonSets(0);
@@ -78,6 +82,7 @@ const SetsCounter = ({ PORT }: Props) => {
                                 }
                             });
                         }
+                        setMatch(res.data.match);
                     }
                 } else {
                     throw new Error(res.error);
@@ -93,7 +98,7 @@ const SetsCounter = ({ PORT }: Props) => {
         if (match != null && match?.player_2 && match?.player_1) {
             takePlayer2();
             takePlayer1();
-            handleSetCreation();
+            handleSetCreation(setNum);
         }
     }, [match])
 
@@ -130,7 +135,12 @@ const SetsCounter = ({ PORT }: Props) => {
     }
 
     useEffect(() => {
-        handleChangePoints();
+        if (pl1Points != 0 || pl2Points != 0) {
+            console.log(setNum)
+            handleChangePoints()
+        }
+
+        let isOver = false
         if ((pl1Points + pl2Points) % 2 === 0) {
             setServe(prev => !prev);
         }
@@ -140,9 +150,7 @@ const SetsCounter = ({ PORT }: Props) => {
                 const newPl1WonSets = prev + 1;
                 if (newPl1WonSets === type || pl2WonSets === type) {
                     setMatchOver(true);
-                } else {
-                    cleanPoints();
-                    handleSetCreation();
+                    isOver = true
                 }
                 return newPl1WonSets;
             });
@@ -151,26 +159,28 @@ const SetsCounter = ({ PORT }: Props) => {
                 const newPl2WonSets = prev + 1;
                 if (pl1WonSets === type || newPl2WonSets === type) {
                     setMatchOver(true);
-                } else {
-                    cleanPoints();
-                    handleSetCreation();
+                    isOver = true
                 }
                 return newPl2WonSets;
             });
         }
+
+        if ((pl1Points === 11 || pl2Points === 11) && !isOver) {
+            cleanPoints();
+            handleSetCreation(setNum+1);
+            setSetNum(prev => prev + 1)
+        }
     }, [pl1Points, pl2Points]);
 
 
+
     const cleanPoints = () => {
-        console.log('am I here')
-        let currSet = pl1WonSets + pl2WonSets
-        setSets(prev => [...prev, { id: currSetId, player_1_score: pl1Points, player_2_score: pl2Points, set_number: currSet }]);
+        setSets(prev => [...prev, { id: currSetId, player_1_score: pl1Points, player_2_score: pl2Points, set_number: setNum }]);
         setPl1Points(0)
         setPl2Points(0)
     }
 
-    const handleSetCreation = async () => {
-        let currSet = pl1WonSets + pl2WonSets + 1
+    const handleSetCreation = async (currSet: number) => {
         console.log(currSet)
 
         await fetch(`${PORT}/api/v1/jwt/admin/tournaments/set/create`, {
@@ -261,8 +271,9 @@ const SetsCounter = ({ PORT }: Props) => {
         setMatchOver(prev => !prev)
     }
 
-    const handleMatchOver = () => {
-        console.log('Match over')
+    const handleMatchOver = async () => {
+        console.log('Match over')        
+        navigate(`/tournament/${tid}/matches`)
     }
 
     const toogleEditMode = () => {
@@ -288,7 +299,7 @@ const SetsCounter = ({ PORT }: Props) => {
                         {isEditMode ? (
                             <div
                                 className="points-count-cont count-cont big-title"
-                                style={{ border: `${serve && match?.status !== 'completed' ? '5px solid var(--color-3)' : ''}` }}>
+                                style={{ border: `${serve && !isMatchOver ? '5px solid var(--color-3)' : ''}` }}>
                                 <input
                                     type="number"
                                     value={pl1Points}
@@ -297,7 +308,7 @@ const SetsCounter = ({ PORT }: Props) => {
                             </div>
                         ) : (
                             <button className="points-count-cont count-cont big-title"
-                                style={{ border: `${serve && match?.status !== 'completed' ? '5px solid var(--color-3)' : ''}` }}
+                                style={{ border: `${serve && !isMatchOver ? '5px solid var(--color-3)' : ''}` }}
                                 onClick={() => setPl1Points(prev => prev + 1)}>
                                 {pl1Points}
                             </button>
@@ -305,7 +316,7 @@ const SetsCounter = ({ PORT }: Props) => {
                         {isEditMode ? (
                             <div
                                 className="points-count-cont count-cont big-title"
-                                style={{ border: `${!serve && match?.status !== 'completed' ? '5px solid var(--color-3)' : ''}` }}>
+                                style={{ border: `${!serve && !isMatchOver ? '5px solid var(--color-3)' : ''}` }}>
                                 <input
                                     type="number"
                                     value={pl2Points}
@@ -314,7 +325,7 @@ const SetsCounter = ({ PORT }: Props) => {
                             </div>
                         ) : (
                             <button className="points-count-cont count-cont big-title"
-                                style={{ border: `${!serve && match?.status !== 'completed' ? '5px solid var(--color-3)' : ''}` }}
+                                style={{ border: `${!serve && !isMatchOver ? '5px solid var(--color-3)' : ''}` }}
                                 onClick={() => setPl2Points(prev => prev + 1)}>
                                 {pl2Points}
                             </button>
@@ -352,7 +363,7 @@ const SetsCounter = ({ PORT }: Props) => {
                         ))}
                     </div>
                     <div className="edit-cont">
-                        {isEditMode && match?.status !== 'completed' ? (
+                        {isEditMode && !isMatchOver ? (
                             <div className="edit-panel text">
                                 <label htmlFor="select-input">Serve:</label>
                                 <select className="text" id="select-input" value={serve ? `true` : `false`} onChange={(event) => setServe(event.target.value == 'true' ? true : false)}>
