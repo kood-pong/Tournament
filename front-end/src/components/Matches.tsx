@@ -47,7 +47,7 @@ const Matches = ({ PORT }: Props) => {
         if (matches != null) {
             let buff = true
             matches.forEach((item) => {
-                if (item.status != 'completed') {
+                if (item.status != 'completed1') {
                     buff = false
                     return
                 }
@@ -63,7 +63,6 @@ const Matches = ({ PORT }: Props) => {
     const handleMatchOver = async () => {
         console.log('Round over')
 
-        // /api/v1/jwt/admin/tournaments/calculate/
         await fetch(`${PORT}/api/v1/jwt/admin/tournaments/calculate/${tid}`, {
             method: 'GET',
             credentials: 'include'

@@ -60,7 +60,7 @@ const TableEntity = ({PORT, match, tableId }: Props) => {
             <div className="text col">{tableId}</div>
             <div className="text col tryper">{player1?.first_name} {player1?.last_name}</div>
             <div className="text col tryper">{player2?.first_name} {player2?.last_name}</div>
-            <div className="text col">{match.status === 'completed' ? 'Yes' : 'No'}</div>
+            <div className="text col">{match.status === 'completed1' ? 'Yes' : 'No'}</div>
         </a>
     );
 }

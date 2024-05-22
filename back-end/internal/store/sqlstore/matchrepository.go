@@ -27,7 +27,7 @@ func (m *MatchRepository) Create(match models.Match) (*models.Match, error) {
 }
 
 func (m *MatchRepository) FindOngoing(tournament_id string) ([]models.Match, error) {
-	query := `SELECT * FROM matches as m WHERE tournament_id = ? AND (status = "ongoing" OR STATUS = "completed")`
+	query := `SELECT * FROM matches as m WHERE tournament_id = ? AND (status = "ongoing" OR STATUS = "completed" OR STATUS = "completed1")`
 
 	var matches []models.Match
 	rows, err := m.store.Db.Query(query, tournament_id)

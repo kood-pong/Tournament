@@ -99,6 +99,12 @@ const SetsCounter = ({ PORT }: Props) => {
             takePlayer2();
             takePlayer1();
             handleSetCreation(setNum);
+            setType(match.sets_to_win)
+            // TODO
+            if (match.sets_to_win === pl1WonSets || match.sets_to_win === pl2WonSets){
+                setMatchOver(true)
+                setEditMode(true)
+            }
         }
     }, [match])
 
@@ -137,7 +143,7 @@ const SetsCounter = ({ PORT }: Props) => {
     useEffect(() => {
         if (pl1Points != 0 || pl2Points != 0) {
             console.log(setNum)
-            handleChangePoints()
+            handleChangePoints(currSetId ,pl1WonSets + pl2WonSets + 1, pl1Points, pl2Points)
         }
 
         let isOver = false
@@ -145,7 +151,7 @@ const SetsCounter = ({ PORT }: Props) => {
             setServe(prev => !prev);
         }
 
-        if (pl1Points === 11) {
+        if (pl1Points >= 11 && Math.abs(pl1Points - pl2Points) >= 2) {
             setPl1WonSets(prev => {
                 const newPl1WonSets = prev + 1;
                 if (newPl1WonSets === type || pl2WonSets === type) {
@@ -154,7 +160,7 @@ const SetsCounter = ({ PORT }: Props) => {
                 }
                 return newPl1WonSets;
             });
-        } else if (pl2Points === 11) {
+        } else if (pl2Points >= 11 && Math.abs(pl1Points - pl2Points) >= 2) {
             setPl2WonSets(prev => {
                 const newPl2WonSets = prev + 1;
                 if (pl1WonSets === type || newPl2WonSets === type) {
@@ -165,14 +171,12 @@ const SetsCounter = ({ PORT }: Props) => {
             });
         }
 
-        if ((pl1Points === 11 || pl2Points === 11) && !isOver) {
+        if ((pl1Points >= 11 || pl2Points >= 11) && !isOver && Math.abs(pl1Points - pl2Points) >= 2) {
             cleanPoints();
             handleSetCreation(setNum+1);
             setSetNum(prev => prev + 1)
         }
     }, [pl1Points, pl2Points]);
-
-
 
     const cleanPoints = () => {
         setSets(prev => [...prev, { id: currSetId, player_1_score: pl1Points, player_2_score: pl2Points, set_number: setNum }]);
@@ -190,8 +194,8 @@ const SetsCounter = ({ PORT }: Props) => {
             body: JSON.stringify({
                 set_number: currSet,
                 match_id: id,
-                player_1_score: pl1Points,
-                player_2_score: pl2Points,
+                player_1_score: 0,
+                player_2_score: 0,
             }),
         }).then(async response => {
             const res = await response.json();
@@ -213,26 +217,23 @@ const SetsCounter = ({ PORT }: Props) => {
         });
     }
 
-    const handleChangePoints = async () => {
-        let currSet = pl1WonSets + pl2WonSets + 1
-
+    const handleChangePoints = async (setId: string, currSet: number, pl1p: number, pl2p: number) => {
         await fetch(`${PORT}/api/v1/jwt/admin/tournaments/set/update`, {
             method: "PUT",
             credentials: "include",
             headers: { "Content-Type": "appliction/json" },
             body: JSON.stringify({
-                id: currSetId,
+                id: setId,
+                // TODO put the right currSet for edit mode 
                 set_number: currSet,
                 match_id: id,
-                player_1_score: pl1Points,
-                player_2_score: pl2Points,
+                player_1_score: pl1p,
+                player_2_score: pl2p,
             }),
         }).then(async response => {
             const res = await response.json();
             console.log(res)
-            if (response.ok) {
-                // navigate('/');
-            } else {
+            if (!response.ok) {
                 setError({
                     isError: true,
                     text: res.error
@@ -249,17 +250,17 @@ const SetsCounter = ({ PORT }: Props) => {
 
     const handleSetsEdit = (newValue: number, index: number, index2: number) => {
         setSets(prevSets => {
-            // Map over the outer array
             return prevSets.map((set, idx) => {
+                console.log(newValue, index, index2, set, idx)
                 if (idx === index) {
                     const updatedSet = set;
 
                     if (index2 == 1) {
-                        http://localhost:3000/tournament/tournament2/matches
                         updatedSet.player_1_score = newValue
                     } else {
                         updatedSet.player_2_score = newValue
                     }
+                    handleChangePoints(updatedSet.id, index+1, updatedSet.player_1_score, updatedSet.player_2_score)
                     return updatedSet;
                 }
                 return set;
@@ -273,7 +274,30 @@ const SetsCounter = ({ PORT }: Props) => {
 
     const handleMatchOver = async () => {
         console.log('Match over')        
-        navigate(`/tournament/${tid}/matches`)
+        await fetch(`${PORT}/api/v1/jwt/admin/tournaments/match/update`, {
+            method: "PUT",
+            credentials: "include",
+            headers: { "Content-Type": "appliction/json" },
+            body: JSON.stringify({
+                id: match ? match.id : '',
+                status: 'completed1',
+                tournament_id: '1',
+                player_1: '1',
+                player_2: '2',
+            }),
+        }).then(async response => {
+            const res = await response.json();
+            console.log(res)
+            if (response.ok) {
+                navigate(`/tournament/${tid}/matches`)
+            }
+        }).catch(error => {
+            console.log(error)
+            setError({
+                isError: true,
+                text: 'Error'
+            });
+        });
     }
 
     const toogleEditMode = () => {
@@ -346,7 +370,7 @@ const SetsCounter = ({ PORT }: Props) => {
                                         type="number"
                                         value={item.player_1_score}
                                         className="sets-input text"
-                                        onChange={(e) => handleSetsEdit(parseInt(e.target.value, 10), index, 0)} />
+                                        onChange={(e) => handleSetsEdit(parseInt(e.target.value, 10), index, 1)} />
                                 ) : (
                                     <span>{item.player_1_score}</span>
                                 )} -
@@ -355,7 +379,7 @@ const SetsCounter = ({ PORT }: Props) => {
                                         type="number"
                                         value={item.player_2_score}
                                         className="sets-input text"
-                                        onChange={(e) => handleSetsEdit(parseInt(e.target.value, 10), index, 1)} />
+                                        onChange={(e) => handleSetsEdit(parseInt(e.target.value, 10), index, 2)} />
                                 ) : (
                                     <span>{item.player_2_score}</span>
                                 )}
@@ -383,7 +407,7 @@ const SetsCounter = ({ PORT }: Props) => {
                     </div>
                 </div>
             </div>
-            {isMatchOver ? (
+            {isMatchOver && !isEditMode? (
                 <div className="back-rect">
                     <div className="popup">
                         <h1 className="title-1">Match Over</h1>

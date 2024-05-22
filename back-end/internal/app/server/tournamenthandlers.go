@@ -26,7 +26,7 @@ type RequestBody struct {
 type RequestBodyUpdate struct {
 	TournamentID string `json:"tournament_id" validate:"required"`
 	NumberOfSets int    `json:"sets_to_win" validate:"required"`
-	CurrentRound int `json:"current_round" validate:"required"`
+	CurrentRound int    `json:"current_round" validate:"required"`
 }
 
 func (s *server) tournamentCreate() http.HandlerFunc {
@@ -428,7 +428,7 @@ func (s *server) calcResults() http.HandlerFunc {
 		}
 
 		for _, match := range ongoingMatches {
-			s.store.Set().DetermineWinner(match.ID); 
+			s.store.Set().DetermineWinner(match.ID)
 		}
 
 		ongoingMatches, err = s.store.Match().FindOngoing(tournament_id)
@@ -436,10 +436,36 @@ func (s *server) calcResults() http.HandlerFunc {
 			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
-		
+
+		t, err := s.store.Tournament().Get(tournament_id)
+		if err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		winners, err := s.store.Result().GetWinners(tournament_id)
+		if err != nil {
+			s.error(w, http.StatusUnprocessableEntity, err)
+			return
+		}
+		if len(winners) == 1 {
+			//finish tournament
+			t.Status = "finished"
+			_, err = s.store.Tournament().Update(t)
+			if err != nil {
+				s.error(w, http.StatusUnprocessableEntity, err)
+				return
+			}
+			s.respond(w, http.StatusOK, Response{
+				Message: "Tournament is done",
+				Data:    true,
+			})
+			return
+		}
+
 		s.respond(w, http.StatusOK, Response{
 			Message: "Calculated results",
-			Data: ongoingMatches,
+			Data:    ongoingMatches,
 		})
 	}
 }
@@ -456,7 +482,7 @@ func (s *server) getRegisteredUsers() http.HandlerFunc {
 
 		s.respond(w, http.StatusOK, Response{
 			Message: "Successfully retrieved registered users",
-			Data: users,
+			Data:    users,
 		})
 	}
 }
@@ -473,7 +499,7 @@ func (s *server) getSets() http.HandlerFunc {
 
 		s.respond(w, http.StatusOK, Response{
 			Message: "Successfully retrieved sets",
-			Data: sets,
+			Data:    sets,
 		})
 	}
 }
