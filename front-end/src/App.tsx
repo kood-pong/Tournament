@@ -15,7 +15,7 @@ import Authentication from "./components/Authentication/Authentication";
 import { AuthProvider } from './components/contexts/AuthContext';
 import SetsCounter from "./components/SetsCounter";
 
-const PORT: string = 'http://localhost:7080'
+const PORT: string = '34.207.119.186:7080'
 
 function App() {
 
