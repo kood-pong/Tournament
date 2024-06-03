@@ -213,6 +213,16 @@ func (s *server) userRegister() http.HandlerFunc {
 			s.error(w, http.StatusUnprocessableEntity, err)
 			return
 		}
+
+		user, err := s.store.User().FindByID(requestBody.UserID)
+		if err != nil {
+			fmt.Println("Error while trying to get user info to send an email", err)
+		}
+
+		if err := s.sendEmailHTML("kood/Pong registration", user.FirstName, []string{user.Email}); err != nil {
+			fmt.Println("Error sending a email", err)
+		}
+
 		s.respond(w, http.StatusOK, Response{
 			Message: fmt.Sprintf(`User successfully %v`, requestBody.Status),
 			Data:    nil,

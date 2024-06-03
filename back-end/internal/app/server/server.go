@@ -1,10 +1,13 @@
 package server
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"net/smtp"
+	"text/template"
 	"tournament/back-end/internal/store"
 	"tournament/back-end/pkg/router"
 )
@@ -16,6 +19,7 @@ const (
 	bucketName      = "kood-pong-media"
 	awsAccessKey    = "AWS_ACCESS_KEY"
 	awsSecretKey    = "AWS_SECRET_KEY"
+	emailKey        = "akda rxlj rcwa nqms"
 	ctxKeyRequestID = iota
 )
 
@@ -82,7 +86,7 @@ func (s *server) configureRouter() {
 	s.router.GET("/api/v1/jwt/admin/tournaments/match/{id}", s.matchGet())
 	s.router.POST("/api/v1/jwt/admin/tournaments/set/create", s.setCreate())
 	s.router.GET("/api/v1/jwt/admin/tournaments/sets/{id}", s.tournamentSets())
-	
+
 	//----------NEWLY ADDED STUFF---------------//
 	s.router.POST("/api/v1/jwt/admin/tournaments/match/setstowin", s.updateSetsToWin())
 	s.router.PUT("/api/v1/jwt/admin/tournaments/set/update", s.updateSet())
@@ -110,6 +114,26 @@ func (s *server) respond(w http.ResponseWriter, code int, data interface{}) {
 func (s *server) decode(r *http.Request, data interface{}) error {
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 		return fmt.Errorf("decode json: %w", err)
+	}
+	return nil
+}
+
+func (s *server) sendEmailHTML(subject string, name string, to []string) error {
+	var body bytes.Buffer
+	t, err := template.ParseFiles("./configs/email.html")
+	if err != nil {
+		return err
+	}
+
+	t.Execute(&body, struct{ Name string }{Name: name})
+
+	auth := smtp.PlainAuth("", "koodpong@gmail.com", emailKey, "smtp.gmail.com")
+
+	headers := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";"
+	msg := "Subject: " + subject + "\n" + headers + "\n\n" + body.String()
+
+	if err := smtp.SendMail("smtp.gmail.com:587", auth, "koodpong@gmail.com", to, []byte(msg)); err != nil {
+		return err
 	}
 	return nil
 }
