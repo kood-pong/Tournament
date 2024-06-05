@@ -1,25 +1,31 @@
-FROM golang:1.22-alpine AS builder
+# Stage 1: Build the Go binary with CGO enabled
+FROM golang:1.22-alpine 
+
+# Install gcc and other necessary libraries
+RUN apk add --no-cache gcc musl-dev sqlite-dev
+
+# Enable CGO
+ENV CGO_ENABLED=1
 
 WORKDIR /build
 
-COPY . .
+# Copy the go.mod and go.sum files first to leverage Docker layer caching
+COPY go.mod go.sum ./
 
+# Download dependencies
 RUN go mod download
 
+# Copy the remaining source files
+COPY . .
+
+# Tidy up the modules
 RUN go mod tidy
 
-RUN apk add --no-cache sqlite-dev
-
-RUN go get github.com/mattn/go-sqlite3
-
+# Build the Go binary
 WORKDIR /build/back-end/cmd
+RUN go build 
 
-RUN go build -o ./pongapi .
+WORKDIR /build/back-end
 
-FROM gcr.io/distroless/base-debian12
+CMD ["./cmd/cmd"]
 
-WORKDIR /app
-
-COPY --from=builder /build/back-end/cmd/pongapi ./pongapi
-
-CMD ["/app/pongapi"]

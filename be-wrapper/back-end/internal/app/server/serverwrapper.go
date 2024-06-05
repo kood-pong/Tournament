@@ -12,9 +12,9 @@ import (
 	"github.com/rs/cors"
 )
 
-func Start(config *Config) error {
+func Start() error {
 	//create database
-	db, err := newDB(config.DatabaseURL, config.DatabaseSchema)
+	db, err := newDB("./internal/db/database.db", "./internal/db/schema.sql")
 	if err != nil {
 		return err
 	}
