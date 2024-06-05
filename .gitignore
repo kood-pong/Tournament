@@ -1,3 +1,4 @@
 *.exe
 back-end/build/*
 back-end/internal/db/database.db
+infrastructure/.terraform
