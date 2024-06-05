@@ -13,7 +13,7 @@ interface AuthContextType {
     logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType>({ isLoggedIn: false, curruser: null, login: function(){ }, logout: function(){} });
+const AuthContext = createContext<AuthContextType>({ isLoggedIn: false, curruser: null, login: function () { }, logout: function () { } });
 
 export const AuthProvider = ({ children, PORT }: AuthProviderProps) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -21,7 +21,7 @@ export const AuthProvider = ({ children, PORT }: AuthProviderProps) => {
 
     useEffect(() => {
         const checkLoggedIn = async () => {
-            await fetch(`http://localhost:7080/api/v1/auth/checkCookie`, {
+            await fetch(`${PORT}/api/v1/auth/checkCookie`, {
                 method: 'GET',
                 credentials: 'include', // Include cookies in the request
             }).then(async response => {
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children, PORT }: AuthProviderProps) => {
     }, []);
 
     const Getcurruser = async (id: string) => {
-        await fetch(`http://localhost:7080/api/v1/users/${id}`, {
+        await fetch(`${PORT}/api/v1/users/${id}`, {
             method: 'GET',
             credentials: 'include', // Include cookies in the request
         }).then(async json => {
